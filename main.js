@@ -9,12 +9,12 @@
 
   // feel — tweak these
   const UNIT = 1.2;          // screens of scrolling per section (higher = slower)
-  const CROP = 0.5;          // how the image fills a smaller frame: 0 = it scales to fit, 1 = it only crops
+  const CROP = 0.5;          // how much the frame crops (vs scales) mid-move: 0 = only scales, 1 = only crops; none at the ends
   // scroll lengths (in sections) for the first three moves, which need a slower pace than the rest
   const LEN_PART = 1.5;      // Avg Joe parting to the sentence
   const OPEN_LEN = 2.5;      // the image opening + Avg/Joe dropping
   const LEN_SHRINK = 1.6;    // the image cropping in to the big sentence
-  const HOLD = 0.4;          // screens of scrolling where nothing moves once the image has settled into the big sentence
+  const HOLD = 0;            // screens of scrolling where nothing moves once the image has settled into the big sentence
   const WS = 0.2;            // screens of scrolling per word on the wheel (matched to the page's scroll speed)
   const SWAP_EVERY = 85;     // px of scrolling between typeface changes in the rotation words
   const TRACK = 0.05;        // rotation words: tracking -50
@@ -302,7 +302,10 @@
     // only start to show once the gap has passed the image's edges. Fully open after that.
     // The image scales with its frame, but only part of the way (CROP): the frame also crops in and out of it.
     const w = el.hero.offsetWidth, h = el.hero.offsetHeight;
-    const iw = w + (geo.full - w) * CROP, ih = h + (geo.fullH - h) * CROP;
+    // crop is strongest mid-move and fades to nothing at both ends, so the small frame shows the whole image again
+    const pIn = gsap.utils.clamp(0, 1, (t - 1) / 0.45), pOut = gsap.utils.clamp(0, 1, t - 2);
+    const crop = CROP * (t < 2 ? Math.sin(Math.PI * pIn) : Math.sin(Math.PI * pOut));
+    const iw = w + (geo.full - w) * crop, ih = h + (geo.fullH - h) * crop;
     const ox = (w - iw) / 2, oy = (h - ih) / 2;
     heroImg.style.width = iw.toFixed(1) + 'px'; heroImg.style.height = ih.toFixed(1) + 'px';
     heroImg.style.transform = `translate(${ox.toFixed(1)}px,${oy.toFixed(1)}px)`;
