@@ -24,7 +24,7 @@
   const LEN_SHRINK = TOUCH ? 0.8 : 1.6;    // the image cropping in to the big sentence
   const EXPAND = LEN_SHRINK / OPEN_LEN;   // share of the open section the image expand takes: same scroll length as the shrink
   const HOLD = 0;            // screens of scrolling where nothing moves once the image has settled into the big sentence
-  const WS = TOUCH ? 0.32 : 0.2;            // screens of scrolling per word on the wheel (matched to the page's scroll speed)
+  const WS = TOUCH ? 0.26 : 0.2;            // screens of scrolling per word on the wheel (matched to the page's scroll speed)
   const SWAP_EVERY = 85;     // px of scrolling between typeface changes in the rotation words
   const TRACK = 0.05;        // rotation words: tracking -50
 
