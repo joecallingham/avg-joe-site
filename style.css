@@ -19,15 +19,20 @@
   --small:max(.8rem,11px);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{font-size:1vw;height:100%;background:var(--cream);overscroll-behavior:none}
-body{height:100%;overflow:hidden;background:var(--cream);color:var(--ink);
+html{font-size:1vw;background:var(--cream);overscroll-behavior:none;scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
+/* Lenis */
+html.lenis,html.lenis body{height:auto}
+.lenis:not(.lenis-autoToggle).lenis-stopped{overflow:clip}
+#scroll-space{width:1px;pointer-events:none}
+body{background:var(--cream);color:var(--ink);
   font-family:"Nuckle",system-ui,sans-serif;font-weight:500;letter-spacing:-.03em;
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overscroll-behavior:none}
 a{color:inherit;text-decoration:none}
 ul{list-style:none}
 img{display:block;max-width:100%}
 
-#stage{position:fixed;inset:0;overflow:hidden;touch-action:none}
+#stage{position:fixed;inset:0;overflow:hidden}
 .layer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
 #veil{position:fixed;inset:0;background:var(--cream);opacity:0;pointer-events:none;z-index:40}
 
@@ -46,9 +51,9 @@ img{display:block;max-width:100%}
   width:calc(var(--w)*2.5rem);margin:0 calc(var(--w)*.15rem) 0 calc(var(--w)*.6rem);position:relative;top:-.08em}
 
 /* letters that rotate through typefaces */
-.cycle{display:inline-block;white-space:nowrap;perspective:40em}
-.cy{display:inline-block;text-align:center;transform-origin:50% 55%;
-  letter-spacing:0;backface-visibility:hidden}
+.cycle{white-space:nowrap}
+/* each letter is a fixed-width, zero-height box on the baseline: any face can swap in without moving the line or its neighbours */
+.cy{display:inline-block;text-align:center;line-height:0;vertical-align:baseline;letter-spacing:0;white-space:nowrap}
 
 /* ---------- travelling image ---------- */
 #hero{position:fixed;left:0;top:0;z-index:2;overflow:hidden;width:0;height:0;border-radius:.25rem;

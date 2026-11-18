@@ -5,14 +5,16 @@
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const EASE = 'power2.inOut';
+  const EASE = 'none';       // moves follow the scroll 1:1; the settle adds the easing
 
   // feel — tweak these
-  const SMOOTH = 3.6;        // how fast the page catches up with your scroll (lower = smoother, slower)
-  const SPEED = 0.55;        // scroll input multiplier (lower = slower)
-  const SNAP_WAIT = 220;     // ms of stillness before it settles into place
-  const SNAP_PULL = 0.22;    // how far into the next section (0–1) before it carries on instead of falling back
+  const UNIT = 1;            // screens of scrolling per section (higher = slower)
+  const SETTLE_WAIT = 160;   // ms after your last scroll input before it checks whether to settle
+  const SETTLE_VELOCITY = 1.6;   // only settles once the glide is slower than this (px per frame)
+  const SETTLE_TIME = 0.9;   // seconds to ease into place
+  const SNAP_PULL = 0.25;    // how far into the next section (0-1) before it carries on instead of falling back
 
+  const TRACK = 0.05;        // rotation words: tracking -50
   const SIZE = { 'snell-black': '1.22em', kelsi: '.82em', campground: '1.08em', postoni: '.92em' };   // optical size per face
   const ROT = ['avebury', 'campground', 'gilroy-heavy', 'kelsi', 'postoni', 'iowan-black', 'iowan-black-italic', 'snell-black'];
 
@@ -53,18 +55,26 @@
         node.appendChild(s); return s;
       });
     }
-    measure() {                       // lock each letter's box so font swaps never shift the sentence
-      const fs = parseFloat(getComputedStyle(this.el).fontSize);
+    measure() {                       // each letter gets a fixed box: its resting face's width, tracked in to -50
+      const r = rem();
+      this.fs = parseFloat(getComputedStyle(this.el).fontSize);
+      this.ls.forEach((s, i) => { s.style.width = ''; this.font(s, this.final[i]); });
       const w = this.ls.map(s => s.getBoundingClientRect().width);
-      this.ls.forEach((s, i) => { s.style.width = (w[i] / fs * 1.12).toFixed(3) + 'em'; });
+      this.ls.forEach((s, i) => { s.style.width = Math.max(0.1, (w[i] - TRACK * this.fs) / r).toFixed(3) + 'rem'; });
     }
     font(s, f) { s.style.fontFamily = f ? `"r-${f}"` : ''; s.style.fontSize = SIZE[f] || ''; }
-    flip(s, f) {
-      if (RM) return this.font(s, f);
-      gsap.to(s, { rotateX: 90, duration: 0.12, ease: 'power1.in', overwrite: true, onComplete: () => {
-        this.font(s, f);
-        gsap.fromTo(s, { rotateX: -90 }, { rotateX: 0, duration: 0.22, ease: 'back.out(2.2)' });
-      } });
+    swap(i, f) {                      // the face just changes; the rest of the word gives a little bounce
+      this.font(this.ls[i], f);
+      if (RM) return;
+      const amp = this.fs * 0.08;
+      this.ls.forEach((s, k) => {
+        if (k === i) return;
+        const d = Math.abs(k - i);
+        gsap.to(s, { keyframes: [
+          { y: -amp * Math.max(0.35, 1 - d * 0.15), duration: 0.1, ease: 'power2.out' },
+          { y: 0, duration: 0.42, ease: 'bounce.out' },
+        ], delay: d * 0.03, overwrite: true });
+      });
     }
     rand() { return ROT[Math.floor(Math.random() * ROT.length)]; }
     burst() {                         // every letter flips through a few faces, then settles
@@ -73,7 +83,7 @@
       const n = 4, gap = 230;
       this.ls.forEach((s, i) => {
         for (let k = 0; k < n; k++) {
-          this.timers.push(setTimeout(() => this.flip(s, k === n - 1 ? this.final[i] : this.rand()), i * 70 + k * gap));
+          this.timers.push(setTimeout(() => this.swap(i, k === n - 1 ? this.final[i] : this.rand()), i * 70 + k * gap));
         }
       });
       this.timers.push(setTimeout(() => this.idle(), this.ls.length * 70 + n * gap + 900));
@@ -82,7 +92,7 @@
       clearInterval(this.iv);
       this.iv = setInterval(() => {
         const i = Math.floor(Math.random() * this.ls.length);
-        this.flip(this.ls[i], Math.random() < 0.2 ? '' : this.rand());
+        this.swap(i, Math.random() < 0.2 ? '' : this.rand());
       }, 1100);
     }
     stop() { this.timers.forEach(clearTimeout); this.timers = []; clearInterval(this.iv); this.iv = 0; }
@@ -157,7 +167,10 @@
 
     const wa = el.avg.offsetWidth, wj = el.joe.offsetWidth, h = el.avg.offsetHeight;
     const pad = cssPx('--pad'), gap = 0.36 * r, fr = cssPx('--frame');
-    const mid = (vh - h) / 2, low = vh - pad * 0.95 - h, jy = 0.06 * r;
+    // line Joe's baseline up with Avg's (different faces sit differently in their boxes)
+    const base = n => { const m = document.createElement('i'); m.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline'; n.appendChild(m); const y = m.offsetTop; m.remove(); return y; };
+    const jy = base(el.avg) - base(el.joe);
+    const mid = (vh - h) / 2, low = vh - pad * 0.95 - h;
     const ax0 = (vw - (wa + gap + wj)) / 2;
     return {
       vh, vw, wa, wj, gap,
@@ -197,7 +210,7 @@
     ft(el.hero, P.hero[0], P.hero[1], 0);
 
     // 1 → 2: the image fills the frame, the sentence closes up on top of it, the logo drops to its home
-    ft(el.avg, P.avg[1], P.avg[2], 1); ft(el.joe, P.joe[1], P.joe[2], 1);
+    ft(el.avg, P.avg[1], P.avg[2], 1, { duration: 0.8 }); ft(el.joe, P.joe[1], P.joe[2], 1.2, { duration: 0.8 });   // Avg leads
     ft(el.slot1, { '--w': 1 }, { '--w': 0 }, 1);
     ft(el.hero, P.hero[1], P.hero[2], 1);
     ft(el.line, { color: '#0b0b0b' }, { color: '#ffffff' }, 1.2, { duration: 0.35, ease: 'none' });
@@ -251,43 +264,28 @@
     if (wi !== shown) { shown = wi; showWorks(wi); }
   }
 
-  /* ---------- smooth scroll engine ---------- */
-  let unit = 1, endPx = 0, maxPx = 0, target = 0, cur = 0, dir = 1, idleT = 0, ready = false, veiling = false;
+  /* ---------- smooth scroll: Lenis (same settings as sumojoestudio.com) driving the timeline ---------- */
+  // The page really scrolls (a tall spacer); Lenis glides it; the scroll position plays the timeline.
+  // Once the glide has nearly stopped, it eases into the nearest resting point.
+  const lenis = new Lenis({
+    lerp: 0.055, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.085, touchInertiaExponent: 1.35, touchMultiplier: 1,
+    autoRaf: false,
+  });
+  gsap.ticker.add(t => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+
+  const spacer = $('#scroll-space');
+  let unit = 1, endPx = 0, maxPx = 0, cur = 0, idleT = 0, ready = false, veiling = false;
   function metrics() {
-    const old = unit;
-    unit = Math.max(460, Math.min(innerHeight * 0.75, 700));      // scroll distance for one section
+    const t = unit > 1 ? cur / unit : 0, past = Math.max(0, cur - endPx);
+    unit = innerHeight * UNIT;
     endPx = END * unit;
     maxPx = endPx + Math.max(0, el.cases.scrollHeight - el.cases.clientHeight);
-    const rescale = v => (v <= END * old ? v / old * unit : endPx + (v - END * old));
-    target = Math.min(maxPx, rescale(target)); cur = Math.min(maxPx, rescale(cur));
-  }
-  const clampPx = v => {               // the work section's height can change (fonts, images), so re-read it
-    maxPx = endPx + Math.max(0, el.cases.scrollHeight - el.cases.clientHeight);
-    return Math.max(0, Math.min(maxPx, v));
-  };
-  function settle() {                 // ease into the nearest resting point, leaning the way you were going
-    if (target >= endPx - 0.5) return;
-    const f = target / unit;
-    const i = RESTS.findIndex(s => s > f);
-    if (i <= 0) { target = 0; return; }
-    const a = RESTS[i - 1], b = RESTS[i], frac = (f - a) / (b - a);
-    target = (dir > 0 ? (frac > SNAP_PULL ? b : a) : (frac < 1 - SNAP_PULL ? a : b)) * unit;
-  }
-  function input(d) {
-    if (!ready || veiling || !d) return;
-    dir = Math.sign(d);
-    target = clampPx(target + d);
-    clearTimeout(idleT); idleT = setTimeout(settle, SNAP_WAIT);
-  }
-  function goTo(t) { clearTimeout(idleT); dir = t * unit >= target ? 1 : -1; target = clampPx(t * unit); }
-  function jumpTo(t) {                // nav + logo: a soft cut instead of replaying everything
-    if (veiling) return;
-    veiling = true; clearTimeout(idleT);
-    gsap.timeline()
-      .to(el.veil, { opacity: 1, duration: RM ? 0.01 : 0.45, ease: 'power2.inOut' })
-      .add(() => { target = cur = clampPx(t * unit); render(); })
-      .to(el.veil, { opacity: 0, duration: RM ? 0.01 : 0.6, ease: 'power2.inOut' })
-      .add(() => { veiling = false; });
+    spacer.style.height = (maxPx + innerHeight) + 'px';
+    lenis.resize();
+    const to = t <= END ? t * unit : endPx + past;
+    lenis.scrollTo(to, { immediate: true, force: true });
+    cur = to;
   }
   function render() {
     const t = Math.min(cur / unit, END);
@@ -295,41 +293,51 @@
     const st = Math.max(0, cur - endPx);
     if (Math.abs(el.cases.scrollTop - st) > 0.5) el.cases.scrollTop = st;
   }
-  gsap.ticker.add((_, dt) => {
-    if (!ready) return;
-    const k = RM ? 1 : 1 - Math.exp(-(dt / 1000) * SMOOTH);
-    cur += (target - cur) * k;
-    if (Math.abs(target - cur) < 0.25) cur = target;
-    render();
-  });
+  lenis.on('scroll', l => { cur = l.animatedScroll; if (ready) render(); });
 
-  addEventListener('wheel', e => {
-    if (e.ctrlKey) return;                         // pinch-zoom
-    e.preventDefault();
-    const m = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1;
-    input(e.deltaY * m * SPEED);
-  }, { passive: false });
+  const settleEase = t => 1 - Math.pow(1 - t, 3);
+  function settle() {                 // wait until the glide has nearly stopped, then ease to the nearest rest
+    if (!ready || veiling) return;
+    if (Math.abs(lenis.velocity) > SETTLE_VELOCITY) { idleT = setTimeout(settle, 60); return; }
+    const pos = lenis.targetScroll;
+    if (pos >= endPx - 0.5) return;   // in the work section: plain scrolling
+    const f = pos / unit, dir = lenis.direction || 1;
+    const i = RESTS.findIndex(s => s > f);
+    let rest = 0;
+    if (i > 0) {
+      const a = RESTS[i - 1], b = RESTS[i], frac = (f - a) / (b - a);
+      rest = dir > 0 ? (frac > SNAP_PULL ? b : a) : (frac < 1 - SNAP_PULL ? a : b);
+    }
+    if (Math.abs(rest * unit - pos) < 1) return;
+    lenis.scrollTo(rest * unit, { duration: SETTLE_TIME, easing: settleEase });
+  }
+  const touched = () => { if (!ready) return; clearTimeout(idleT); idleT = setTimeout(settle, SETTLE_WAIT); };
+  addEventListener('wheel', touched, { passive: true });
+  addEventListener('touchend', touched, { passive: true });
 
-  let ty = null;
-  addEventListener('touchstart', e => { ty = e.touches[0].clientY; }, { passive: true });
-  addEventListener('touchmove', e => {
-    if (ty === null) return;
-    const y = e.touches[0].clientY;
-    e.preventDefault(); input((ty - y) * 1.6); ty = y;
-  }, { passive: false });
-  addEventListener('touchend', () => { ty = null; }, { passive: true });
+  const inOut = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  function goTo(t) { clearTimeout(idleT); lenis.scrollTo(Math.min(maxPx, t * unit), { duration: SETTLE_TIME * 1.3, easing: inOut }); }
+  function jumpTo(t) {                // nav + logo: a soft cut instead of replaying everything
+    if (veiling) return;
+    veiling = true; clearTimeout(idleT);
+    gsap.timeline()
+      .to(el.veil, { opacity: 1, duration: RM ? 0.01 : 0.45, ease: 'power2.inOut' })
+      .add(() => { lenis.scrollTo(t * unit, { immediate: true, force: true }); cur = t * unit; render(); })
+      .to(el.veil, { opacity: 0, duration: RM ? 0.01 : 0.6, ease: 'power2.inOut' })
+      .add(() => { veiling = false; });
+  }
 
   addEventListener('keydown', e => {
     const down = ['ArrowDown', 'PageDown', ' '].includes(e.key), up = ['ArrowUp', 'PageUp'].includes(e.key);
     if (!down && !up) return;
     e.preventDefault();
-    if (e.key === 'Home') return goTo(0);
-    if (target > endPx + 1 || (down && target >= endPx - 1)) {   // in the work section: plain smooth scrolling
-      dir = down ? 1 : -1; clearTimeout(idleT);
-      target = down ? clampPx(target + innerHeight * 0.8) : Math.max(endPx, target - innerHeight * 0.8);
+    const pos = lenis.targetScroll;
+    if (pos > endPx + 1 || (down && pos >= endPx - 1)) {       // work section: smooth page-by-page
+      const to = down ? Math.min(maxPx, pos + innerHeight * 0.8) : Math.max(endPx, pos - innerHeight * 0.8);
+      lenis.scrollTo(to, { duration: 1 });
       return;
     }
-    const f = target / unit;
+    const f = pos / unit;
     const next = down ? RESTS.find(s => s > f + 0.01) : [...RESTS].reverse().find(s => s < f - 0.01);
     if (next !== undefined) goTo(next);
   });
@@ -370,7 +378,7 @@
 
   // for testing in the console
   window.__avg = {
-    goTo, jumpTo, input, RESTS,
-    get t() { return tl && tl.time(); }, get target() { return target / unit; }, get cur() { return cur / unit; },
+    goTo, jumpTo, RESTS, lenis,
+    get t() { return tl && tl.time(); }, get target() { return lenis.targetScroll / unit; }, get cur() { return cur / unit; },
   };
 })();
