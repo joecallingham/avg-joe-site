@@ -10,7 +10,10 @@
   // feel — tweak these
   const UNIT = 1.2;          // screens of scrolling per section (higher = slower)
   const CROP = 0.5;          // how the image fills a smaller frame: 0 = it scales to fit, 1 = it only crops
-  const OPEN_LEN = 1.7;      // the image opening + Avg/Joe dropping gets more scroll, so it moves at your pace
+  // scroll lengths (in sections) for the first three moves, which need a slower pace than the rest
+  const LEN_PART = 1.5;      // Avg Joe parting to the sentence
+  const OPEN_LEN = 2.5;      // the image opening + Avg/Joe dropping
+  const LEN_SHRINK = 1.6;    // the image cropping in to the big sentence
   const HOLD = 0.4;          // screens of scrolling where nothing moves once the image has settled into the big sentence
   const WS = 0.2;            // screens of scrolling per word on the wheel (matched to the page's scroll speed)
   const SWAP_EVERY = 85;     // px of scrolling between typeface changes in the rotation words
@@ -365,7 +368,7 @@
   let unit = 1, endPx = 0, maxPx = 0, cur = 0, ready = false, veiling = false, brandOn = false, travel = 0;
   // scroll position <-> timeline time; section 1->2 is OPEN_LEN screens long, every other section one screen
   // knots of [timeline time, screens scrolled]: section 1-2 is OPEN_LEN long, and there is a HOLD at 3 (a pause on the big sentence)
-  const KNOTS = () => [[0, 0], [1, 1], [2, 1 + OPEN_LEN], [3, 2 + OPEN_LEN], [3, 2 + OPEN_LEN + HOLD], [END, END - 1 + OPEN_LEN + HOLD]];
+  const KNOTS = () => { const a = LEN_PART, b = a + OPEN_LEN, c = b + LEN_SHRINK, d = c + HOLD; return [[0, 0], [1, a], [2, b], [3, c], [3, d], [END, d + END - 3]]; };
   const pxOf = t => { const k = KNOTS(); for (let i = 1; i < k.length; i++) { const [t0, s0] = k[i - 1], [t1, s1] = k[i]; if (t <= t1 && t1 > t0) return unit * (s0 + (t - t0) / (t1 - t0) * (s1 - s0)); } const [tl1, sl1] = k[k.length - 1]; return unit * (sl1 + t - tl1); };
   const tOf = px => { const s = px / unit, k = KNOTS(); for (let i = 1; i < k.length; i++) { const [t0, s0] = k[i - 1], [t1, s1] = k[i]; if (s <= s1) return s1 > s0 ? t0 + (s - s0) / (s1 - s0) * (t1 - t0) : t1; } const [tl1, sl1] = k[k.length - 1]; return tl1 + s - sl1; };
   function metrics() {
@@ -419,8 +422,9 @@
   function autoOpen() {
     if (autoing || autoDone || veiling) return;
     const pos = lenis.targetScroll, dir = lenis.direction;
-    if (dir <= 0 || pos <= 2 || pos >= unit - 2 || lenis.animatedScroll > unit * 0.5) return;   // only opening, from the top
-    const to = unit, from = lenis.animatedScroll, dist = Math.abs(to - from);
+    const open = pxOf(1);
+    if (dir <= 0 || pos <= 2 || pos >= open - 2 || lenis.animatedScroll > open * 0.5) return;   // only opening, from the top
+    const to = open, from = lenis.animatedScroll, dist = Math.abs(to - from);
     if (dist < 2) return;
     const v = Math.max(1, Math.abs(lenis.velocity) * 60);                 // px per second, roughly
     const dur = RM ? 0.01 : Math.max(0.9, Math.min(2.2, 1.5 * dist / v));
