@@ -156,7 +156,7 @@ img{display:block;max-width:100%}
 /* the bar + notch are cut out of images in main.js (cutImages), so only images show them */
 #nav{position:fixed;left:50%;bottom:calc(var(--frame) - 1px);transform:translateX(-50%);z-index:50}
 /* one soft shape: big rounded shoulders that flare out into the bottom edge */
-.notch{position:relative;width:21rem;height:2.6rem;display:flex;align-items:center;justify-content:center;gap:1.6rem;padding-top:.3rem}
+.notch{position:relative;width:26.5rem;height:2.6rem;display:flex;align-items:center;justify-content:center;gap:1.6rem;padding-top:.3rem}
 .notch svg{position:absolute;inset:0;width:100%;height:100%;fill:none;overflow:visible;display:block}
 /* three plain buttons; the middle one changes its words with where you are */
 .nb{position:relative;font-size:var(--small);letter-spacing:-.02em;line-height:1.6;padding:.2rem 0;color:#8e8b86;transition:color .35s}
@@ -184,7 +184,7 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
   .case-620 .txt,.case-620 figure{grid-column:1/-1}
   .case-620{padding-bottom:9rem}
   .case-620 h2{font-size:3.6rem}
-  .notch{width:30rem;height:3.6rem;gap:1.8rem}
+  .notch{width:36rem;height:3.6rem;gap:1.8rem}
   .nb[data-k="studio"]{min-width:9.5rem}
 }
 
