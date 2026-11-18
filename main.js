@@ -1,21 +1,19 @@
-/* Avg Joe — scroll-driven. Scrolling scrubs one timeline forwards and backwards;
-   when you stop, it eases into the nearest resting point. Smooth (lerped) scroll throughout.
-   Rests: 0 logo · 1 sentence · 2 full image · 3 big sentence · 4… services wheel (one rest per word) · end: work */
+/* Avg Joe — scroll-driven. Lenis glides the real page scroll (same settings as sumojoestudio.com)
+   and the scroll position plays one timeline 1:1, forwards and backwards. No locking: it's continuous.
+   Sections: 0 logo · 1 sentence · 2 full image · 3 big sentence · 4… services wheel · end: work */
 (() => {
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const EASE = 'none';       // moves follow the scroll 1:1; the settle adds the easing
+  const EASE = 'none';       // moves follow the scroll 1:1
 
   // feel — tweak these
   const UNIT = 1;            // screens of scrolling per section (higher = slower)
-  const SETTLE_WAIT = 160;   // ms after your last scroll input before it checks whether to settle
-  const SETTLE_VELOCITY = 1.6;   // only settles once the glide is slower than this (px per frame)
-  const SETTLE_TIME = 0.9;   // seconds to ease into place
-  const SNAP_PULL = 0.25;    // how far into the next section (0-1) before it carries on instead of falling back
-
+  const WS = 0.2;            // screens of scrolling per word on the wheel (matched to the page's scroll speed)
+  const SWAP_EVERY = 70;     // px of scrolling between typeface changes in the rotation words
   const TRACK = 0.05;        // rotation words: tracking -50
-  const SIZE = { 'snell-black': '1.22em', kelsi: '.82em', campground: '1.08em', postoni: '.92em' };   // optical size per face
+
+  const SIZE = { 'snell-black': 1.22, kelsi: 0.82, campground: 1.08, postoni: 0.92 };   // optical size per face
   const ROT = ['avebury', 'campground', 'gilroy-heavy', 'kelsi', 'postoni', 'iowan-black', 'iowan-black-italic', 'snell-black'];
 
   // Services on the wheel, each with the work that pops in beside it.
@@ -36,6 +34,7 @@
     avg: $('#logo-avg'), joe: $('#logo-joe'), line: $('#s-line'), slot1: $('#slot1'), hero: $('#hero'),
     big: $('#s-big'), slot2: $('#slot2'), wheel: $('#s-wheel'), wbg: $('#wheel-bg'), list: $('#wheel-list'),
     works: $('#works'), cases: $('#s-cases'), veil: $('#veil'), track: $('.track'), strip: $('.strip'),
+    notch: $('.notch'),
   };
 
   const wp = { v: -3 };
@@ -43,68 +42,70 @@
   const cssPx = n => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n)) * rem();
 
   /* ---------- letters that rotate through typefaces ---------- */
+  // Each letter sits in a fixed, zero-height box (its resting width), so nothing outside the word ever moves.
+  // When a letter changes face, the letters slide sideways to re-space the word around it.
+  const meter = document.createElement('span');
+  meter.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre;letter-spacing:0;line-height:1';
+  document.body.appendChild(meter);
+  const advCache = new Map();
+  function advance(ch, face, fs) {
+    const key = `${face}|${ch}|${fs}`;
+    if (!advCache.has(key)) {
+      meter.style.fontFamily = face ? `"r-${face}"` : '"Nuckle"';
+      meter.style.fontSize = fs * (SIZE[face] || 1) + 'px';
+      meter.textContent = ch;
+      advCache.set(key, meter.getBoundingClientRect().width);
+    }
+    return advCache.get(key);
+  }
+
   class Cycler {
     constructor(node) {
-      this.el = node; this.timers = []; this.iv = 0;
-      const text = node.textContent.trim();
+      this.el = node; this.n = 0;
+      this.text = node.textContent.trim();
       this.final = (node.dataset.final || '').split(',');
-      node.textContent = ''; node.setAttribute('role', 'text'); node.setAttribute('aria-label', text);
-      this.ls = [...text].map(ch => {
+      this.cur = [...this.text].map((_, i) => this.final[i] || '');
+      node.textContent = ''; node.setAttribute('role', 'text'); node.setAttribute('aria-label', this.text);
+      this.ls = [...this.text].map(ch => {
         const s = document.createElement('span');
         s.className = 'cy'; s.textContent = ch; s.setAttribute('aria-hidden', 'true');
         node.appendChild(s); return s;
       });
     }
-    measure() {                       // each letter gets a fixed box: its resting face's width, tracked in to -50
+    font(s, f) { s.style.fontFamily = f ? `"r-${f}"` : ''; s.style.fontSize = SIZE[f] ? SIZE[f] + 'em' : ''; }
+    measure() {
       const r = rem();
       this.fs = parseFloat(getComputedStyle(this.el).fontSize);
-      this.ls.forEach((s, i) => { s.style.width = ''; this.font(s, this.final[i]); });
-      const w = this.ls.map(s => s.getBoundingClientRect().width);
-      this.ls.forEach((s, i) => { s.style.width = Math.max(0.1, (w[i] - TRACK * this.fs) / r).toFixed(3) + 'rem'; });
+      this.box = [...this.text].map((ch, i) => Math.max(1, advance(ch, this.final[i], this.fs) - TRACK * this.fs));
+      this.ls.forEach((s, i) => { s.style.width = (this.box[i] / r).toFixed(3) + 'rem'; this.font(s, this.cur[i]); });
+      this.layout(false);
     }
-    font(s, f) { s.style.fontFamily = f ? `"r-${f}"` : ''; s.style.fontSize = SIZE[f] || ''; }
-    swap(i, f) {                      // the face just changes; the rest of the word gives a little bounce
-      this.font(this.ls[i], f);
-      if (RM) return;
-      const amp = this.fs * 0.08;
-      this.ls.forEach((s, k) => {
-        if (k === i) return;
-        const d = Math.abs(k - i);
-        gsap.to(s, { keyframes: [
-          { y: -amp * Math.max(0.35, 1 - d * 0.15), duration: 0.1, ease: 'power2.out' },
-          { y: 0, duration: 0.42, ease: 'bounce.out' },
-        ], delay: d * 0.03, overwrite: true });
-      });
-    }
-    rand() { return ROT[Math.floor(Math.random() * ROT.length)]; }
-    burst() {                         // every letter flips through a few faces, then settles
-      this.stop();
-      if (RM) { this.ls.forEach((s, i) => this.font(s, this.final[i])); return; }
-      const n = 4, gap = 230;
+    layout(animate = true) {          // centre the letters (at their current faces) inside the word's fixed width
+      const adv = [...this.text].map((ch, i) => advance(ch, this.cur[i], this.fs) - TRACK * this.fs);
+      const total = this.box.reduce((a, b) => a + b, 0), used = adv.reduce((a, b) => a + b, 0);
+      let x = (total - used) / 2, bx = 0;
       this.ls.forEach((s, i) => {
-        for (let k = 0; k < n; k++) {
-          this.timers.push(setTimeout(() => this.swap(i, k === n - 1 ? this.final[i] : this.rand()), i * 70 + k * gap));
-        }
+        const dx = x + adv[i] / 2 - (bx + this.box[i] / 2);
+        if (animate && !RM) gsap.to(s, { x: dx, duration: 0.45, ease: 'power3.out', overwrite: true });
+        else gsap.set(s, { x: dx });
+        x += adv[i]; bx += this.box[i];
       });
-      this.timers.push(setTimeout(() => this.idle(), this.ls.length * 70 + n * gap + 900));
     }
-    idle() {                          // then one letter at a time keeps turning
-      clearInterval(this.iv);
-      this.iv = setInterval(() => {
-        const i = Math.floor(Math.random() * this.ls.length);
-        this.swap(i, Math.random() < 0.2 ? '' : this.rand());
-      }, 1100);
+    step() {                          // one letter (moving along the word) changes face
+      const i = this.n++ % this.ls.length;
+      let f; do { f = Math.random() < 0.15 ? '' : ROT[Math.floor(Math.random() * ROT.length)]; } while (f === this.cur[i]);
+      this.cur[i] = f;
+      this.font(this.ls[i], f);
+      this.layout();
     }
-    stop() { this.timers.forEach(clearTimeout); this.timers = []; clearInterval(this.iv); this.iv = 0; }
   }
   const cy = { studio: new Cycler($('#cy-studio')), craft: new Cycler($('#cy-craft')), brand: new Cycler($('#cy-brand')) };
 
   /* ---------- wheel ---------- */
   const STEP = 12, RADIUS = 37.5;     // degrees between words, rem from the pivot
-  const WS = 0.7;                     // timeline length of one wheel click (sections are 1)
   const WE = 4 + (SERVICES.length - 1) * WS;     // wheel end
   const END = WE + 1;                 // work section fully in
-  const RESTS = [0, 1, 2, 3, ...SERVICES.map((_, i) => 4 + i * WS), END];
+  const RESTS = [0, 1, 2, 3, ...SERVICES.map((_, i) => 4 + i * WS), END];   // used by the arrow keys
 
   const items = SERVICES.map((s, i) => {
     const li = document.createElement('li');
@@ -135,9 +136,9 @@
     cards.forEach((set, k) => {
       if (k === i) {
         gsap.fromTo(set, { autoAlpha: 0, scale: 0.7, y: 24 },
-          { autoAlpha: 1, scale: 1, y: 0, duration: RM ? 0.01 : 0.7, ease: 'back.out(1.7)', stagger: 0.09, overwrite: true });
+          { autoAlpha: 1, scale: 1, y: 0, duration: RM ? 0.01 : 0.6, ease: 'back.out(1.7)', stagger: 0.07, overwrite: true });
       } else {
-        gsap.to(set, { autoAlpha: 0, scale: 0.8, y: -12, duration: RM ? 0.01 : 0.28, ease: 'power2.in', overwrite: true });
+        gsap.to(set, { autoAlpha: 0, scale: 0.8, y: -12, duration: RM ? 0.01 : 0.22, ease: 'power2.in', overwrite: true });
       }
     });
     items.forEach((li, k) => li.setAttribute('aria-current', k === i ? 'true' : 'false'));
@@ -154,11 +155,44 @@
     gsap.set(el.track, { x: el.strip.clientWidth / 2 - (a.offsetLeft + a.offsetWidth / 2) });
   }
 
-  /* ---------- the timeline: where everything sits at each rest, and the moves between ---------- */
-  let tl;
+  /* ---------- the notch: cut out of images only ---------- */
+  // The bar along the bottom and the notch are not drawn on top of the page; they are cut out of any image
+  // that reaches them, so text and backgrounds pass underneath untouched and images get soft curves.
+  const NOTCH = [[0, 42], [11, 42, 17, 36, 18.5, 26], [20.5, 11, 26, 2, 42, 2], [178, 2], [194, 2, 199.5, 11, 201.5, 26], [203, 36, 209, 42, 220, 42]];
+  const masked = () => [el.hero, ...$$('.boon-grid img, .case-620 figure img, .work .ph')];
+  let cutGeo = null;
+  function notchGeo() {
+    const b = el.notch.getBoundingClientRect(), fr = cssPx('--frame');
+    cutGeo = { x: b.left, y: b.top, w: b.width, h: b.height, base: innerHeight - fr, vw: innerWidth, vh: innerHeight };
+  }
+  function cutPath(ox, oy) {          // bar + notch outline, in an element's own coordinates
+    const g = cutGeo, sx = g.w / 220, sy = g.h / 42;
+    const P = (x, y) => `${(g.x + x * sx - ox).toFixed(1)} ${(g.y + y * sy - oy).toFixed(1)}`;
+    const far = 4000, base = (g.base - oy).toFixed(1), bottom = (g.vh + 10 - oy).toFixed(1);
+    let d = `M${(-far - ox).toFixed(1)} ${bottom}V${base}H${(g.x - ox).toFixed(1)}`;
+    d += `L${P(0, 42)}C${P(11, 42)} ${P(17, 36)} ${P(18.5, 26)}C${P(20.5, 11)} ${P(26, 2)} ${P(42, 2)}`;
+    d += `L${P(178, 2)}C${P(194, 2)} ${P(199.5, 11)} ${P(201.5, 26)}C${P(203, 36)} ${P(209, 42)} ${P(220, 42)}`;
+    d += `L${(g.vw + far - ox).toFixed(1)} ${base}V${bottom}Z`;
+    return d;
+  }
+  function cutImages() {
+    if (!cutGeo) return;
+    const top = cutGeo.y;
+    masked().forEach(n => {
+      const b = n.getBoundingClientRect();
+      if (b.bottom <= top || b.top >= cutGeo.vh || b.width < 1) { if (n._cut) { n.style.clipPath = ''; n._cut = false; } return; }
+      n.style.clipPath = `path(evenodd, "M0 0H${b.width.toFixed(1)}V${b.height.toFixed(1)}H0Z ${cutPath(b.left, b.top)}")`;
+      n._cut = true;
+    });
+  }
+
+  /* ---------- the timeline ---------- */
+  let tl, geo = null;
+  const heroImg = $('#hero img');
   function measure() {
     const vw = innerWidth, vh = innerHeight, r = rem();
-    gsap.set([el.avg, el.joe, el.line, el.big], { clearProps: 'transform' });
+    el.slot1.style.removeProperty('--w'); gsap.set(el.slot1, { clearProps: '--w' });
+    gsap.set([el.avg, el.joe, el.line, el.big, ...$$('.big .ln')], { clearProps: 'transform' });
     const rect = n => { const b = n.getBoundingClientRect(); return { x: b.left, y: b.top, width: b.width, height: b.height }; };
     el.slot1.style.setProperty('--w', 0); const s0 = rect(el.slot1);
     el.slot1.style.setProperty('--w', 1); const s1 = rect(el.slot1);
@@ -173,17 +207,12 @@
     const mid = (vh - h) / 2, low = vh - pad * 0.95 - h;
     const ax0 = (vw - (wa + gap + wj)) / 2;
     return {
-      vh, vw, wa, wj, gap,
+      vh, vw, wa, wj, gap, r, full: vw - 2 * fr,
       avg: [{ x: ax0, y: mid }, { x: pad, y: mid }, { x: pad, y: low }],
       joe: [{ x: ax0 + wa + gap, y: mid + jy }, { x: vw - pad - wj, y: mid + jy }, { x: vw - pad - wj, y: low + jy }],
-      hero: [
-        { ...s0, borderRadius: 0.25 * r },
-        { ...s1, borderRadius: 0.25 * r },
-        { x: fr, y: fr, width: vw - 2 * fr, height: vh - 2 * fr, borderRadius: 0 },
-        { ...s2, borderRadius: 0.5 * r },
-        { ...s2, y: s2.y - vh, borderRadius: 0.5 * r },
-      ],
+      hero: [s1, s1, { x: fr, y: fr, width: vw - 2 * fr, height: vh - 2 * fr }, s2, { ...s2, y: s2.y - vh }],
       line3: { x: s2.x + s2.width / 2 - vw / 2, y: s2.y + s2.height / 2 - vh / 2, scale: s2.width / (vw * 0.985) },
+      bigFs: parseFloat(getComputedStyle($('.big')).fontSize),
     };
   }
 
@@ -191,11 +220,13 @@
     const keep = tl ? tl.time() : 0;
     if (tl) tl.kill();
     const P = measure(), vh = P.vh;
+    const lines = $$('.big .ln');
     // starting state
     gsap.set(el.avg, P.avg[0]); gsap.set(el.joe, P.joe[0]); gsap.set(el.hero, P.hero[0]);
     gsap.set(el.line, { x: 0, y: 0, scale: 1, autoAlpha: 1, color: '#0b0b0b' });
-    gsap.set(el.slot1, { '--w': 0 });
+    gsap.set(el.slot1, { '--w': 1 });   // the sentence starts in its final position
     gsap.set(el.big, { autoAlpha: 0, y: 0 });
+    gsap.set(lines, { autoAlpha: 0, y: P.bigFs * 0.45 });
     gsap.set(el.wheel, { y: vh, autoAlpha: 1, visibility: 'visible' });
     gsap.set(el.cases, { y: vh, visibility: 'visible' });
     gsap.set(el.wbg, { opacity: 0 });
@@ -204,32 +235,34 @@
     tl = gsap.timeline({ paused: true, defaults: { ease: EASE, duration: 1 } });
     const ft = (t, from, to, at, extra = {}) => tl.fromTo(t, from, { ...to, immediateRender: false, ...extra }, at);
 
-    // 0 → 1: Avg Joe part to the edges, the sentence opens from the middle, the image grows in the gap
+    // 0 → 1: Avg Joe part to the edges; the gap between them uncovers the image first, then the words
     ft(el.avg, P.avg[0], P.avg[1], 0); ft(el.joe, P.joe[0], P.joe[1], 0);
-    ft(el.slot1, { '--w': 0 }, { '--w': 1 }, 0);
-    ft(el.hero, P.hero[0], P.hero[1], 0);
 
-    // 1 → 2: the image fills the frame, the sentence closes up on top of it, the logo drops to its home
-    ft(el.avg, P.avg[1], P.avg[2], 1, { duration: 0.8 }); ft(el.joe, P.joe[1], P.joe[2], 1.2, { duration: 0.8 });   // Avg leads
-    ft(el.slot1, { '--w': 1 }, { '--w': 0 }, 1);
-    ft(el.hero, P.hero[1], P.hero[2], 1);
-    ft(el.line, { color: '#0b0b0b' }, { color: '#ffffff' }, 1.2, { duration: 0.35, ease: 'none' });
-    tl.set(el.big, { autoAlpha: 1 }, 1.97);
+    // 1 → 2: first the image opens to fill the frame; then Avg (leading) and Joe drop to the bottom;
+    //        then the sentence closes up on top of the image
+    ft(el.hero, P.hero[1], P.hero[2], 1, { duration: 0.5 });
+    ft(el.line, { color: '#0b0b0b' }, { color: '#ffffff' }, 1.1, { duration: 0.25 });
+    ft(el.avg, P.avg[1], P.avg[2], 1.45, { duration: 0.3 });
+    ft(el.joe, P.joe[1], P.joe[2], 1.55, { duration: 0.3 });
+    ft(el.slot1, { '--w': 1 }, { '--w': 0 }, 1.7, { duration: 0.3 });
+    tl.set(el.big, { autoAlpha: 1 }, 1.99);
 
-    // 2 → 3: the image contracts into the big sentence, carrying the small one with it
+    // 2 → 3: the image contracts into the big sentence, carrying the small one with it,
+    //        while the big sentence animates in line by line
     ft(el.hero, P.hero[2], P.hero[3], 2);
     ft(el.line, { x: 0, y: 0, scale: 1 }, P.line3, 2);
-    ft(el.line, { autoAlpha: 1 }, { autoAlpha: 0 }, 2, { duration: 0.7, ease: 'power3.in' });
+    ft(el.line, { autoAlpha: 1 }, { autoAlpha: 0 }, 2, { duration: 0.6, ease: 'power2.in' });
+    lines.forEach((ln, i) => ft(ln, { autoAlpha: 0, y: P.bigFs * 0.45 }, { autoAlpha: 1, y: 0 }, 2.1 + i * 0.18, { duration: 0.55, ease: 'power2.out' }));
 
     // 3 → 4: everything but the logo and nav moves up, the wheel comes in spinning
     ft(el.big, { y: 0 }, { y: -vh }, 3);
     ft(el.hero, P.hero[3], P.hero[4], 3);
     ft(el.wheel, { y: vh }, { y: 0 }, 3);
-    ft(wp, { v: -3 }, { v: 0 }, 3, { ease: 'power3.out' });
+    ft(wp, { v: -3 }, { v: 0 }, 3);
     ft(el.wbg, { opacity: 0 }, { opacity: 1 }, 3.2, { duration: 0.8 });
 
-    // 4 → WE: one click of the wheel per word
-    for (let k = 1; k < SERVICES.length; k++) ft(wp, { v: k - 1 }, { v: k }, 4 + (k - 1) * WS, { duration: WS });
+    // 4 → WE: the wheel turns, one word per WS
+    ft(wp, { v: 0 }, { v: SERVICES.length - 1 }, 4, { duration: WE - 4 });
 
     // WE → END: the work comes up
     ft(el.wheel, { y: 0, autoAlpha: 1 }, { y: -vh * 0.35, autoAlpha: 0 }, WE);
@@ -241,32 +274,73 @@
     tl.time(keep, false); onTime();
   }
 
-  /* ---------- things that run on their own clock, switched by where you are ---------- */
-  let zone = -1, shown = -2, geo = null;
+  let shown = -2;
   function onTime() {
     const t = tl.time();
     layoutWheel();
-    // reveal the sentence exactly in the gap between Avg and Joe while they part; fully open after that
+    // As Avg and Joe part, the gap between them uncovers the image first; the words (already in place)
+    // only start to show once the gap has passed the image's edges. Fully open after that.
     if (t < 1) {
-      const pad = geo.gap * 1.6;
-      const l = Math.max(0, gsap.getProperty(el.avg, 'x') + geo.wa + pad);
-      const r = Math.max(0, geo.vw - gsap.getProperty(el.joe, 'x') + pad);
-      el.line.style.setProperty('--l', l.toFixed(1) + 'px'); el.line.style.setProperty('--r', r.toFixed(1) + 'px');
-    } else { el.line.style.setProperty('--l', '0px'); el.line.style.setProperty('--r', '0px'); }
-    const z = t < 0.15 ? 0 : t < 2.55 ? 1 : t < 3.6 ? 3 : t < WE + 0.5 ? 4 : 5;
-    if (z !== zone) {
-      zone = z;
-      if (z === 1) cy.studio.burst(); else cy.studio.stop();
-      if (z === 3) cy.craft.burst(); else cy.craft.stop();
-      if (z !== 5) cy.brand.stop();
-    }
+      const pad = geo.gap * 1.6, vw = geo.vw;
+      const gl = gsap.getProperty(el.avg, 'x') + geo.wa + pad;      // gap left edge (viewport x)
+      const gr = gsap.getProperty(el.joe, 'x') - pad;               // gap right edge
+      const hb = el.hero.getBoundingClientRect();
+      if (gr <= gl) {
+        heroImg.style.clipPath = 'inset(0 0 0 100%)';
+        el.line.style.setProperty('--l', vw / 2 + 'px'); el.line.style.setProperty('--r', vw / 2 + 'px');
+      } else {
+        heroImg.style.clipPath = `inset(0 ${Math.max(0, hb.right - gr).toFixed(1)}px 0 ${Math.max(0, gl - hb.left).toFixed(1)}px)`;
+        const tl_ = Math.min(gl, hb.left), tr_ = Math.max(gr, hb.right);   // words start at the image's edges
+        el.line.style.setProperty('--l', Math.max(0, tl_).toFixed(1) + 'px');
+        el.line.style.setProperty('--r', Math.max(0, vw - tr_).toFixed(1) + 'px');
+      }
+    } else { el.line.style.setProperty('--l', '0px'); el.line.style.setProperty('--r', '0px'); heroImg.style.clipPath = ''; }
+    // the image's corners round off gradually as it moves away from filling the frame
+    const w = el.hero.offsetWidth, h = el.hero.offsetHeight;
+    const fullness = Math.min(1, w / geo.full);
+    el.hero.style.borderRadius = Math.min(0.16 * Math.min(w, h), (1 - fullness) * 1.8 * geo.r).toFixed(2) + 'px';
+    // work pops in beside whichever word is in focus
     const wi = t > 3.6 && t < WE + 0.35 ? Math.round(gsap.utils.clamp(0, SERVICES.length - 1, wp.v)) : -1;
     if (wi !== shown) { shown = wi; showWorks(wi); }
   }
 
-  /* ---------- smooth scroll: Lenis (same settings as sumojoestudio.com) driving the timeline ---------- */
-  // The page really scrolls (a tall spacer); Lenis glides it; the scroll position plays the timeline.
-  // Once the glide has nearly stopped, it eases into the nearest resting point.
+  /* ---------- intro: at the top, Avg and Joe open on their own to show an icon or image ---------- */
+  // Loops until you scroll; then they close up and the scroll sequence takes over. Back at the top, it starts again.
+  const introItems = $$('#intro > *');
+  const gapState = { s: 0 };          // how far each of Avg / Joe is pushed out (px); separate from the scroll timeline
+  const applyGap = () => { el.avg.style.translate = `${(-gapState.s).toFixed(2)}px 0`; el.joe.style.translate = `${gapState.s.toFixed(2)}px 0`; };
+  let introTl = null, introWait = 0;
+  function introStart() {
+    if (RM || introTl) return;
+    const r = rem();
+    gsap.set(introItems, { xPercent: -50, yPercent: -50 });
+    introTl = gsap.timeline({ repeat: -1, delay: 0.5 });
+    introItems.forEach(it => {
+      const half = it.getBoundingClientRect().width / 2 + 0.85 * r;
+      introTl
+        .to(gapState, { s: half, duration: 0.85, ease: 'power3.inOut', onUpdate: applyGap })
+        .fromTo(it, { autoAlpha: 0, scale: 0.86 }, { autoAlpha: 1, scale: 1, duration: 0.55, ease: 'power2.out' }, '<0.3')
+        .to({}, { duration: 1.5 })
+        .to(it, { autoAlpha: 0, scale: 0.92, duration: 0.35, ease: 'power2.in' })
+        .to(gapState, { s: 0, duration: 0.75, ease: 'power3.inOut', onUpdate: applyGap }, '<0.1')
+        .to({}, { duration: 0.45 });
+    });
+  }
+  function introStop() {
+    clearTimeout(introWait);
+    if (!introTl) return;
+    introTl.kill(); introTl = null;
+    gsap.to(introItems, { autoAlpha: 0, scale: 0.92, duration: 0.25, ease: 'power2.in', overwrite: true });
+    gsap.to(gapState, { s: 0, duration: 0.45, ease: 'power3.out', onUpdate: applyGap, overwrite: true });
+  }
+  function introCheck() {             // called on every scroll update
+    if (cur > 2) { introStop(); return; }
+    if (introTl) return;
+    clearTimeout(introWait);
+    introWait = setTimeout(() => { if (cur <= 2) introStart(); }, 1200);
+  }
+
+  /* ---------- smooth scroll: Lenis (same settings as sumojoestudio.com) ---------- */
   const lenis = new Lenis({
     lerp: 0.055, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.085, touchInertiaExponent: 1.35, touchMultiplier: 1,
     autoRaf: false,
@@ -275,7 +349,7 @@
   gsap.ticker.lagSmoothing(0);
 
   const spacer = $('#scroll-space');
-  let unit = 1, endPx = 0, maxPx = 0, cur = 0, idleT = 0, ready = false, veiling = false;
+  let unit = 1, endPx = 0, maxPx = 0, cur = 0, ready = false, veiling = false, brandOn = false, travel = 0;
   function metrics() {
     const t = unit > 1 ? cur / unit : 0, past = Math.max(0, cur - endPx);
     unit = innerHeight * UNIT;
@@ -292,34 +366,33 @@
     if (Math.abs(t - tl.time()) > 1e-5) tl.time(t);
     const st = Math.max(0, cur - endPx);
     if (Math.abs(el.cases.scrollTop - st) > 0.5) el.cases.scrollTop = st;
+    cutImages();
   }
-  lenis.on('scroll', l => { cur = l.animatedScroll; if (ready) render(); });
-
-  const settleEase = t => 1 - Math.pow(1 - t, 3);
-  function settle() {                 // wait until the glide has nearly stopped, then ease to the nearest rest
-    if (!ready || veiling) return;
-    if (Math.abs(lenis.velocity) > SETTLE_VELOCITY) { idleT = setTimeout(settle, 60); return; }
-    const pos = lenis.targetScroll;
-    if (pos >= endPx - 0.5) return;   // in the work section: plain scrolling
-    const f = pos / unit, dir = lenis.direction || 1;
-    const i = RESTS.findIndex(s => s > f);
-    let rest = 0;
-    if (i > 0) {
-      const a = RESTS[i - 1], b = RESTS[i], frac = (f - a) / (b - a);
-      rest = dir > 0 ? (frac > SNAP_PULL ? b : a) : (frac < 1 - SNAP_PULL ? a : b);
+  lenis.on('scroll', l => {
+    const prev = cur;
+    cur = l.animatedScroll;
+    if (!ready) return;
+    render();
+    introCheck();
+    // rotation words only change while you're scrolling
+    if (RM || veiling) return;
+    travel = Math.min(travel + Math.abs(cur - prev), SWAP_EVERY * 2);
+    while (travel >= SWAP_EVERY) {
+      travel -= SWAP_EVERY;
+      const t = tl.time();
+      if (t > 0.05 && t < 2.5) cy.studio.step();
+      if (t > 2.15 && t < 3.7) cy.craft.step();
+      if (brandOn) cy.brand.step();
     }
-    if (Math.abs(rest * unit - pos) < 1) return;
-    lenis.scrollTo(rest * unit, { duration: SETTLE_TIME, easing: settleEase });
-  }
-  const touched = () => { if (!ready) return; clearTimeout(idleT); idleT = setTimeout(settle, SETTLE_WAIT); };
-  addEventListener('wheel', touched, { passive: true });
-  addEventListener('touchend', touched, { passive: true });
+  });
+  // the work cards pop in on their own clock, so keep their cut-outs current while they animate
+  gsap.ticker.add(() => { if (ready && shown >= 0) cutImages(); });
 
   const inOut = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-  function goTo(t) { clearTimeout(idleT); lenis.scrollTo(Math.min(maxPx, t * unit), { duration: SETTLE_TIME * 1.3, easing: inOut }); }
+  function goTo(t) { lenis.scrollTo(Math.min(maxPx, t * unit), { duration: 1.1, easing: inOut }); }
   function jumpTo(t) {                // nav + logo: a soft cut instead of replaying everything
     if (veiling) return;
-    veiling = true; clearTimeout(idleT);
+    veiling = true;
     gsap.timeline()
       .to(el.veil, { opacity: 1, duration: RM ? 0.01 : 0.45, ease: 'power2.inOut' })
       .add(() => { lenis.scrollTo(t * unit, { immediate: true, force: true }); cur = t * unit; render(); })
@@ -349,20 +422,24 @@
   $$('.logo').forEach(a => a.addEventListener('click', e => { e.preventDefault(); jumpTo(0); }));
   $$('a[href="#"]').forEach(a => a.addEventListener('click', e => e.preventDefault()));
 
-  // work section: reveal as it comes into view
+  // work section: reveal as it comes into view; "brand" only turns while it's on screen
   const io = new IntersectionObserver(es => es.forEach(en => {
     if (!en.isIntersecting) return;
     en.target.classList.add('in'); io.unobserve(en.target);
-    if (en.target.contains(cy.brand.el)) cy.brand.burst();
   }), { threshold: 0.15 });
   $$('.rv').forEach(n => io.observe(n));
+  new IntersectionObserver(es => es.forEach(en => { brandOn = en.isIntersecting; })).observe(cy.brand.el);
   $$('#s-cases img').forEach(i => i.addEventListener('load', () => ready && metrics()));
 
   /* ---------- start ---------- */
   let rz;
   addEventListener('resize', () => {
     clearTimeout(rz);
-    rz = setTimeout(() => { if (!ready) return; build(); metrics(); render(); setNav('studio'); }, 120);
+    rz = setTimeout(() => {
+      if (!ready) return;
+      advCache.clear(); Object.values(cy).forEach(c => c.measure());
+      build(); metrics(); notchGeo(); render(); setNav('studio');
+    }, 120);
   });
 
   const loaded = Promise.all([
@@ -372,13 +449,14 @@
   ]);
   Promise.race([loaded, new Promise(r => setTimeout(r, 2500))]).then(() => {
     Object.values(cy).forEach(c => c.measure());
-    build(); metrics(); setNav('studio'); ready = true; render();
+    build(); metrics(); setNav('studio'); notchGeo(); ready = true; render();
     gsap.fromTo('.logo', { opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0px)', duration: RM ? 0.01 : 1.2, ease: 'power2.out', stagger: 0.12, clearProps: 'filter' });
+    if (cur <= 2) gsap.delayedCall(RM ? 0 : 1.1, () => { if (cur <= 2) introStart(); });
   });
 
   // for testing in the console
   window.__avg = {
-    goTo, jumpTo, RESTS, lenis,
-    get t() { return tl && tl.time(); }, get target() { return lenis.targetScroll / unit; }, get cur() { return cur / unit; },
+    goTo, jumpTo, RESTS, lenis, cy, get intro() { return !!introTl; }, get gap() { return gapState.s; },
+    get t() { return tl && tl.time(); }, get target() { return lenis.targetScroll / unit; },
   };
 })();
