@@ -8,11 +8,12 @@
   const EASE = 'none';       // moves follow the scroll 1:1
 
   // feel — tweak these
-  const UNIT = 1;            // screens of scrolling per section (higher = slower)
+  const UNIT = 1.2;          // screens of scrolling per section (higher = slower)
+  const CROP = 0.5;          // how the image fills a smaller frame: 0 = it scales to fit, 1 = it only crops
   const OPEN_LEN = 1.7;      // the image opening + Avg/Joe dropping gets more scroll, so it moves at your pace
   const HOLD = 0.4;          // screens of scrolling where nothing moves once the image has settled into the big sentence
   const WS = 0.2;            // screens of scrolling per word on the wheel (matched to the page's scroll speed)
-  const SWAP_EVERY = 70;     // px of scrolling between typeface changes in the rotation words
+  const SWAP_EVERY = 85;     // px of scrolling between typeface changes in the rotation words
   const TRACK = 0.05;        // rotation words: tracking -50
 
   const SIZE = { 'snell-black': 1.22, kelsi: 0.82, campground: 1.08, postoni: 0.92 };   // optical size per face
@@ -222,7 +223,6 @@
     const keep = tl ? tl.time() : 0;
     if (tl) tl.kill();
     const P = measure(), vh = P.vh;
-    heroImg.style.width = P.full + 'px'; heroImg.style.height = P.fullH + 'px';
     const lines = $$('.big .ln');
     // starting state
     gsap.set(el.avg, P.avg[0]); gsap.set(el.joe, P.joe[0]); gsap.set(el.hero, P.hero[0]);
@@ -285,9 +285,11 @@
     layoutWheel();
     // As Avg and Joe part, the gap between them uncovers the image first; the words (already in place)
     // only start to show once the gap has passed the image's edges. Fully open after that.
-    // The image never scales: it stays full-frame size, centred in its frame, and the frame crops in and out of it.
+    // The image scales with its frame, but only part of the way (CROP): the frame also crops in and out of it.
     const w = el.hero.offsetWidth, h = el.hero.offsetHeight;
-    const ox = (w - geo.full) / 2, oy = (h - geo.fullH) / 2;
+    const iw = w + (geo.full - w) * CROP, ih = h + (geo.fullH - h) * CROP;
+    const ox = (w - iw) / 2, oy = (h - ih) / 2;
+    heroImg.style.width = iw.toFixed(1) + 'px'; heroImg.style.height = ih.toFixed(1) + 'px';
     heroImg.style.transform = `translate(${ox.toFixed(1)}px,${oy.toFixed(1)}px)`;
     if (t < 1) {
       const pad = geo.gap * 1.6, vw = geo.vw;
@@ -299,7 +301,7 @@
         el.line.style.setProperty('--l', vw / 2 + 'px'); el.line.style.setProperty('--r', vw / 2 + 'px');
       } else {
         // the gap, in the image's own coordinates
-        const L = Math.max(0, gl - hb.left) - ox, R = ox + geo.full - w + Math.max(0, hb.right - gr);
+        const L = Math.max(0, gl - hb.left) - ox, R = ox + iw - w + Math.max(0, hb.right - gr);
         heroImg.style.clipPath = `inset(0 ${Math.max(0, R).toFixed(1)}px 0 ${Math.max(0, L).toFixed(1)}px)`;
         const tl_ = Math.min(gl, hb.left), tr_ = Math.max(gr, hb.right);   // words start at the image's edges
         el.line.style.setProperty('--l', Math.max(0, tl_).toFixed(1) + 'px');
@@ -404,18 +406,18 @@
       if (brandOn) cy.brand.step();
     }
   });
-  // Opening Avg Joe from the top is the one place that auto-scrolls and locks into place: nudge it down and it
+  // The first time Avg Joe is opened (once per visit), it auto-scrolls and locks into place: nudge it down and it
   // carries on to the sentence, starting at the speed you were scrolling and easing to a stop (same curve as
   // sumojoestudio.com). Scrolling is ignored until it lands, and the rest of that same flick is ignored after,
   // so momentum can't throw Avg and Joe down. Scrolling back up is never automatic.
-  let autoing = false, lastWheel = 0;
+  let autoing = false, autoDone = false, lastWheel = 0;   // autoDone: it only ever happens once per visit
   addEventListener('wheel', () => { lastWheel = performance.now(); }, { passive: true });
   function releaseAfterFlick() {
     if (performance.now() - lastWheel < 180) { setTimeout(releaseAfterFlick, 60); return; }
     lenis.start(); autoing = false;
   }
   function autoOpen() {
-    if (autoing || veiling) return;
+    if (autoing || autoDone || veiling) return;
     const pos = lenis.targetScroll, dir = lenis.direction;
     if (dir <= 0 || pos <= 2 || pos >= unit - 2 || lenis.animatedScroll > unit * 0.5) return;   // only opening, from the top
     const to = unit, from = lenis.animatedScroll, dist = Math.abs(to - from);
@@ -423,7 +425,7 @@
     const v = Math.max(1, Math.abs(lenis.velocity) * 60);                 // px per second, roughly
     const dur = RM ? 0.01 : Math.max(0.9, Math.min(2.2, 1.5 * dist / v));
     const k = Math.max(0, Math.min(3, v * dur / dist));                    // starting slope = your current speed
-    autoing = true;
+    autoing = true; autoDone = true;
     lenis.scrollTo(to, {
       duration: dur, lock: true, force: true,
       easing: e => k * e + (3 - 2 * k) * e * e + (k - 2) * e * e * e,
