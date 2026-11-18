@@ -177,7 +177,7 @@
   /* ---------- the notch: cut out of images only ---------- */
   // The bar along the bottom and the notch are not drawn on top of the page; they are cut out of any image
   // that reaches them, so text and backgrounds pass underneath untouched and images get soft curves.
-  const NOTCH = [[0, 42], [11, 42, 17, 36, 18.5, 26], [20.5, 11, 26, 2, 42, 2], [178, 2], [194, 2, 199.5, 11, 201.5, 26], [203, 36, 209, 42, 220, 42]];
+  const NOTCH_FLANK = 2.1;   // how wide each curved side of the notch is, in notch-heights
   const masked = () => [el.hero, ...$$('.boon-grid img, .case-620 figure img, .work .ph')];
   let cutGeo = null;
   function notchGeo() {
@@ -185,13 +185,16 @@
     cutGeo = { x: b.left, y: b.top, w: b.width, h: b.height, base: innerHeight - fr, vw: innerWidth, vh: innerHeight };
   }
   function cutPath(ox, oy) {          // bar + notch outline, in an element's own coordinates
-    const g = cutGeo, sx = g.w / 220, sy = g.h / 42;
-    const P = (x, y) => `${(g.x + x * sx - ox).toFixed(1)} ${(g.y + y * sy - oy).toFixed(1)}`;
-    const far = 4000, base = (g.base - oy).toFixed(1), bottom = (g.vh + 10 - oy).toFixed(1);
-    let d = `M${(-far - ox).toFixed(1)} ${bottom}V${base}H${(g.x - ox).toFixed(1)}`;
-    d += `L${P(0, 42)}C${P(11, 42)} ${P(17, 36)} ${P(18.5, 26)}C${P(20.5, 11)} ${P(26, 2)} ${P(42, 2)}`;
-    d += `L${P(178, 2)}C${P(194, 2)} ${P(199.5, 11)} ${P(201.5, 26)}C${P(203, 36)} ${P(209, 42)} ${P(220, 42)}`;
-    d += `L${(g.vw + far - ox).toFixed(1)} ${base}V${bottom}Z`;
+    // The flanks are drawn at a fixed size from the notch height, so a wider notch never stretches them:
+    // each side is one long soft S, from the bottom edge up into a rounded shoulder.
+    const g = cutGeo, far = 4000;
+    const top = g.y - oy, B = g.base - oy, F = NOTCH_FLANK * (g.base - g.y);
+    const L = g.x - ox, R = g.x + g.w - ox, bottom = g.vh + 10 - oy;
+    const n = v => v.toFixed(1);
+    let d = `M${n(-far - ox)} ${n(bottom)}V${n(B)}H${n(L)}`;
+    d += `C${n(L + 0.55 * F)} ${n(B)} ${n(L + 0.42 * F)} ${n(top)} ${n(L + F)} ${n(top)}`;
+    d += `H${n(R - F)}C${n(R - 0.42 * F)} ${n(top)} ${n(R - 0.55 * F)} ${n(B)} ${n(R)} ${n(B)}`;
+    d += `H${n(g.vw + far - ox)}V${n(bottom)}Z`;
     return d;
   }
   function cutImages() {
