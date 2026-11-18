@@ -260,8 +260,8 @@
     //        then the sentence closes up on top of the image
     ft(el.hero, P.hero[1], P.hero[2], 1, { duration: 0.45 });
     ft(el.line, { color: '#0b0b0b' }, { color: '#ffffff' }, 1.1, { duration: 0.25 });
-    ft(el.avg, P.avg[1], P.avg[2], 1.5, { duration: 0.34, ease: 'power2.inOut' });    // only once the image is fully open
-    ft(el.joe, P.joe[1], P.joe[2], 1.56, { duration: 0.34, ease: 'power2.inOut' });
+    ft(el.avg, P.avg[1], P.avg[2], 1.5, { duration: 0.34 });    // only once the image is fully open; linear, so it moves 1:1 with the scroll
+    ft(el.joe, P.joe[1], P.joe[2], 1.56, { duration: 0.34 });
     ft(el.slot1, { '--w': 1 }, { '--w': 0 }, 1.76, { duration: 0.24, ease: 'power2.inOut' });
     tl.set(el.big, { autoAlpha: 1 }, 1.99);
 
