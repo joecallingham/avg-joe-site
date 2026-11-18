@@ -8,15 +8,17 @@
   const EASE = 'none';       // moves follow the scroll 1:1
 
   // feel — tweak these
-  const UNIT = 1.2;          // screens of scrolling per section (higher = slower)
+  // touch devices get their own, more even pace and their own native scrolling
+  const TOUCH = matchMedia('(pointer: coarse)').matches;
+  const UNIT = TOUCH ? 0.85 : 1.2;   // screens of scrolling per section (higher = slower)
   const CROP = 0.5;          // how much the frame crops (vs scales) mid-move: 0 = only scales, 1 = only crops; none at the ends
   // scroll lengths (in sections) for the first three moves, which need a slower pace than the rest
-  const LEN_PART = 1.5;      // Avg Joe parting to the sentence
-  const OPEN_LEN = 2.5;      // the image opening + Avg/Joe dropping
-  const LEN_SHRINK = 1.6;    // the image cropping in to the big sentence
+  const LEN_PART = TOUCH ? 1.1 : 1.5;      // Avg Joe parting to the sentence
+  const OPEN_LEN = TOUCH ? 1.8 : 2.5;      // the image opening + Avg/Joe dropping
+  const LEN_SHRINK = TOUCH ? 1.15 : 1.6;    // the image cropping in to the big sentence
   const EXPAND = LEN_SHRINK / OPEN_LEN;   // share of the open section the image expand takes: same scroll length as the shrink
   const HOLD = 0;            // screens of scrolling where nothing moves once the image has settled into the big sentence
-  const WS = 0.2;            // screens of scrolling per word on the wheel (matched to the page's scroll speed)
+  const WS = TOUCH ? 0.32 : 0.2;            // screens of scrolling per word on the wheel (matched to the page's scroll speed)
   const SWAP_EVERY = 85;     // px of scrolling between typeface changes in the rotation words
   const TRACK = 0.05;        // rotation words: tracking -50
 
@@ -322,7 +324,13 @@
       if (gr <= gl) {
         heroImg.style.clipPath = 'inset(0 0 0 100%)';
         el.line.style.setProperty('--l', vw / 2 + 'px'); el.line.style.setProperty('--r', vw / 2 + 'px');
+        el.line.style.setProperty('--t', hb.top + 'px'); el.line.style.setProperty('--b', (geo.vh - hb.bottom) + 'px');
       } else {
+        // vertically, the reveal starts as the image's own band and grows to the whole sentence once the gap passes the image
+        const q = gsap.utils.clamp(0, 1, (hb.left - gl) / (geo.vw * 0.18));
+        const band = 1 - q;
+        el.line.style.setProperty('--t', (hb.top * band - geo.vh * 2 * q).toFixed(1) + 'px');
+        el.line.style.setProperty('--b', ((geo.vh - hb.bottom) * band - geo.vh * 2 * q).toFixed(1) + 'px');
         // the gap, in the image's own coordinates
         const L = Math.max(0, gl - hb.left) - ox, R = ox + iw - w + Math.max(0, hb.right - gr);
         heroImg.style.clipPath = `inset(0 ${Math.max(0, R).toFixed(1)}px 0 ${Math.max(0, L).toFixed(1)}px)`;
@@ -330,7 +338,7 @@
         el.line.style.setProperty('--l', Math.max(0, tl_).toFixed(1) + 'px');
         el.line.style.setProperty('--r', Math.max(0, vw - tr_).toFixed(1) + 'px');
       }
-    } else { el.line.style.setProperty('--l', '0px'); el.line.style.setProperty('--r', '0px'); heroImg.style.clipPath = ''; }
+    } else { el.line.style.setProperty('--l', '0px'); el.line.style.setProperty('--r', '0px'); el.line.style.setProperty('--t', '-200%'); el.line.style.setProperty('--b', '-200%'); heroImg.style.clipPath = ''; }
     // the frame's corners round off gradually as it moves away from filling the screen
     const fullness = Math.min(1, w / geo.full);
     el.hero.style.borderRadius = Math.min(0.16 * Math.min(w, h), (1 - fullness) * 1.8 * geo.r).toFixed(2) + 'px';
@@ -378,7 +386,7 @@
 
   /* ---------- smooth scroll: Lenis (same settings as sumojoestudio.com) ---------- */
   const lenis = new Lenis({
-    lerp: 0.055, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.085, touchInertiaExponent: 1.35, touchMultiplier: 1,
+    lerp: 0.055, wheelMultiplier: 1, syncTouch: false, syncTouchLerp: 0.085, touchInertiaExponent: 1.35, touchMultiplier: 1,
     autoRaf: false,
   });
   gsap.ticker.add(t => lenis.raf(t * 1000));
@@ -571,11 +579,13 @@
   }
 
   /* ---------- start ---------- */
-  let rz;
+  let rz, lastW = innerWidth;
   addEventListener('resize', () => {
     clearTimeout(rz);
     rz = setTimeout(() => {
       if (!ready) return;
+      if (TOUCH && innerWidth === lastW) return;   // just the address bar sliding in or out: ignore
+      lastW = innerWidth;
       advCache.clear(); Object.values(cy).forEach(c => c.measure());
       resplit(); build(); metrics(); notchGeo(); render(); setNav('studio');
     }, 120);
