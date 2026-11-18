@@ -413,7 +413,6 @@
     if (!ready) return;
     render();
     introCheck();
-    autoOpen();
     // rotation words only change while you're scrolling
     if (RM || veiling) return;
     travel = Math.min(travel + Math.abs(cur - prev), SWAP_EVERY * 2);
@@ -425,39 +424,11 @@
       if (brandOn) cy.brand.step();
     }
   });
-  // The first time Avg Joe is opened (once per visit), it auto-scrolls and locks into place: nudge it down and it
-  // carries on to the sentence, starting at the speed you were scrolling and easing to a stop (same curve as
-  // sumojoestudio.com). Scrolling is ignored until it lands, and the rest of that same flick is ignored after,
-  // so momentum can't throw Avg and Joe down. Scrolling back up is never automatic.
-  let autoing = false, autoDone = false, lastWheel = 0;   // autoDone: it only ever happens once per visit
-  addEventListener('wheel', () => { lastWheel = performance.now(); }, { passive: true });
-  function releaseAfterFlick() {
-    if (performance.now() - lastWheel < 180) { setTimeout(releaseAfterFlick, 60); return; }
-    lenis.start(); autoing = false;
-  }
-  function autoOpen() {
-    if (autoing || autoDone || veiling) return;
-    const pos = lenis.targetScroll, dir = lenis.direction;
-    const open = pxOf(1);
-    if (dir <= 0 || pos <= 2 || pos >= open - 2 || lenis.animatedScroll > open * 0.5) return;   // only opening, from the top
-    const to = open, from = lenis.animatedScroll, dist = Math.abs(to - from);
-    if (dist < 2) return;
-    const v = Math.max(1, Math.abs(lenis.velocity) * 60);                 // px per second, roughly
-    const dur = RM ? 0.01 : Math.max(0.9, Math.min(2.2, 1.5 * dist / v));
-    const k = Math.max(0, Math.min(3, v * dur / dist));                    // starting slope = your current speed
-    autoing = true; autoDone = true;
-    lenis.scrollTo(to, {
-      duration: dur, lock: true, force: true,
-      easing: e => k * e + (3 - 2 * k) * e * e + (k - 2) * e * e * e,
-      onComplete: () => { lenis.stop(); releaseAfterFlick(); },
-    });
-  }
-
   // the work cards pop in on their own clock, so keep their cut-outs current while they animate
   gsap.ticker.add(() => { if (ready && shown >= 0) cutImages(); });
 
   const inOut = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-  function goTo(t) { autoDone = true; lenis.scrollTo(Math.min(maxPx, pxOf(t)), { duration: 1.1, easing: inOut }); }
+  function goTo(t) { lenis.scrollTo(Math.min(maxPx, pxOf(t)), { duration: 1.1, easing: inOut }); }
   function jumpTo(t) {                // nav + logo: a soft cut instead of replaying everything
     if (veiling) return;
     veiling = true;
