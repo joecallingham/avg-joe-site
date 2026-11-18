@@ -268,8 +268,8 @@
     // WE → END: the work comes up
     ft(wp, { v: SERVICES.length - 1 }, { v: SERVICES.length - 1 + SPIN }, WE);   // keeps spinning as it leaves
     ft(el.wheel, { y: 0 }, { y: -vh * 0.35 }, WE);
-    ft(el.wheel, { autoAlpha: 1 }, { autoAlpha: 0 }, WE + 0.45, { duration: 0.55 });
-    ft(el.wbg, { opacity: 1 }, { opacity: 0 }, WE, { duration: 0.6 });
+    ft(el.wheel, { autoAlpha: 1 }, { autoAlpha: 0 }, WE + 0.05, { duration: 0.4 });
+    ft(el.wbg, { opacity: 1 }, { opacity: 0 }, WE, { duration: 0.75, ease: 'sine.inOut' });
     ft(el.cases, { y: vh }, { y: 0 }, WE);
 
     geo = P;
@@ -455,13 +455,43 @@
     if (!en.isIntersecting) return;
     en.target.classList.add('in'); io.unobserve(en.target);
   }), { threshold: 0.15 });
-  // copy, lozenges and images slide and fade up; siblings (each lozenge, each image) follow one after another
+  // Case-study copy is split into its actual lines (re-split on resize) so each line slides up on its own.
+  const heads = $$('.case h2');
+  function splitLines(h) {
+    const wasIn = !!h.querySelector('.line-rv.in');
+    h.querySelectorAll('.line-rv').forEach(l => { io.unobserve(l); l.replaceWith(...l.childNodes); });
+    h.querySelectorAll('.wd').forEach(w => w.replaceWith(w.textContent));
+    h.normalize();
+    const units = [];
+    [...h.childNodes].forEach(n => {
+      if (n.nodeType !== 3) { units.push(n); return; }
+      const frag = document.createDocumentFragment();
+      n.textContent.split(/(\s+)/).forEach(p => {
+        if (!p) return;
+        if (/^\s+$/.test(p)) { frag.appendChild(document.createTextNode(p)); return; }
+        const s = document.createElement('span'); s.className = 'wd'; s.textContent = p;
+        frag.appendChild(s); units.push(s);
+      });
+      n.replaceWith(frag);
+    });
+    const fs = parseFloat(getComputedStyle(h).fontSize);
+    const lineOf = new Map(); let li = -1, lastTop = -1e9;
+    units.forEach(u => { const top = u.getBoundingClientRect().top; if (top > lastTop + fs * 0.5) { li++; lastTop = top; } lineOf.set(u, li); });
+    const lines = Array.from({ length: li + 1 }, () => { const s = document.createElement('span'); s.className = 'line-rv rv'; return s; });
+    let curLine = 0;
+    [...h.childNodes].forEach(n => { if (lineOf.has(n)) curLine = lineOf.get(n); lines[curLine].appendChild(n); });
+    lines.forEach((l, i) => { l.style.transitionDelay = (i * 0.09).toFixed(2) + 's'; h.appendChild(l); if (wasIn) l.classList.add('in'); });
+    return lines;
+  }
+  // lozenges and images slide and fade up too; siblings (each lozenge, each image) follow one after another
   $$('.rv').forEach(n => {
     const sibs = [...n.parentElement.children].filter(c => c.classList.contains('rv'));
     const i = sibs.indexOf(n);
     if (i > 0) n.style.transitionDelay = (i * (n.tagName === 'IMG' ? 0.14 : 0.07)).toFixed(2) + 's';
   });
-  const startReveal = () => $$('.rv').forEach(n => io.observe(n));   // only once the work section has been moved below the screen
+  let revealing = false;
+  const startReveal = () => { revealing = true; $$('.rv:not(.in)').forEach(n => io.observe(n)); };   // only once the work section is below the screen
+  function resplit() { heads.forEach(h => splitLines(h).forEach(l => { if (revealing && !l.classList.contains('in')) io.observe(l); })); }
   new IntersectionObserver(es => es.forEach(en => { brandOn = en.isIntersecting; })).observe(cy.brand.el);
   $$('#s-cases img').forEach(i => i.addEventListener('load', () => ready && metrics()));
 
@@ -472,7 +502,7 @@
     rz = setTimeout(() => {
       if (!ready) return;
       advCache.clear(); Object.values(cy).forEach(c => c.measure());
-      build(); metrics(); notchGeo(); render(); setNav('studio');
+      resplit(); build(); metrics(); notchGeo(); render(); setNav('studio');
     }, 120);
   });
 
@@ -483,6 +513,7 @@
   ]);
   Promise.race([loaded, new Promise(r => setTimeout(r, 2500))]).then(() => {
     Object.values(cy).forEach(c => c.measure());
+    resplit();
     build(); metrics(); setNav('studio'); notchGeo(); ready = true; render();
     requestAnimationFrame(() => requestAnimationFrame(startReveal));
     gsap.fromTo('.logo', { opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0px)', duration: RM ? 0.01 : 1.2, ease: 'power2.out', stagger: 0.12, clearProps: 'filter' });

@@ -99,7 +99,8 @@ img{display:block;max-width:100%}
 .work:hover span{opacity:1}
 
 /* ---------- cases ---------- */
-#s-cases{z-index:5;display:block;overflow:hidden;background:var(--cream);visibility:hidden;scrollbar-width:none}
+/* soft top edge: the panel fades in from see-through to cream, so it never draws a hard line over the gradient */
+#s-cases{z-index:5;display:block;overflow:hidden;background:linear-gradient(to bottom,rgba(241,238,231,0) 0,rgba(241,238,231,.85) 22vh,var(--cream) 38vh);visibility:hidden;scrollbar-width:none}
 #s-cases::-webkit-scrollbar{display:none}
 .case{padding:1.5rem var(--pad) 2rem;position:relative}
 .case h2{font-weight:500;letter-spacing:-.05em}
@@ -122,6 +123,9 @@ img{display:block;max-width:100%}
 .case-620:hover .sys{color:#3d6b12}
 .rv{opacity:0;transform:translateY(2rem);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform 1.1s cubic-bezier(.2,.7,.2,1)}
 .rv.in{opacity:1;transform:none}
+.line-rv{display:block}
+.line-rv.rv{transform:translateY(.6em)}
+.line-rv.rv.in{transform:none}
 .pills li.rv{transform:translateY(1rem)}
 .pills li.rv.in{transform:none}
 .case img.rv{transform:translateY(3rem)}
