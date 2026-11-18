@@ -187,13 +187,6 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
   .boon-grid img{height:auto}
   .boon-grid figure,.boon-grid .van{grid-column:1/-1}
   .case-620 .txt,.case-620 figure{grid-column:1/-1}
-  /* phones: images and lozenges first, then the copy, then "View Case Study" under it */
-  .case-boon h2{order:2}
-  .case-boon .more{order:3;margin-top:calc(var(--s1) - var(--gutter))}
-  .case-620 .txt{order:1;justify-content:flex-start}
-  .case-620{min-height:0;align-items:start}
-  .case-620 .more{margin-top:var(--s1)}
-  .case-620 h2{margin-top:0}
   .case-620{padding-bottom:9rem}
   .case-620 h2{font-size:3.6rem}
   .notch{width:38rem;height:3.6rem;gap:1.6rem}
