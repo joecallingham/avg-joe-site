@@ -14,6 +14,7 @@
   const LEN_PART = 1.5;      // Avg Joe parting to the sentence
   const OPEN_LEN = 2.5;      // the image opening + Avg/Joe dropping
   const LEN_SHRINK = 1.6;    // the image cropping in to the big sentence
+  const EXPAND = LEN_SHRINK / OPEN_LEN;   // share of the open section the image expand takes: same scroll length as the shrink
   const HOLD = 0;            // screens of scrolling where nothing moves once the image has settled into the big sentence
   const WS = 0.2;            // screens of scrolling per word on the wheel (matched to the page's scroll speed)
   const SWAP_EVERY = 85;     // px of scrolling between typeface changes in the rotation words
@@ -261,11 +262,11 @@
 
     // 1 → 2: the image opens to fill the frame while the sentence closes up over it;
     //        then Avg (leading) and Joe drop to the bottom
-    ft(el.hero, P.hero[1], P.hero[2], 1, { duration: 0.45 });
+    ft(el.hero, P.hero[1], P.hero[2], 1, { duration: EXPAND });
     ft(el.line, { color: '#0b0b0b' }, { color: '#ffffff' }, 1.1, { duration: 0.25 });
-    ft(el.avg, P.avg[1], P.avg[2], 1.5, { duration: 0.34 });    // only once the image is fully open; linear, so it moves 1:1 with the scroll
-    ft(el.joe, P.joe[1], P.joe[2], 1.56, { duration: 0.34 });
-    ft(el.slot1, { '--w': 1 }, { '--w': 0 }, 1, { duration: 0.45 });   // the sentence closes up while the image expands
+    ft(el.avg, P.avg[1], P.avg[2], 1 + EXPAND + 0.02, { duration: 0.3 });    // only once the image is fully open; linear, so it moves 1:1 with the scroll
+    ft(el.joe, P.joe[1], P.joe[2], 1 + EXPAND + 0.05, { duration: 0.3 });
+    ft(el.slot1, { '--w': 1 }, { '--w': 0 }, 1, { duration: EXPAND });   // the sentence closes up while the image expands
     tl.set(el.big, { autoAlpha: 1 }, 1.99);
 
     // 2 → 3: the frame crops in to its place in the big sentence; the small sentence stays put and fades,
@@ -306,7 +307,7 @@
     // The image scales with its frame, but only part of the way (CROP): the frame also crops in and out of it.
     const w = el.hero.offsetWidth, h = el.hero.offsetHeight;
     // crop is strongest mid-move and fades to nothing at both ends, so the small frame shows the whole image again
-    const pIn = gsap.utils.clamp(0, 1, (t - 1) / 0.45), pOut = gsap.utils.clamp(0, 1, t - 2);
+    const pIn = gsap.utils.clamp(0, 1, (t - 1) / EXPAND), pOut = gsap.utils.clamp(0, 1, t - 2);
     const crop = CROP * (t < 2 ? Math.sin(Math.PI * pIn) : Math.sin(Math.PI * pOut));
     const iw = w + (geo.full - w) * crop, ih = h + (geo.fullH - h) * crop;
     const ox = (w - iw) / 2, oy = (h - ih) / 2;
