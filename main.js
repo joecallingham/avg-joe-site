@@ -179,7 +179,7 @@
   // The bar along the bottom and the notch are not drawn on top of the page; they are cut out of any image
   // that reaches them, so text and backgrounds pass underneath untouched and images get soft curves.
   const NOTCH_FLANK = 2.1;   // how wide each curved side of the notch is, in notch-heights
-  const masked = () => [el.hero, ...$$('.boon-grid img, .case-620 figure img, .work .ph')];
+  const masked = () => [el.hero, ...$$('.boon-grid img, .case-620 figure img, .work .ph, .fw-img')];
   let cutGeo = null;
   function notchGeo() {
     const b = el.notch.getBoundingClientRect(), fr = cssPx('--frame');
@@ -416,6 +416,7 @@
     const prev = cur;
     cur = l.animatedScroll;
     if (!ready) return;
+    scrollTick(cur - prev, l.velocity);
     render();
     introCheck();
     // rotation words only change while you're scrolling
@@ -471,6 +472,11 @@
   hov($('.nb[data-k="contact"]'), 'soon');
   $$('.work').forEach(n => hov(n, 'pick'));
   $$('.logo').forEach(a => a.addEventListener('click', e => { e.preventDefault(); jumpTo(0); }));
+  $$('a[href^="#case-"]').forEach(a => a.addEventListener('click', e => {
+    e.preventDefault();
+    const t = $(a.getAttribute('href'));
+    if (t) lenis.scrollTo(endPx + t.offsetTop, { duration: 1.2, easing: inOut });
+  }));
   $$('a[href="#"]').forEach(a => a.addEventListener('click', e => e.preventDefault()));
 
   // work section: reveal as it comes into view; "brand" only turns while it's on screen
@@ -517,6 +523,52 @@
   function resplit() { heads.forEach(h => splitLines(h).forEach(l => { if (revealing && !l.classList.contains('in')) io.observe(l); })); }
   new IntersectionObserver(es => es.forEach(en => { brandOn = en.isIntersecting; })).observe(cy.brand.el);
   $$('#s-cases img').forEach(i => i.addEventListener('load', () => ready && metrics()));
+
+  /* ---------- sound: the same interface sounds as sumojoestudio.com, synthesised (no files) ---------- */
+  // Browsers only allow sound after a click or tap, so it starts with your first one.
+  let actx = null, master = null, hoverAt = 0, tickAt = 0, tickTravel = 0, lastHover = null;
+  function audio() {
+    if (!actx) { actx = new (window.AudioContext || window.webkitAudioContext)(); master = actx.createGain(); master.gain.value = 0.5; master.connect(actx.destination); }
+    if (actx.state !== 'running') actx.resume();
+    return actx;
+  }
+  function blip(f0, f1, dur, vol, type = 'sine') {
+    if (!actx || actx.state !== 'running') return;
+    const t = actx.currentTime + 0.002, o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    g.gain.setValueAtTime(1e-4, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.003); g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+    o.connect(g).connect(master); o.start(t); o.stop(t + dur + 0.02);
+  }
+  function crackle() {
+    if (!actx || actx.state !== 'running') return;
+    const t = actx.currentTime + 0.002, n = Math.ceil(0.012 * actx.sampleRate), b = actx.createBuffer(1, n, actx.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n) ** 3;
+    const src = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain();
+    src.buffer = b; f.type = 'bandpass'; f.frequency.value = 3200; f.Q.value = 1.2; g.gain.value = 0.25;
+    src.connect(f).connect(g).connect(master); src.start(t);
+  }
+  const clickable = n => (n instanceof Element ? n.closest('a, button, [role=button], #wheel-list li') : null);
+  document.addEventListener('pointerdown', e => {
+    audio();
+    if (clickable(e.target)) { blip(1500, 700, 0.045, 0.16, 'triangle'); crackle(); }          // click: a short "tock"
+  });
+  document.addEventListener('pointerover', e => {
+    if (e.pointerType !== 'mouse') return;
+    const c = clickable(e.target);
+    if (c && c !== lastHover && actx && performance.now() - hoverAt > 70) { hoverAt = performance.now(); blip(2600, 2200, 0.018, 0.035); }   // hover: a tiny tick
+    lastHover = c;
+  });
+  function scrollTick(delta, velocity) {          // scroll: a soft tick every 160px, brighter when you scroll faster
+    if (!actx) return;
+    tickTravel += Math.abs(delta);
+    if (tickTravel < 160) return;
+    tickTravel = 0;
+    const now = performance.now();
+    if (now - tickAt < 70) return;
+    tickAt = now;
+    const a = Math.min(1, Math.abs(velocity) / 60);
+    blip(520 + 520 * a, 420 + 420 * a, 0.03, 0.03 + 0.03 * a, 'triangle');
+  }
 
   /* ---------- start ---------- */
   let rz;
