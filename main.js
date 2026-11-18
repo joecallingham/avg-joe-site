@@ -209,11 +209,10 @@
     const mid = (vh - h) / 2, low = vh - pad * 0.95 - h;
     const ax0 = (vw - (wa + gap + wj)) / 2;
     return {
-      vh, vw, wa, wj, gap, r, full: vw - 2 * fr,
+      vh, vw, wa, wj, gap, r, full: vw - 2 * fr, fullH: vh - 2 * fr,
       avg: [{ x: ax0, y: mid }, { x: pad, y: mid }, { x: pad, y: low }],
       joe: [{ x: ax0 + wa + gap, y: mid + jy }, { x: vw - pad - wj, y: mid + jy }, { x: vw - pad - wj, y: low + jy }],
       hero: [s1, s1, { x: fr, y: fr, width: vw - 2 * fr, height: vh - 2 * fr }, s2, { ...s2, y: s2.y - vh }],
-      line3: { x: s2.x + s2.width / 2 - vw / 2, y: s2.y + s2.height / 2 - vh / 2, scale: s2.width / (vw * 0.985) },
       bigFs: parseFloat(getComputedStyle($('.big')).fontSize),
     };
   }
@@ -222,6 +221,7 @@
     const keep = tl ? tl.time() : 0;
     if (tl) tl.kill();
     const P = measure(), vh = P.vh;
+    heroImg.style.width = P.full + 'px'; heroImg.style.height = P.fullH + 'px';
     const lines = $$('.big .ln');
     // starting state
     gsap.set(el.avg, P.avg[0]); gsap.set(el.joe, P.joe[0]); gsap.set(el.hero, P.hero[0]);
@@ -249,11 +249,11 @@
     ft(el.slot1, { '--w': 1 }, { '--w': 0 }, 1.76, { duration: 0.24, ease: 'power2.inOut' });
     tl.set(el.big, { autoAlpha: 1 }, 1.99);
 
-    // 2 → 3: the image contracts into the big sentence, carrying the small one with it,
-    //        while the big sentence animates in line by line
+    // 2 → 3: the frame crops in to its place in the big sentence; the small sentence stays put and fades,
+    //        while the big sentence animates in line by line (the frame crops in; the image doesn't shrink)
     ft(el.hero, P.hero[2], P.hero[3], 2);
-    ft(el.line, { x: 0, y: 0, scale: 1 }, P.line3, 2);
-    ft(el.line, { autoAlpha: 1 }, { autoAlpha: 0 }, 2, { duration: 0.6, ease: 'power2.in' });
+    // the small sentence stays put at the same size and fades out as the frame crops in past it
+    ft(el.line, { autoAlpha: 1 }, { autoAlpha: 0 }, 2.3, { duration: 0.38, ease: 'power1.in' });
     lines.forEach((ln, i) => ft(ln, { autoAlpha: 0, y: P.bigFs * 0.45 }, { autoAlpha: 1, y: 0 }, 2.1 + i * 0.18, { duration: 0.55, ease: 'power2.out' }));
 
     // 3 → 4: everything but the logo and nav moves up, the wheel comes in spinning
@@ -284,6 +284,10 @@
     layoutWheel();
     // As Avg and Joe part, the gap between them uncovers the image first; the words (already in place)
     // only start to show once the gap has passed the image's edges. Fully open after that.
+    // The image never scales: it stays full-frame size, centred in its frame, and the frame crops in and out of it.
+    const w = el.hero.offsetWidth, h = el.hero.offsetHeight;
+    const ox = (w - geo.full) / 2, oy = (h - geo.fullH) / 2;
+    heroImg.style.transform = `translate(${ox.toFixed(1)}px,${oy.toFixed(1)}px)`;
     if (t < 1) {
       const pad = geo.gap * 1.6, vw = geo.vw;
       const gl = gsap.getProperty(el.avg, 'x') + geo.wa + pad;      // gap left edge (viewport x)
@@ -293,14 +297,15 @@
         heroImg.style.clipPath = 'inset(0 0 0 100%)';
         el.line.style.setProperty('--l', vw / 2 + 'px'); el.line.style.setProperty('--r', vw / 2 + 'px');
       } else {
-        heroImg.style.clipPath = `inset(0 ${Math.max(0, hb.right - gr).toFixed(1)}px 0 ${Math.max(0, gl - hb.left).toFixed(1)}px)`;
+        // the gap, in the image's own coordinates
+        const L = Math.max(0, gl - hb.left) - ox, R = ox + geo.full - w + Math.max(0, hb.right - gr);
+        heroImg.style.clipPath = `inset(0 ${Math.max(0, R).toFixed(1)}px 0 ${Math.max(0, L).toFixed(1)}px)`;
         const tl_ = Math.min(gl, hb.left), tr_ = Math.max(gr, hb.right);   // words start at the image's edges
         el.line.style.setProperty('--l', Math.max(0, tl_).toFixed(1) + 'px');
         el.line.style.setProperty('--r', Math.max(0, vw - tr_).toFixed(1) + 'px');
       }
     } else { el.line.style.setProperty('--l', '0px'); el.line.style.setProperty('--r', '0px'); heroImg.style.clipPath = ''; }
-    // the image's corners round off gradually as it moves away from filling the frame
-    const w = el.hero.offsetWidth, h = el.hero.offsetHeight;
+    // the frame's corners round off gradually as it moves away from filling the screen
     const fullness = Math.min(1, w / geo.full);
     el.hero.style.borderRadius = Math.min(0.16 * Math.min(w, h), (1 - fullness) * 1.8 * geo.r).toFixed(2) + 'px';
     // work pops in beside whichever word is in focus

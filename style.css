@@ -59,7 +59,7 @@ img{display:block;max-width:100%}
 /* ---------- travelling image ---------- */
 #hero{position:fixed;left:0;top:0;z-index:2;overflow:hidden;width:0;height:0;border-radius:.25rem;
   will-change:transform,width,height}
-#hero img{width:100%;height:100%;object-fit:cover}
+#hero img{position:absolute;left:0;top:0;max-width:none;object-fit:cover;will-change:transform}
 /* intro: while you're at the top, Avg and Joe open on their own to show one of these */
 #intro{position:fixed;left:50%;top:50%;z-index:59;pointer-events:none;color:var(--ink)}
 #intro>*{position:absolute;left:0;top:0;visibility:hidden;opacity:0;display:block;max-width:none}
