@@ -122,6 +122,10 @@ img{display:block;max-width:100%}
 .case-620:hover .sys{color:#3d6b12}
 .rv{opacity:0;transform:translateY(2rem);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform 1.1s cubic-bezier(.2,.7,.2,1)}
 .rv.in{opacity:1;transform:none}
+.pills li.rv{transform:translateY(1rem)}
+.pills li.rv.in{transform:none}
+.case img.rv{transform:translateY(3rem)}
+.case img.rv.in{transform:none}
 
 /* ---------- nav notch ---------- */
 /* the bar + notch are cut out of images in main.js (cutImages), so only images show them */

@@ -37,7 +37,8 @@
     notch: $('.notch'),
   };
 
-  const wp = { v: -3 };
+  const SPIN = 1 / WS;                // wheel speed: words per screen of scrolling, used everywhere
+  const wp = { v: -SPIN };
   const rem = () => parseFloat(getComputedStyle(document.documentElement).fontSize);
   const cssPx = n => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n)) * rem();
 
@@ -230,7 +231,7 @@
     gsap.set(el.wheel, { y: vh, autoAlpha: 1, visibility: 'visible' });
     gsap.set(el.cases, { y: vh, visibility: 'visible' });
     gsap.set(el.wbg, { opacity: 0 });
-    wp.v = -3;
+    wp.v = -SPIN;
 
     tl = gsap.timeline({ paused: true, defaults: { ease: EASE, duration: 1 } });
     const ft = (t, from, to, at, extra = {}) => tl.fromTo(t, from, { ...to, immediateRender: false, ...extra }, at);
@@ -258,14 +259,16 @@
     ft(el.big, { y: 0 }, { y: -vh }, 3);
     ft(el.hero, P.hero[3], P.hero[4], 3);
     ft(el.wheel, { y: vh }, { y: 0 }, 3);
-    ft(wp, { v: -3 }, { v: 0 }, 3);
+    ft(wp, { v: -SPIN }, { v: 0 }, 3);                               // spins in at the same speed
     ft(el.wbg, { opacity: 0 }, { opacity: 1 }, 3.2, { duration: 0.8 });
 
     // 4 → WE: the wheel turns, one word per WS
     ft(wp, { v: 0 }, { v: SERVICES.length - 1 }, 4, { duration: WE - 4 });
 
     // WE → END: the work comes up
-    ft(el.wheel, { y: 0, autoAlpha: 1 }, { y: -vh * 0.35, autoAlpha: 0 }, WE);
+    ft(wp, { v: SERVICES.length - 1 }, { v: SERVICES.length - 1 + SPIN }, WE);   // keeps spinning as it leaves
+    ft(el.wheel, { y: 0 }, { y: -vh * 0.35 }, WE);
+    ft(el.wheel, { autoAlpha: 1 }, { autoAlpha: 0 }, WE + 0.45, { duration: 0.55 });
     ft(el.wbg, { opacity: 1 }, { opacity: 0 }, WE, { duration: 0.6 });
     ft(el.cases, { y: vh }, { y: 0 }, WE);
 
@@ -300,7 +303,8 @@
     const fullness = Math.min(1, w / geo.full);
     el.hero.style.borderRadius = Math.min(0.16 * Math.min(w, h), (1 - fullness) * 1.8 * geo.r).toFixed(2) + 'px';
     // work pops in beside whichever word is in focus
-    const wi = t > 3.6 && t < WE + 0.35 ? Math.round(gsap.utils.clamp(0, SERVICES.length - 1, wp.v)) : -1;
+    const wv = Math.round(wp.v);
+    const wi = t > 3.6 && wv >= 0 && wv <= SERVICES.length - 1 ? wv : -1;
     if (wi !== shown) { shown = wi; showWorks(wi); }
   }
 
@@ -354,7 +358,7 @@
     const t = unit > 1 ? cur / unit : 0, past = Math.max(0, cur - endPx);
     unit = innerHeight * UNIT;
     endPx = END * unit;
-    maxPx = endPx + Math.max(0, el.cases.scrollHeight - el.cases.clientHeight);
+    maxPx = endPx + Math.max(0, el.cases.scrollHeight - el.cases.clientHeight) + innerHeight;   // + one screen so the work slides up off
     spacer.style.height = (maxPx + innerHeight) + 'px';
     lenis.resize();
     const to = t <= END ? t * unit : endPx + past;
@@ -364,8 +368,10 @@
   function render() {
     const t = Math.min(cur / unit, END);
     if (Math.abs(t - tl.time()) > 1e-5) tl.time(t);
-    const st = Math.max(0, cur - endPx);
+    const past = Math.max(0, cur - endPx), room = Math.max(0, el.cases.scrollHeight - el.cases.clientHeight);
+    const st = Math.min(past, room);
     if (Math.abs(el.cases.scrollTop - st) > 0.5) el.cases.scrollTop = st;
+    if (cur >= endPx) gsap.set(el.cases, { y: -(past - st) });      // after the last case study, the whole section slides up off screen
     cutImages();
   }
   lenis.on('scroll', l => {
@@ -427,7 +433,13 @@
     if (!en.isIntersecting) return;
     en.target.classList.add('in'); io.unobserve(en.target);
   }), { threshold: 0.15 });
-  $$('.rv').forEach(n => io.observe(n));
+  // copy, lozenges and images slide and fade up; siblings (each lozenge, each image) follow one after another
+  $$('.rv').forEach(n => {
+    const sibs = [...n.parentElement.children].filter(c => c.classList.contains('rv'));
+    const i = sibs.indexOf(n);
+    if (i > 0) n.style.transitionDelay = (i * (n.tagName === 'IMG' ? 0.14 : 0.07)).toFixed(2) + 's';
+  });
+  const startReveal = () => $$('.rv').forEach(n => io.observe(n));   // only once the work section has been moved below the screen
   new IntersectionObserver(es => es.forEach(en => { brandOn = en.isIntersecting; })).observe(cy.brand.el);
   $$('#s-cases img').forEach(i => i.addEventListener('load', () => ready && metrics()));
 
@@ -450,6 +462,7 @@
   Promise.race([loaded, new Promise(r => setTimeout(r, 2500))]).then(() => {
     Object.values(cy).forEach(c => c.measure());
     build(); metrics(); setNav('studio'); notchGeo(); ready = true; render();
+    requestAnimationFrame(() => requestAnimationFrame(startReveal));
     gsap.fromTo('.logo', { opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0px)', duration: RM ? 0.01 : 1.2, ease: 'power2.out', stagger: 0.12, clearProps: 'filter' });
     if (cur <= 2) gsap.delayedCall(RM ? 0 : 1.1, () => { if (cur <= 2) introStart(); });
   });
