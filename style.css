@@ -122,21 +122,22 @@ img{display:block;max-width:100%}
 .case + .case{padding-top:0}
 /* Boon: heading over 11 columns; images 8 + 4 columns, same height */
 .case-boon{min-height:100vh;min-height:100svh}
-.case-boon h2{grid-column:1/span 11;font-size:3.62rem;line-height:1.14}
-.case-boon .pills{grid-column:1/-1;margin:calc(var(--s2) - var(--gutter)) 0 calc(var(--s2) - var(--gutter))}
+.case-boon h2{grid-column:1/span 11;font-size:3.62rem;line-height:1.14;margin-bottom:calc(var(--s2) - var(--gutter))}
 .boon-grid{display:contents}
 .boon-grid img{width:100%;height:29.5rem;object-fit:cover}
-.boon-grid img:first-child{grid-column:1/span 8}
-.boon-grid img:last-child{grid-column:9/span 4}
+.boon-grid figure{grid-column:1/span 8}
+.boon-grid .van{grid-column:9/span 4;transition-delay:.14s}
 .case-boon .more{grid-column:1/-1;margin-top:calc(var(--s1) - var(--gutter))}
 /* 620: copy over 6 columns, image over the other 6; copy top and "View Case Study" line up with the image */
 .case-620{min-height:100vh;min-height:100svh;align-items:stretch}
 .case-620 .txt{grid-column:1/span 6;display:flex;flex-direction:column;justify-content:space-between}
 .case-620 h2{font-size:3.8rem;line-height:1.03;letter-spacing:-.055em;margin-top:-.12em}
 .case-620 .more{margin-top:var(--s2)}
-.case-620 figure{grid-column:7/span 6;position:relative}
+.case-620 figure{grid-column:7/span 6}
 .case-620 figure img{width:100%;height:auto}
-.case-620 figure .pills{position:absolute;left:var(--s2);top:var(--s2);z-index:1}
+/* lozenges sit on the image, top left, in every case study */
+.case figure{position:relative}
+.case figure .pills{position:absolute;left:var(--s2);top:var(--s2);right:var(--s2);z-index:1}
 .sys{transition:color .6s}
 .case-620:hover .sys{color:#3d6b12}
 /* grid overlay (press G) */
@@ -184,8 +185,15 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
   #wheel-list li{font-size:4.2rem}
   .case-boon h2{font-size:3.1rem;grid-column:1/-1}
   .boon-grid img{height:auto}
-  .boon-grid img:first-child,.boon-grid img:last-child{grid-column:1/-1}
+  .boon-grid figure,.boon-grid .van{grid-column:1/-1}
   .case-620 .txt,.case-620 figure{grid-column:1/-1}
+  /* phones: images and lozenges first, then the copy, then "View Case Study" under it */
+  .case-boon h2{order:2}
+  .case-boon .more{order:3;margin-top:calc(var(--s1) - var(--gutter))}
+  .case-620 .txt{order:1;justify-content:flex-start}
+  .case-620{min-height:0;align-items:start}
+  .case-620 .more{margin-top:var(--s1)}
+  .case-620 h2{margin-top:0}
   .case-620{padding-bottom:9rem}
   .case-620 h2{font-size:3.6rem}
   .notch{width:38rem;height:3.6rem;gap:1.6rem}
