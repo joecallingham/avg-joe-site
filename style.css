@@ -189,7 +189,11 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
 /* ---------- phones ---------- */
 @media (max-width:760px){
   html{font-size:2.35vw}
-  :root{--frame:.8rem;--cols:4;--margin:1.6rem;--gutter:1rem;--ov-wide:none}
+  :root{--frame:.8rem;--cols:4;--margin:1.6rem;--gutter:2.2rem;--ov-wide:none;
+    /* roomier spacing steps on phones */
+    --s1:1.4rem;--s2:2.8rem;--s3:5.2rem;--s4:8.5rem}
+  .fw-grid{row-gap:var(--s3)}
+  .case{padding-top:var(--s3);min-height:0;align-content:start}
   /* phones: the sentence sits on three lines with the image in the middle one, close to the centre */
   .line{white-space:nowrap;text-align:center;font-size:3.1rem;line-height:1.18}
   .mbr{display:inline}
