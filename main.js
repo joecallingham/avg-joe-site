@@ -256,13 +256,13 @@
     // 0 → 1: Avg Joe part to the edges; the gap between them uncovers the image first, then the words
     ft(el.avg, P.avg[0], P.avg[1], 0); ft(el.joe, P.joe[0], P.joe[1], 0);
 
-    // 1 → 2: first the image opens to fill the frame; then Avg (leading) and Joe drop to the bottom;
-    //        then the sentence closes up on top of the image
+    // 1 → 2: the image opens to fill the frame while the sentence closes up over it;
+    //        then Avg (leading) and Joe drop to the bottom
     ft(el.hero, P.hero[1], P.hero[2], 1, { duration: 0.45 });
     ft(el.line, { color: '#0b0b0b' }, { color: '#ffffff' }, 1.1, { duration: 0.25 });
     ft(el.avg, P.avg[1], P.avg[2], 1.5, { duration: 0.34 });    // only once the image is fully open; linear, so it moves 1:1 with the scroll
     ft(el.joe, P.joe[1], P.joe[2], 1.56, { duration: 0.34 });
-    ft(el.slot1, { '--w': 1 }, { '--w': 0 }, 1.76, { duration: 0.24, ease: 'power2.inOut' });
+    ft(el.slot1, { '--w': 1 }, { '--w': 0 }, 1, { duration: 0.45 });   // the sentence closes up while the image expands
     tl.set(el.big, { autoAlpha: 1 }, 1.99);
 
     // 2 → 3: the frame crops in to its place in the big sentence; the small sentence stays put and fades,
