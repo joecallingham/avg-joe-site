@@ -584,11 +584,15 @@
     clearTimeout(rz);
     rz = setTimeout(() => {
       if (!ready) return;
-      if (TOUCH && innerWidth === lastW) return;   // just the address bar sliding in or out: ignore
+      if (TOUCH && innerWidth === lastW) {
+        // just the browser bars sliding in or out: re-place everything for the new height,
+        // but keep the scroll distances as they are so the page doesn't jump under your finger
+        build(); notchGeo(); lenis.resize(); render(); return;
+      }
       lastW = innerWidth;
       advCache.clear(); Object.values(cy).forEach(c => c.measure());
       resplit(); build(); metrics(); notchGeo(); render(); setNav('studio');
-    }, 120);
+    }, TOUCH ? 60 : 120);
   });
 
   const loaded = Promise.all([
