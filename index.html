@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Avg Joe — a studio putting the extra into ordinary</title>
+<meta name="description" content="Avg Joe is a studio blending craft and AI, putting the extra into ordinary.">
+<meta name="theme-color" content="#f1eee7">
+<link rel="preload" href="img/mushroom.jpg" as="image">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main id="stage">
+  <div id="wheel-bg" aria-hidden="true"></div>
+
+  <!-- 3. the big sentence, revealed as the image contracts -->
+  <section id="s-big" class="layer" aria-label="What we do">
+    <p class="big">
+      <span class="ln">blending <span class="cycle" id="cy-craft" data-final=",snell-black,avebury,iowan-black,iowan-black">craft</span> <span class="amp">&amp;</span> <span class="ai">AI</span></span>
+      <span class="ln">putting<span id="slot2" class="slot2"></span>the extra</span>
+      <span class="ln">into <img class="swallow" src="img/swallow.png" alt="" width="147" height="97"> ordinary.</span>
+    </p>
+  </section>
+
+  <!-- 4. services wheel -->
+  <section id="s-wheel" class="layer" aria-label="Services">
+    <div id="wheel"><ul id="wheel-list"></ul></div>
+    <div id="works"></div>
+  </section>
+
+  <!-- 5. case studies (scrolls natively) -->
+  <section id="s-cases" class="layer" aria-label="Work">
+    <article class="case case-boon">
+      <h2 class="rv">How do you build an inclusive community with trusted products? More than coffee, Brewed by Boon want to clean up the industry as well as serve.</h2>
+      <ul class="pills rv"><li>Branding</li><li>Art Direction</li><li>App Build</li><li>Photography</li></ul>
+      <div class="boon-grid rv">
+        <img src="img/boon-sign.jpg" alt="Brewed by Boon neon sign" loading="lazy" width="2200" height="1004">
+        <img src="img/boon-van.jpg" alt="Brewed by Boon coffee van at a festival" loading="lazy" width="1400" height="1311">
+      </div>
+      <a class="more rv" href="#">View Case Study ↘</a>
+    </article>
+
+    <article class="case case-620">
+      <div class="txt">
+        <h2 class="rv">620 Tennis wanted more time coaching. So we gave them a <span class="cycle" id="cy-brand" data-final=",snell-black,avebury,iowan-black,iowan-black-italic">brand</span> worth seeing and an automated <span class="sys">system</span> that promotes their camps for them.</h2>
+        <a class="more rv" href="#">View Case Study ↘</a>
+      </div>
+      <figure class="rv">
+        <ul class="pills"><li>Branding</li><li>Automation</li><li>Art Direction</li><li>Photography</li></ul>
+        <img src="img/620.jpg" alt="Kids playing football at a 620 camp" loading="lazy" width="1800" height="1805">
+      </figure>
+    </article>
+  </section>
+
+  <!-- the one image that travels through the first three steps -->
+  <div id="hero" aria-hidden="true"><img src="img/mushroom.jpg" alt="" width="2800" height="1489"></div>
+
+  <!-- 1–2. the small sentence -->
+  <section id="s-line" class="layer" aria-label="Intro">
+    <p class="line">a <span class="cycle" id="cy-studio" data-final="postoni,avebury,snell-black,iowan-black-italic,gilroy-heavy,gilroy-heavy">studio</span> putting the<span id="slot1" class="slot1"></span> extra into ordinary</p>
+  </section>
+</main>
+
+<div id="veil" aria-hidden="true"></div>
+
+<a id="logo-avg" class="logo" href="#top" aria-label="Avg Joe, back to start">Avg</a>
+<a id="logo-joe" class="logo" href="#top" aria-hidden="true" tabindex="-1">Joe</a>
+
+<nav id="nav" aria-label="Main">
+  <div class="notch">
+    <svg viewBox="0 0 220 42" preserveAspectRatio="none" aria-hidden="true"><path d="M0 42C9 42 12.5 37 14.5 27 17 11 23 2 40 2H180C197 2 203 11 205.5 27 207.5 37 211 42 220 42V44H0Z"/></svg>
+    <div class="strip">
+      <div class="track">
+        <a href="#work" data-k="work">Work</a>
+        <a href="#top" data-k="studio" class="on">Studio</a>
+        <a href="#contact" data-k="contact">Contact</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
