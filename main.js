@@ -154,7 +154,7 @@
 
   /* ---------- nav: stays on Studio ---------- */
   // The middle button talks: its words change with where you are (and with what you hover).
-  const SAYS = { top: 'Studio', big: "That's us", wheel: 'Pick one?', pick: 'Good choice', work: 'Have a nose', end: 'Say hello?', soon: 'Soon, promise' };
+  const SAYS = { top: 'Studio', big: "That's us", wheel: 'Pick one?', pick: 'Good choice', work: 'Have a nose', end: 'Say hello?', soon: "Let's chat" };
   let saying = 'Studio', sayTl = null, hoverSay = null;
   function say(text) {
     if (text === saying) return;
@@ -462,9 +462,10 @@
   });
 
   $$('.nb').forEach(a => a.addEventListener('click', e => {
+    if (a.dataset.k === 'contact') return;          // Contact opens WhatsApp in a new tab
     e.preventDefault();
     if (a.dataset.k === 'studio') jumpTo(0);
-    if (a.dataset.k === 'work') goTo(END);           // Contact: no page yet
+    if (a.dataset.k === 'work') goTo(END);
   }));
   const hov = (n, key) => { n.addEventListener('mouseenter', () => { hoverSay = key; navState(); }); n.addEventListener('mouseleave', () => { hoverSay = null; navState(); }); };
   hov($('.nb[data-k="contact"]'), 'soon');
