@@ -1,12 +1,17 @@
-/* Avg Joe — stepped scroll. Each scroll gesture moves one step and locks into place.
-   Steps: 0 logo · 1 sentence · 2 full image · 3 big sentence · 4 services wheel · 5 work (native scroll) */
+/* Avg Joe — scroll-driven. Scrolling scrubs one timeline forwards and backwards;
+   when you stop, it eases into the nearest resting point. Smooth (lerped) scroll throughout.
+   Rests: 0 logo · 1 sentence · 2 full image · 3 big sentence · 4… services wheel (one rest per word) · end: work */
 (() => {
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const DUR = RM ? 0.01 : 1.25;      // main step
-  const WDUR = RM ? 0.01 : 0.8;      // one click of the wheel
-  const EASE = 'power3.inOut';
+  const EASE = 'power2.inOut';
+
+  // feel — tweak these
+  const SMOOTH = 3.6;        // how fast the page catches up with your scroll (lower = smoother, slower)
+  const SPEED = 0.55;        // scroll input multiplier (lower = slower)
+  const SNAP_WAIT = 220;     // ms of stillness before it settles into place
+  const SNAP_PULL = 0.22;    // how far into the next section (0–1) before it carries on instead of falling back
 
   const SIZE = { 'snell-black': '1.22em', kelsi: '.82em', campground: '1.08em', postoni: '.92em' };   // optical size per face
   const ROT = ['avebury', 'campground', 'gilroy-heavy', 'kelsi', 'postoni', 'iowan-black', 'iowan-black-italic', 'snell-black'];
@@ -31,9 +36,9 @@
     works: $('#works'), cases: $('#s-cases'), veil: $('#veil'), track: $('.track'), strip: $('.strip'),
   };
 
-  let state = 0, busy = false, wheelIdx = 0, slotW = 0;
-  const wp = { v: 0 };
+  const wp = { v: -3 };
   const rem = () => parseFloat(getComputedStyle(document.documentElement).fontSize);
+  const cssPx = n => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n)) * rem();
 
   /* ---------- letters that rotate through typefaces ---------- */
   class Cycler {
@@ -81,16 +86,20 @@
       }, 1100);
     }
     stop() { this.timers.forEach(clearTimeout); this.timers = []; clearInterval(this.iv); this.iv = 0; }
-    get running() { return this.iv || this.timers.length; }
   }
   const cy = { studio: new Cycler($('#cy-studio')), craft: new Cycler($('#cy-craft')), brand: new Cycler($('#cy-brand')) };
 
   /* ---------- wheel ---------- */
   const STEP = 12, RADIUS = 37.5;     // degrees between words, rem from the pivot
+  const WS = 0.7;                     // timeline length of one wheel click (sections are 1)
+  const WE = 4 + (SERVICES.length - 1) * WS;     // wheel end
+  const END = WE + 1;                 // work section fully in
+  const RESTS = [0, 1, 2, 3, ...SERVICES.map((_, i) => 4 + i * WS), END];
+
   const items = SERVICES.map((s, i) => {
     const li = document.createElement('li');
     li.textContent = s.name;
-    li.addEventListener('click', () => { if (state === 4) setWheel(i); });
+    li.addEventListener('click', () => { const t = tl.time(); if (t > 3.6 && t < WE + 0.4) goTo(4 + i * WS); });
     el.list.appendChild(li);
     return li;
   });
@@ -98,7 +107,7 @@
     const a = document.createElement('a');
     a.className = 'work'; a.href = w.href;
     a.style.cssText = `left:${w.x}%;top:${w.y}%;width:${w.w}rem`;
-    a.innerHTML = `<div class="ph" style="aspect-ratio:${w.ar}"><img src="img/${w.img}.jpg" alt="" loading="lazy"></div><span>View Case Study ↘</span>`;
+    a.innerHTML = `<div class="ph" style="aspect-ratio:${w.ar}"><img src="img/${w.img}.jpg" alt=""></div><span>View Case Study ↘</span>`;
     a.setAttribute('aria-label', `${s.name}: view case study`);
     el.works.appendChild(a);
     return a;
@@ -112,203 +121,256 @@
       li.style.opacity = ad > 4.6 ? 0 : Math.max(0.12, 1 - ad * 0.22).toFixed(3);
     });
   }
-  function showWorks(i, delay = 0) {
+  function showWorks(i) {
     cards.forEach((set, k) => {
       if (k === i) {
         gsap.fromTo(set, { autoAlpha: 0, scale: 0.7, y: 24 },
-          { autoAlpha: 1, scale: 1, y: 0, duration: RM ? 0.01 : 0.7, ease: 'back.out(1.7)', stagger: 0.09, delay, overwrite: true });
+          { autoAlpha: 1, scale: 1, y: 0, duration: RM ? 0.01 : 0.7, ease: 'back.out(1.7)', stagger: 0.09, overwrite: true });
       } else {
         gsap.to(set, { autoAlpha: 0, scale: 0.8, y: -12, duration: RM ? 0.01 : 0.28, ease: 'power2.in', overwrite: true });
       }
     });
-  }
-  function setWheel(i, dur = WDUR) {
-    wheelIdx = i;
     items.forEach((li, k) => li.setAttribute('aria-current', k === i ? 'true' : 'false'));
-    gsap.to(wp, { v: i, duration: dur, ease: 'power3.out', overwrite: true, onUpdate: layoutWheel });
-    showWorks(i, 0.12);
-    busy = true; gsap.delayedCall(Math.min(dur, 0.42), () => { busy = false; });
   }
 
-  /* ---------- nav ---------- */
+  /* ---------- nav: stays on Studio ---------- */
   function setNav(key) {
     $$('a', el.track).forEach(a => {
       const on = a.dataset.k === key;
       a.classList.toggle('on', on);
-      if (on) { a.setAttribute('aria-current', 'page'); } else { a.removeAttribute('aria-current'); }
+      if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
     const a = $(`a[data-k="${key}"]`, el.track);
-    const x = el.strip.clientWidth / 2 - (a.offsetLeft + a.offsetWidth / 2);
-    gsap.to(el.track, { x, duration: RM ? 0.01 : 0.7, ease: 'power3.out', overwrite: true });
+    gsap.set(el.track, { x: el.strip.clientWidth / 2 - (a.offsetLeft + a.offsetWidth / 2) });
   }
 
-  /* ---------- where everything sits at each step ---------- */
-  function slot1Rect(w) {
-    el.slot1.style.setProperty('--w', w);
-    const r = el.slot1.getBoundingClientRect();
-    el.slot1.style.setProperty('--w', slotW);
-    return r;
-  }
-  function heroRect(st) {
-    const vw = innerWidth, vh = innerHeight;
-    if (st <= 1) { const r = slot1Rect(st); return { x: r.left, y: r.top, w: r.width, h: r.height, br: 0.25 }; }
-    if (st === 2) { const p = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--frame')) * rem(); return { x: p, y: p, w: vw - 2 * p, h: vh - 2 * p, br: 0 }; }
-    const r = el.slot2.getBoundingClientRect(), oy = gsap.getProperty(el.big, 'y') || 0;
-    return { x: r.left, y: r.top - oy - (st >= 4 ? vh : 0), w: r.width, h: r.height, br: 0.5 };
-  }
-
-  function render(st, d = 0, from = st) {
+  /* ---------- the timeline: where everything sits at each rest, and the moves between ---------- */
+  let tl;
+  function measure() {
     const vw = innerWidth, vh = innerHeight, r = rem();
-    const t = gsap.timeline({ defaults: { duration: d, ease: EASE, overwrite: 'auto' } });
+    gsap.set([el.avg, el.joe, el.line, el.big], { clearProps: 'transform' });
+    const rect = n => { const b = n.getBoundingClientRect(); return { x: b.left, y: b.top, width: b.width, height: b.height }; };
+    el.slot1.style.setProperty('--w', 0); const s0 = rect(el.slot1);
+    el.slot1.style.setProperty('--w', 1); const s1 = rect(el.slot1);
+    el.slot1.style.setProperty('--w', 0);
+    const s2 = rect(el.slot2);
 
-    // logo: together in the middle, out to the edges, then down to its permanent home
     const wa = el.avg.offsetWidth, wj = el.joe.offsetWidth, h = el.avg.offsetHeight;
-    const pad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pad')) * r, gap = 0.36 * r;
-    let ax = pad, jx = vw - pad - wj, y = vh - pad * 0.95 - h;
-    if (st === 0) { ax = (vw - (wa + gap + wj)) / 2; jx = ax + wa + gap; }
-    if (st <= 1) y = (vh - h) / 2;
-    t.to(el.avg, { x: ax, y }, 0).to(el.joe, { x: jx, y: y + 0.06 * r }, 0);
-
-    // small sentence
-    const hr = heroRect(st);
-    slotW = st === 1 ? 1 : 0;
-    let lx = 0, ly = 0, ls = 1;
-    if (st >= 3) { ls = hr.w / (vw * 0.985); lx = hr.x + hr.w / 2 - vw / 2; ly = hr.y + hr.h / 2 - vh / 2; }
-    t.to(el.line, { '--c': st === 0 ? 50 : 0, x: lx, y: ly, scale: ls }, 0)
-     .to(el.line, { autoAlpha: st >= 3 ? 0 : 1, ease: st >= 3 ? 'power3.in' : 'power3.out', duration: st >= 3 ? d * 0.7 : d * 0.5 }, st >= 3 ? 0 : d * 0.3)
-     .to(el.slot1, { '--w': slotW }, 0);
-    const white = st >= 2;
-    t.to(el.line, { color: white ? '#fff' : '#0b0b0b', duration: d * 0.3, ease: 'none' }, from > st ? d * 0.5 : d * 0.18);
-
-    // the image
-    t.to(el.hero, { x: hr.x, y: hr.y, width: hr.w, height: hr.h, borderRadius: hr.br + 'rem' }, 0)
-     .set(el.hero, { autoAlpha: st === 5 ? 0 : 1 }, st === 5 ? d : 0);
-
-    // big sentence waits underneath the image
-    t.set(el.big, { autoAlpha: st >= 2 && st <= 4 ? 1 : 0 }, st >= 2 && from < 2 ? d * 0.92 : (st === 5 ? d : 0))
-     .to(el.big, { y: st >= 4 ? -vh : 0 }, 0);
-
-    // wheel + work
-    t.set([el.wheel, el.cases], { visibility: 'visible' }, 0)
-     .to(el.wheel, { y: st < 4 ? vh : st === 4 ? 0 : -vh * 0.35, autoAlpha: st === 4 ? 1 : (st < 4 ? 1 : 0) }, 0)
-     .to(el.wbg, { opacity: st === 4 ? 1 : 0, duration: d * 0.8 }, st === 4 ? d * 0.2 : 0)
-     .to(el.cases, { y: st < 5 ? vh : 0 }, 0)
-     .set(el.wheel, { visibility: st === 4 ? 'visible' : 'hidden' }, d)
-     .set(el.cases, { visibility: st === 5 ? 'visible' : 'hidden' }, d);
-    return t;
+    const pad = cssPx('--pad'), gap = 0.36 * r, fr = cssPx('--frame');
+    const mid = (vh - h) / 2, low = vh - pad * 0.95 - h, jy = 0.06 * r;
+    const ax0 = (vw - (wa + gap + wj)) / 2;
+    return {
+      vh, vw, wa, wj, gap,
+      avg: [{ x: ax0, y: mid }, { x: pad, y: mid }, { x: pad, y: low }],
+      joe: [{ x: ax0 + wa + gap, y: mid + jy }, { x: vw - pad - wj, y: mid + jy }, { x: vw - pad - wj, y: low + jy }],
+      hero: [
+        { ...s0, borderRadius: 0.25 * r },
+        { ...s1, borderRadius: 0.25 * r },
+        { x: fr, y: fr, width: vw - 2 * fr, height: vh - 2 * fr, borderRadius: 0 },
+        { ...s2, borderRadius: 0.5 * r },
+        { ...s2, y: s2.y - vh, borderRadius: 0.5 * r },
+      ],
+      line3: { x: s2.x + s2.width / 2 - vw / 2, y: s2.y + s2.height / 2 - vh / 2, scale: s2.width / (vw * 0.985) },
+    };
   }
 
-  function enter(st, from) {
-    // type rotation
-    if (st === 1 || st === 2) { if (!cy.studio.running || from === 0) cy.studio.burst(); } else cy.studio.stop();
-    if (st === 3) gsap.delayedCall(from === 2 ? DUR * 0.45 : 0.2, () => state === 3 && cy.craft.burst()); else cy.craft.stop();
-    if (st !== 5) cy.brand.stop();
-    // wheel spins in
-    if (st === 4) {
-      if (from < 4) { wheelIdx = 0; wp.v = -3; }
-      if (from > 4) { wheelIdx = SERVICES.length - 1; wp.v = wheelIdx + 3; }
-      gsap.to(wp, { v: wheelIdx, duration: DUR * 1.15, ease: 'power3.out', onUpdate: layoutWheel, overwrite: true });
-      showWorks(wheelIdx, DUR * 0.6);
-    } else showWorks(-1);
-    if (st === 5 && from !== 5) el.cases.scrollTop = 0;
-    document.body.dataset.step = st;
+  function build() {
+    const keep = tl ? tl.time() : 0;
+    if (tl) tl.kill();
+    const P = measure(), vh = P.vh;
+    // starting state
+    gsap.set(el.avg, P.avg[0]); gsap.set(el.joe, P.joe[0]); gsap.set(el.hero, P.hero[0]);
+    gsap.set(el.line, { x: 0, y: 0, scale: 1, autoAlpha: 1, color: '#0b0b0b' });
+    gsap.set(el.slot1, { '--w': 0 });
+    gsap.set(el.big, { autoAlpha: 0, y: 0 });
+    gsap.set(el.wheel, { y: vh, autoAlpha: 1, visibility: 'visible' });
+    gsap.set(el.cases, { y: vh, visibility: 'visible' });
+    gsap.set(el.wbg, { opacity: 0 });
+    wp.v = -3;
+
+    tl = gsap.timeline({ paused: true, defaults: { ease: EASE, duration: 1 } });
+    const ft = (t, from, to, at, extra = {}) => tl.fromTo(t, from, { ...to, immediateRender: false, ...extra }, at);
+
+    // 0 → 1: Avg Joe part to the edges, the sentence opens from the middle, the image grows in the gap
+    ft(el.avg, P.avg[0], P.avg[1], 0); ft(el.joe, P.joe[0], P.joe[1], 0);
+    ft(el.slot1, { '--w': 0 }, { '--w': 1 }, 0);
+    ft(el.hero, P.hero[0], P.hero[1], 0);
+
+    // 1 → 2: the image fills the frame, the sentence closes up on top of it, the logo drops to its home
+    ft(el.avg, P.avg[1], P.avg[2], 1); ft(el.joe, P.joe[1], P.joe[2], 1);
+    ft(el.slot1, { '--w': 1 }, { '--w': 0 }, 1);
+    ft(el.hero, P.hero[1], P.hero[2], 1);
+    ft(el.line, { color: '#0b0b0b' }, { color: '#ffffff' }, 1.2, { duration: 0.35, ease: 'none' });
+    tl.set(el.big, { autoAlpha: 1 }, 1.97);
+
+    // 2 → 3: the image contracts into the big sentence, carrying the small one with it
+    ft(el.hero, P.hero[2], P.hero[3], 2);
+    ft(el.line, { x: 0, y: 0, scale: 1 }, P.line3, 2);
+    ft(el.line, { autoAlpha: 1 }, { autoAlpha: 0 }, 2, { duration: 0.7, ease: 'power3.in' });
+
+    // 3 → 4: everything but the logo and nav moves up, the wheel comes in spinning
+    ft(el.big, { y: 0 }, { y: -vh }, 3);
+    ft(el.hero, P.hero[3], P.hero[4], 3);
+    ft(el.wheel, { y: vh }, { y: 0 }, 3);
+    ft(wp, { v: -3 }, { v: 0 }, 3, { ease: 'power3.out' });
+    ft(el.wbg, { opacity: 0 }, { opacity: 1 }, 3.2, { duration: 0.8 });
+
+    // 4 → WE: one click of the wheel per word
+    for (let k = 1; k < SERVICES.length; k++) ft(wp, { v: k - 1 }, { v: k }, 4 + (k - 1) * WS, { duration: WS });
+
+    // WE → END: the work comes up
+    ft(el.wheel, { y: 0, autoAlpha: 1 }, { y: -vh * 0.35, autoAlpha: 0 }, WE);
+    ft(el.wbg, { opacity: 1 }, { opacity: 0 }, WE, { duration: 0.6 });
+    ft(el.cases, { y: vh }, { y: 0 }, WE);
+
+    geo = P;
+    tl.eventCallback('onUpdate', onTime);
+    tl.time(keep, false); onTime();
   }
 
-  function go(n) {
-    if (busy || n === state || n < 0 || n > 5) return;
-    busy = true; tail = true;
-    const from = state; state = n;
-    enter(n, from);
-    render(n, DUR, from).eventCallback('onComplete', () => { busy = false; });
+  /* ---------- things that run on their own clock, switched by where you are ---------- */
+  let zone = -1, shown = -2, geo = null;
+  function onTime() {
+    const t = tl.time();
+    layoutWheel();
+    // reveal the sentence exactly in the gap between Avg and Joe while they part; fully open after that
+    if (t < 1) {
+      const pad = geo.gap * 1.6;
+      const l = Math.max(0, gsap.getProperty(el.avg, 'x') + geo.wa + pad);
+      const r = Math.max(0, geo.vw - gsap.getProperty(el.joe, 'x') + pad);
+      el.line.style.setProperty('--l', l.toFixed(1) + 'px'); el.line.style.setProperty('--r', r.toFixed(1) + 'px');
+    } else { el.line.style.setProperty('--l', '0px'); el.line.style.setProperty('--r', '0px'); }
+    const z = t < 0.15 ? 0 : t < 2.55 ? 1 : t < 3.6 ? 3 : t < WE + 0.5 ? 4 : 5;
+    if (z !== zone) {
+      zone = z;
+      if (z === 1) cy.studio.burst(); else cy.studio.stop();
+      if (z === 3) cy.craft.burst(); else cy.craft.stop();
+      if (z !== 5) cy.brand.stop();
+    }
+    const wi = t > 3.6 && t < WE + 0.35 ? Math.round(gsap.utils.clamp(0, SERVICES.length - 1, wp.v)) : -1;
+    if (wi !== shown) { shown = wi; showWorks(wi); }
   }
-  function jump(n) {                  // nav clicks: a soft cut rather than replaying every step
-    if (busy || n === state) return;
-    busy = true; tail = true;
-    const from = state;
+
+  /* ---------- smooth scroll engine ---------- */
+  let unit = 1, endPx = 0, maxPx = 0, target = 0, cur = 0, dir = 1, idleT = 0, ready = false, veiling = false;
+  function metrics() {
+    const old = unit;
+    unit = Math.max(460, Math.min(innerHeight * 0.75, 700));      // scroll distance for one section
+    endPx = END * unit;
+    maxPx = endPx + Math.max(0, el.cases.scrollHeight - el.cases.clientHeight);
+    const rescale = v => (v <= END * old ? v / old * unit : endPx + (v - END * old));
+    target = Math.min(maxPx, rescale(target)); cur = Math.min(maxPx, rescale(cur));
+  }
+  const clampPx = v => {               // the work section's height can change (fonts, images), so re-read it
+    maxPx = endPx + Math.max(0, el.cases.scrollHeight - el.cases.clientHeight);
+    return Math.max(0, Math.min(maxPx, v));
+  };
+  function settle() {                 // ease into the nearest resting point, leaning the way you were going
+    if (target >= endPx - 0.5) return;
+    const f = target / unit;
+    const i = RESTS.findIndex(s => s > f);
+    if (i <= 0) { target = 0; return; }
+    const a = RESTS[i - 1], b = RESTS[i], frac = (f - a) / (b - a);
+    target = (dir > 0 ? (frac > SNAP_PULL ? b : a) : (frac < 1 - SNAP_PULL ? a : b)) * unit;
+  }
+  function input(d) {
+    if (!ready || veiling || !d) return;
+    dir = Math.sign(d);
+    target = clampPx(target + d);
+    clearTimeout(idleT); idleT = setTimeout(settle, SNAP_WAIT);
+  }
+  function goTo(t) { clearTimeout(idleT); dir = t * unit >= target ? 1 : -1; target = clampPx(t * unit); }
+  function jumpTo(t) {                // nav + logo: a soft cut instead of replaying everything
+    if (veiling) return;
+    veiling = true; clearTimeout(idleT);
     gsap.timeline()
-      .to(el.veil, { opacity: 1, duration: RM ? 0.01 : 0.4, ease: 'power2.inOut' })
-      .add(() => { state = n; render(n, 0, n); enter(n, from === 0 && n !== 1 ? -1 : n); })
+      .to(el.veil, { opacity: 1, duration: RM ? 0.01 : 0.45, ease: 'power2.inOut' })
+      .add(() => { target = cur = clampPx(t * unit); render(); })
       .to(el.veil, { opacity: 0, duration: RM ? 0.01 : 0.6, ease: 'power2.inOut' })
-      .add(() => { busy = false; });
+      .add(() => { veiling = false; });
   }
-  function step(dir) {
-    if (busy) return;
-    if (state === 4) {
-      const ni = wheelIdx + dir;
-      if (ni >= 0 && ni < SERVICES.length) return setWheel(ni);
-    }
-    go(state + dir);
+  function render() {
+    const t = Math.min(cur / unit, END);
+    if (Math.abs(t - tl.time()) > 1e-5) tl.time(t);
+    const st = Math.max(0, cur - endPx);
+    if (Math.abs(el.cases.scrollTop - st) > 0.5) el.cases.scrollTop = st;
   }
+  gsap.ticker.add((_, dt) => {
+    if (!ready) return;
+    const k = RM ? 1 : 1 - Math.exp(-(dt / 1000) * SMOOTH);
+    cur += (target - cur) * k;
+    if (Math.abs(target - cur) < 0.25) cur = target;
+    render();
+  });
 
-  /* ---------- input: one gesture = one step ---------- */
-  let lastWheel = 0, lastDelta = 0, lastStep = 0, tail = false;
-  function fresh(e) {
-    const now = performance.now(), dt = now - lastWheel, ad = Math.abs(e.deltaY);
-    const isNew = dt > 170 || (ad > lastDelta * 1.7 && ad > 36 && now - lastStep > 520);
-    lastWheel = now; lastDelta = ad;
-    if (dt > 170) tail = false;       // the previous gesture's momentum has died away
-    if (isNew && ad >= 3 && !busy) { lastStep = now; return true; }
-    return false;
-  }
   addEventListener('wheel', e => {
-    if (e.ctrlKey) return;
-    if (state === 5 && !busy) {
-      const isNew = fresh(e);
-      if (tail) return e.preventDefault();               // don't let leftover momentum scroll the work page
-      if (el.cases.scrollTop <= 0 && e.deltaY < 0) { e.preventDefault(); if (isNew) step(-1); }
-      return;
-    }
+    if (e.ctrlKey) return;                         // pinch-zoom
     e.preventDefault();
-    if (fresh(e)) step(e.deltaY > 0 ? 1 : -1);
+    const m = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1;
+    input(e.deltaY * m * SPEED);
   }, { passive: false });
 
-  let ty = null, tTop = 0;
-  addEventListener('touchstart', e => { ty = e.touches[0].clientY; tTop = el.cases.scrollTop; }, { passive: true });
-  addEventListener('touchend', e => {
+  let ty = null;
+  addEventListener('touchstart', e => { ty = e.touches[0].clientY; }, { passive: true });
+  addEventListener('touchmove', e => {
     if (ty === null) return;
-    const dy = e.changedTouches[0].clientY - ty; ty = null;
-    if (state === 5) { if (tTop <= 0 && el.cases.scrollTop <= 0 && dy > 70) step(-1); return; }
-    if (Math.abs(dy) > 42) step(dy < 0 ? 1 : -1);
-  }, { passive: true });
+    const y = e.touches[0].clientY;
+    e.preventDefault(); input((ty - y) * 1.6); ty = y;
+  }, { passive: false });
+  addEventListener('touchend', () => { ty = null; }, { passive: true });
 
   addEventListener('keydown', e => {
     const down = ['ArrowDown', 'PageDown', ' '].includes(e.key), up = ['ArrowUp', 'PageUp'].includes(e.key);
     if (!down && !up) return;
-    if (state === 5) { if (up && el.cases.scrollTop <= 0) { e.preventDefault(); step(-1); } return; }
-    e.preventDefault(); step(down ? 1 : -1);
+    e.preventDefault();
+    if (e.key === 'Home') return goTo(0);
+    if (target > endPx + 1 || (down && target >= endPx - 1)) {   // in the work section: plain smooth scrolling
+      dir = down ? 1 : -1; clearTimeout(idleT);
+      target = down ? clampPx(target + innerHeight * 0.8) : Math.max(endPx, target - innerHeight * 0.8);
+      return;
+    }
+    const f = target / unit;
+    const next = down ? RESTS.find(s => s > f + 0.01) : [...RESTS].reverse().find(s => s < f - 0.01);
+    if (next !== undefined) goTo(next);
   });
 
   $$('a', el.track).forEach(a => a.addEventListener('click', e => {
     e.preventDefault();
-    const k = a.dataset.k;
-    if (k === 'studio') jump(0);     // Work + Contact: not wired yet, nav stays on Studio
+    if (a.dataset.k === 'studio') jumpTo(0);       // Work + Contact: not wired yet, nav stays on Studio
   }));
-  $$('.logo').forEach(a => a.addEventListener('click', e => { e.preventDefault(); jump(0); }));
+  $$('.logo').forEach(a => a.addEventListener('click', e => { e.preventDefault(); jumpTo(0); }));
   $$('a[href="#"]').forEach(a => a.addEventListener('click', e => e.preventDefault()));
 
-  // work page: reveal on scroll
+  // work section: reveal as it comes into view
   const io = new IntersectionObserver(es => es.forEach(en => {
     if (!en.isIntersecting) return;
     en.target.classList.add('in'); io.unobserve(en.target);
     if (en.target.contains(cy.brand.el)) cy.brand.burst();
-  }), { root: el.cases, threshold: 0.15 });
+  }), { threshold: 0.15 });
   $$('.rv').forEach(n => io.observe(n));
+  $$('#s-cases img').forEach(i => i.addEventListener('load', () => ready && metrics()));
 
   /* ---------- start ---------- */
   let rz;
-  addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (!busy) { render(state, 0); layoutWheel(); setNav('studio'); } }, 120); });
+  addEventListener('resize', () => {
+    clearTimeout(rz);
+    rz = setTimeout(() => { if (!ready) return; build(); metrics(); render(); setNav('studio'); }, 120);
+  });
 
-  const ready = Promise.all([
+  const loaded = Promise.all([
     document.fonts.ready,
     ...ROT.map(f => document.fonts.load(`1em "r-${f}"`, 'studiocraftbn').catch(() => {})),
     document.fonts.load('500 1em Nuckle'), document.fonts.load('300 1em Riccione'),
   ]);
-  Promise.race([ready, new Promise(r => setTimeout(r, 2500))]).then(() => {
+  Promise.race([loaded, new Promise(r => setTimeout(r, 2500))]).then(() => {
     Object.values(cy).forEach(c => c.measure());
-    gsap.set([el.wheel, el.cases], { y: innerHeight });
-    render(0, 0); layoutWheel(); setNav('studio'); document.body.dataset.step = 0;
+    build(); metrics(); setNav('studio'); ready = true; render();
     gsap.fromTo('.logo', { opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0px)', duration: RM ? 0.01 : 1.2, ease: 'power2.out', stagger: 0.12, clearProps: 'filter' });
   });
 
-  window.__avg = { go, jump, step, get state() { return state; }, get busy() { return busy; } };   // for testing
+  // for testing in the console
+  window.__avg = {
+    goTo, jumpTo, input, RESTS,
+    get t() { return tl && tl.time(); }, get target() { return target / unit; }, get cur() { return cur / unit; },
+  };
 })();
