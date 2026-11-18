@@ -227,7 +227,8 @@
     // line Joe's baseline up with Avg's (different faces sit differently in their boxes)
     const base = n => { const m = document.createElement('i'); m.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline'; n.appendChild(m); const y = m.offsetTop; m.remove(); return y; };
     const jy = base(el.avg) - base(el.joe);
-    const mid = (vh - h) / 2, low = vh - pad * 0.95 - h;
+    const phone = matchMedia('(max-width:760px)').matches;
+    const mid = (vh - h) / 2, low = phone ? pad * 0.95 : vh - pad * 0.95 - h;   // phones: Avg Joe live at the top, not the bottom
     const ax0 = (vw - (wa + gap + wj)) / 2;
     return {
       vh, vw, wa, wj, gap, r, full: vw - 2 * fr, fullH: vh - 2 * fr,

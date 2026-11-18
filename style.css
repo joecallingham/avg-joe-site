@@ -53,6 +53,7 @@ img{display:block;max-width:100%}
 /* the sentence only shows in the gap between Avg and Joe as they part (set from main.js) */
 #s-line{z-index:3;pointer-events:none;color:var(--ink);--l:50vw;--r:50vw;
   clip-path:inset(-200% var(--r) -200% var(--l))}
+.mbr{display:none}
 .line{font-size:1.56rem;line-height:1.3;white-space:nowrap;letter-spacing:-.035em}
 .slot1{--w:0;display:inline-block;vertical-align:middle;height:1.7rem;
   width:calc(var(--w)*2.5rem);margin:0 calc(var(--w)*.15rem) 0 calc(var(--w)*.6rem);position:relative;top:-.08em}
@@ -169,7 +170,10 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
 @media (max-width:760px){
   html{font-size:2.35vw}
   :root{--frame:.8rem;--cols:4;--margin:1.6rem;--gutter:1rem;--ov-wide:none}
-  .line{white-space:normal;text-align:center;max-width:27rem;font-size:2.1rem}
+  /* phones: the sentence sits on three lines with the image in the middle one, close to the centre */
+  .line{white-space:nowrap;text-align:center;font-size:3.1rem;line-height:1.18}
+  .mbr{display:inline}
+  .slot1{height:3.3rem;width:calc(var(--w)*5rem);margin:0 calc(var(--w)*.5rem) 0 calc(var(--w)*.9rem)}
   .big{font-size:4.05rem}
   .work:nth-child(odd){left:60%!important;top:11%!important}
   .work:nth-child(even){left:56%!important;top:71%!important}
