@@ -530,7 +530,7 @@
   const loaded = Promise.all([
     document.fonts.ready,
     ...ROT.map(f => document.fonts.load(`1em "r-${f}"`, 'studiocraftbn').catch(() => {})),
-    document.fonts.load('500 1em Nuckle'), document.fonts.load('300 1em Riccione'),
+    document.fonts.load('500 1em Nuckle'), document.fonts.load('300 1em Riccione'), document.fonts.load('1em snell', '&'),
   ]);
   Promise.race([loaded, new Promise(r => setTimeout(r, 2500))]).then(() => {
     Object.values(cy).forEach(c => c.measure());
