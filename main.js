@@ -176,18 +176,18 @@
   }
   function navState() {
     const t = tl ? tl.time() : 0;
-    const past = cur - endPx - Math.max(0, el.cases.scrollHeight - el.cases.clientHeight);
+    const past = cur - endPx - room;
     const where = past > VH() * 0.4 ? 'end' : t >= WE + 0.5 ? 'work' : t >= 3.6 ? 'wheel' : t >= 2.6 ? 'big' : 'top';
     say(SAYS[hoverSay && (hoverSay !== 'pick' || where === 'wheel') ? hoverSay : where]);
-    $('.nb[data-k="work"]').classList.toggle('on', where === 'work');
+    if (workBtn._on !== (where === 'work')) { workBtn._on = where === 'work'; workBtn.classList.toggle('on', workBtn._on); }
   }
+  const workBtn = $('.nb[data-k="work"]');
   function setNav() { navState(); }
 
   /* ---------- the notch: cut out of images only ---------- */
   // The bar along the bottom and the notch are not drawn on top of the page; they are cut out of any image
   // that reaches them, so text and backgrounds pass underneath untouched and images get soft curves.
   const NOTCH_FLANK = 2.1;   // how wide each curved side of the notch is, in notch-heights
-  const masked = () => [el.hero, ...$$('.boon-grid img, .case-620 figure img, .work .ph, .fw-card')];
   let cutGeo = null;
   function notchGeo() {
     const b = el.notch.getBoundingClientRect(), fr = cssPx('--frame');
@@ -207,20 +207,31 @@
     d += `H${n(g.vw + far - ox)}V${n(bottom)}Z`;
     return d;
   }
+  const caseImgs = () => $$('.boon-grid img, .case-620 figure img, .fw-card');
+  let cutNodes = [];
   function cutImages() {
-    if (!cutGeo) return;
+    if (!cutGeo || !tl) return;
+    const t = tl.time(), want = [];
+    if (t > 0.9 && t < 3.3) want.push(el.hero);                          // the film, while it's big
+    if (shown >= 0) want.push(...cards[shown].map(a => a.firstElementChild));   // the work cards beside the wheel
+    if (cur > endPx - VH() * 1.2) want.push(...caseImgs());                // the work section
+    cutNodes.forEach(n => { if (!want.includes(n) && n._cut) { n.style.clipPath = ''; n._cut = false; n._path = ''; } });
+    cutNodes = want;
     const top = cutGeo.y;
-    masked().forEach(n => {
-      const b = n.getBoundingClientRect();
-      if (b.bottom <= top || b.top >= cutGeo.vh || b.width < 1) { if (n._cut) { n.style.clipPath = ''; n._cut = false; } return; }
-      n.style.clipPath = `path(evenodd, "M0 0H${b.width.toFixed(1)}V${b.height.toFixed(1)}H0Z ${cutPath(b.left, b.top)}")`;
+    const rects = want.map(n => n.getBoundingClientRect());              // all reads first, then all writes
+    want.forEach((n, i) => {
+      const b = rects[i];
+      if (b.bottom <= top || b.top >= cutGeo.vh || b.width < 1) { if (n._cut) { n.style.clipPath = ''; n._cut = false; n._path = ''; } return; }
+      const p = `path(evenodd, "M0 0H${b.width.toFixed(1)}V${b.height.toFixed(1)}H0Z ${cutPath(b.left, b.top)}")`;
+      if (p !== n._path) { n.style.clipPath = p; n._path = p; }
       n._cut = true;
     });
   }
 
   /* ---------- the timeline ---------- */
   let tl, geo = null;
-  const heroImg = $('#hero video');   // the Out-of-Office film (was the mushroom image)
+  const heroImg = $('#hero video');
+  heroImg.src = (TOUCH || innerWidth < 760) ? heroImg.dataset.srcPhone : heroImg.dataset.src;   // phones: lighter film   // the Out-of-Office film (was the mushroom image)
   function measure() {
     const vw = innerWidth, vh = VH(), r = rem();
     document.documentElement.style.setProperty('--vhs', vh + 'px');
@@ -253,6 +264,7 @@
     const keep = tl ? tl.time() : 0;
     if (tl) tl.kill();
     const P = measure(), vh = P.vh;
+    heroImg.style.width = P.full + 'px'; heroImg.style.height = P.fullH + 'px';
     const lines = $$('.big .ln');
     // starting state
     gsap.set(el.avg, P.avg[0]); gsap.set(el.joe, P.joe[0]); gsap.set(el.hero, P.hero[0]);
@@ -309,47 +321,59 @@
     tl.time(keep, false); onTime();
   }
 
-  let shown = -2;
+  // Each style write costs the browser work, so only write when a value actually changes.
+  const lastStyle = new WeakMap();
+  function put(node, prop, val) {
+    let m = lastStyle.get(node); if (!m) lastStyle.set(node, m = {});
+    if (m[prop] === val) return;
+    m[prop] = val;
+    if (prop.startsWith('--')) node.style.setProperty(prop, val); else node.style[prop] = val;
+  }
+  let shown = -2, lastWheelV = null;
   function onTime() {
     const t = tl.time();
-    layoutWheel();
-    // As Avg and Joe part, the gap between them uncovers the image first; the words (already in place)
-    // only start to show once the gap has passed the image's edges. Fully open after that.
-    // The image scales with its frame, but only part of the way (CROP): the frame also crops in and out of it.
-    const w = el.hero.offsetWidth, h = el.hero.offsetHeight;
-    // crop is strongest mid-move and fades to nothing at both ends, so the small frame shows the whole image again
+    if (wp.v !== lastWheelV) { lastWheelV = wp.v; layoutWheel(); }        // the wheel only redraws when it turns
+    // The frame's size and position come straight from the timeline (no measuring the page).
+    const w = gsap.getProperty(el.hero, 'width'), h = gsap.getProperty(el.hero, 'height');
+    const hx = gsap.getProperty(el.hero, 'x'), hy = gsap.getProperty(el.hero, 'y');
+    // The film scales with its frame part of the way (CROP) and the frame crops the rest; strongest mid-move,
+    // nothing at either end. It's moved with a GPU transform only (never resized), which keeps scrolling smooth.
     const pIn = gsap.utils.clamp(0, 1, (t - 1) / EXPAND), pOut = gsap.utils.clamp(0, 1, t - 2);
     const crop = CROP * (t < 2 ? Math.sin(Math.PI * pIn) : Math.sin(Math.PI * pOut));
     const iw = w + (geo.full - w) * crop, ih = h + (geo.fullH - h) * crop;
-    const ox = (w - iw) / 2, oy = (h - ih) / 2;
-    heroImg.style.width = iw.toFixed(1) + 'px'; heroImg.style.height = ih.toFixed(1) + 'px';
-    heroImg.style.transform = `translate(${ox.toFixed(1)}px,${oy.toFixed(1)}px)`;
+    const s = Math.max(iw / geo.full, ih / geo.fullH);
+    const tx = (w - geo.full * s) / 2, ty = (h - geo.fullH * s) / 2;
+    put(heroImg, 'transform', `translate3d(${tx.toFixed(1)}px,${ty.toFixed(1)}px,0) scale(${s.toFixed(4)})`);
     if (t < 1) {
+      // As Avg and Joe part, the gap between them uncovers the image first, then the words outward from it.
       const pad = geo.gap * 1.6, vw = geo.vw;
       const gl = gsap.getProperty(el.avg, 'x') + geo.wa + pad;      // gap left edge (viewport x)
       const gr = gsap.getProperty(el.joe, 'x') - pad;               // gap right edge
-      const hb = el.hero.getBoundingClientRect();
+      const hb = { left: hx, top: hy, right: hx + w, bottom: hy + h };
       if (gr <= gl) {
-        heroImg.style.clipPath = 'inset(0 0 0 100%)';
-        el.line.style.setProperty('--l', vw / 2 + 'px'); el.line.style.setProperty('--r', vw / 2 + 'px');
-        el.line.style.setProperty('--t', hb.top + 'px'); el.line.style.setProperty('--b', (geo.vh - hb.bottom) + 'px');
+        put(heroImg, 'clipPath', 'inset(0 0 0 100%)');
+        put(el.line, '--l', vw / 2 + 'px'); put(el.line, '--r', vw / 2 + 'px');
+        put(el.line, '--t', hb.top.toFixed(1) + 'px'); put(el.line, '--b', (geo.vh - hb.bottom).toFixed(1) + 'px');
       } else {
         // vertically, the reveal starts as the image's own band and grows to the whole sentence once the gap passes the image
-        const q = gsap.utils.clamp(0, 1, (hb.left - gl) / (geo.vw * 0.18));
-        const band = 1 - q;
-        el.line.style.setProperty('--t', (hb.top * band - geo.vh * 2 * q).toFixed(1) + 'px');
-        el.line.style.setProperty('--b', ((geo.vh - hb.bottom) * band - geo.vh * 2 * q).toFixed(1) + 'px');
-        // the gap, in the image's own coordinates
-        const L = Math.max(0, gl - hb.left) - ox, R = ox + iw - w + Math.max(0, hb.right - gr);
-        heroImg.style.clipPath = `inset(0 ${Math.max(0, R).toFixed(1)}px 0 ${Math.max(0, L).toFixed(1)}px)`;
+        const q = gsap.utils.clamp(0, 1, (hb.left - gl) / (geo.vw * 0.18)), band = 1 - q;
+        put(el.line, '--t', (hb.top * band - geo.vh * 2 * q).toFixed(1) + 'px');
+        put(el.line, '--b', ((geo.vh - hb.bottom) * band - geo.vh * 2 * q).toFixed(1) + 'px');
+        // the gap, in the film's own (unscaled) coordinates
+        const Ls = Math.max(0, gl - hb.left), Rs = Math.max(0, hb.right - gr);
+        const L = (Ls - tx) / s, R = (tx + geo.full * s - (w - Rs)) / s;
+        put(heroImg, 'clipPath', `inset(0 ${Math.max(0, R).toFixed(1)}px 0 ${Math.max(0, L).toFixed(1)}px)`);
         const tl_ = Math.min(gl, hb.left), tr_ = Math.max(gr, hb.right);   // words start at the image's edges
-        el.line.style.setProperty('--l', Math.max(0, tl_).toFixed(1) + 'px');
-        el.line.style.setProperty('--r', Math.max(0, vw - tr_).toFixed(1) + 'px');
+        put(el.line, '--l', Math.max(0, tl_).toFixed(1) + 'px');
+        put(el.line, '--r', Math.max(0, vw - tr_).toFixed(1) + 'px');
       }
-    } else { el.line.style.setProperty('--l', '0px'); el.line.style.setProperty('--r', '0px'); el.line.style.setProperty('--t', '-200%'); el.line.style.setProperty('--b', '-200%'); heroImg.style.clipPath = ''; }
+    } else {
+      put(el.line, '--l', '0px'); put(el.line, '--r', '0px'); put(el.line, '--t', '-200%'); put(el.line, '--b', '-200%');
+      put(heroImg, 'clipPath', 'none');
+    }
     // the frame's corners round off gradually as it moves away from filling the screen
     const fullness = Math.min(1, w / geo.full);
-    el.hero.style.borderRadius = Math.min(0.16 * Math.min(w, h), (1 - fullness) * 1.8 * geo.r).toFixed(2) + 'px';
+    put(el.hero, 'borderRadius', (Math.round(Math.min(0.16 * Math.min(w, h), (1 - fullness) * 1.8 * geo.r) * 2) / 2) + 'px');
     // work pops in beside whichever word is in focus
     const wv = Math.round(wp.v);
     const wi = t > 3.6 && wv >= 0 && wv <= SERVICES.length - 1 ? wv : -1;
@@ -401,7 +425,7 @@
   gsap.ticker.lagSmoothing(0);
 
   const spacer = $('#scroll-space');
-  let unit = 1, endPx = 0, maxPx = 0, cur = 0, ready = false, veiling = false, brandOn = false, travel = 0;
+  let room = 0, unit = 1, endPx = 0, maxPx = 0, cur = 0, ready = false, veiling = false, brandOn = false, travel = 0;
   // scroll position <-> timeline time; section 1->2 is OPEN_LEN screens long, every other section one screen
   // knots of [timeline time, screens scrolled]: section 1-2 is OPEN_LEN long, and there is a HOLD at 3 (a pause on the big sentence)
   const KNOTS = () => { const a = LEN_PART, b = a + OPEN_LEN, c = b + LEN_SHRINK, d = c + HOLD; return [[0, 0], [1, a], [2, b], [3, c], [3, d], [END, d + END - 3]]; };
@@ -411,20 +435,22 @@
     const t = unit > 1 ? Math.min(tOf(cur), END) : 0, past = Math.max(0, cur - endPx);
     unit = VH() * UNIT;
     endPx = pxOf(END);
-    maxPx = endPx + Math.max(0, el.cases.scrollHeight - el.cases.clientHeight) + VH();   // + one screen so the work slides up off
+    room = Math.max(0, el.cases.scrollHeight - el.cases.clientHeight);
+    maxPx = endPx + room + VH();   // + one screen so the work slides up off
     spacer.style.height = (maxPx + innerHeight) + 'px';
     lenis.resize();
     const to = t < END ? pxOf(t) : endPx + past;
     lenis.scrollTo(to, { immediate: true, force: true });
     cur = to;
   }
+  let lastSt = -1;
   function render() {
     const t = Math.min(tOf(cur), END);
     if (Math.abs(t - tl.time()) > 1e-5) tl.time(t);
-    const past = Math.max(0, cur - endPx), room = Math.max(0, el.cases.scrollHeight - el.cases.clientHeight);
+    const past = Math.max(0, cur - endPx);
     const st = Math.min(past, room);
-    if (Math.abs(el.cases.scrollTop - st) > 0.5) el.cases.scrollTop = st;
-    if (cur >= endPx) gsap.set(el.cases, { y: -(past - st) });      // after the last case study, the whole section slides up off screen
+    if (Math.abs(lastSt - st) > 0.5) { el.cases.scrollTop = st; lastSt = st; }
+    if (cur >= endPx) put(el.cases, 'transform', `translate3d(0,${(-(past - st)).toFixed(1)}px,0)`);      // after the last case study, the whole section slides up off screen
     cutImages();
     navState();
   }
@@ -587,14 +613,16 @@
   }
 
   /* ---------- start ---------- */
-  let rz, lastW = innerWidth;
+  let rz, lastW = innerWidth, lastVH = 0;
   addEventListener('resize', () => {
     clearTimeout(rz);
     rz = setTimeout(() => {
       if (!ready) return;
       if (TOUCH && innerWidth === lastW) {
-        // just the browser bars sliding in or out: the layout uses a stable height, so only the notch follows
-        notchGeo(); cutImages(); return;
+        // just the browser bars sliding in or out: the layout uses a stable height, so only the notch follows.
+        // (If that stable height itself ever changes, re-place everything once, keeping the scroll position.)
+        if (VH() !== lastVH) { lastVH = VH(); build(); }
+        notchGeo(); cutImages(); render(); return;
       }
       lastW = innerWidth;
       advCache.clear(); Object.values(cy).forEach(c => c.measure());
@@ -610,7 +638,7 @@
   Promise.race([loaded, new Promise(r => setTimeout(r, 2500))]).then(() => {
     Object.values(cy).forEach(c => c.measure());
     resplit();
-    build(); metrics(); setNav('studio'); notchGeo(); ready = true; render();
+    build(); metrics(); setNav('studio'); notchGeo(); ready = true; render(); lastVH = VH();
     // start the film (autoplay alone isn't always honoured); keep it playing if the browser pauses it
     heroImg.muted = true; heroImg.playsInline = true;
     const playFilm = () => { if (heroImg.paused) heroImg.play().catch(() => {}); };
