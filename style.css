@@ -98,10 +98,13 @@ img{display:block;max-width:100%}
 #works{position:absolute;inset:0;pointer-events:none}
 .work{position:absolute;visibility:hidden;pointer-events:auto;display:block}
 .work img{width:100%;height:100%;object-fit:cover;border-radius:.5rem}
-.work .ph{overflow:hidden;border-radius:.5rem}
+.work .ph{overflow:hidden;border-radius:.5rem;position:relative;z-index:1}
 .work span,.more{display:inline-block;font-size:var(--small);letter-spacing:-.02em;margin-top:.7rem}
-.work span{opacity:.6}
-.work:hover span{opacity:1}
+/* "View Case Study" waits tucked up behind the image and slides down out from under it on hover */
+.work span{position:relative;z-index:0;opacity:0;transform:translateY(-130%);
+  transition:transform .55s cubic-bezier(.2,.8,.2,1),opacity .35s ease}
+.work:hover span,.work:focus-visible span{opacity:1;transform:none}
+@media (hover:none){.work span{opacity:1;transform:none}}
 
 /* ---------- cases ---------- */
 /* soft top edge: the panel fades in from see-through to cream, so it never draws a hard line over the gradient */
