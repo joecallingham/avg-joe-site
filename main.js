@@ -9,6 +9,7 @@
 
   // feel — tweak these
   const UNIT = 1;            // screens of scrolling per section (higher = slower)
+  const OPEN_LEN = 1.7;      // the image opening + Avg/Joe dropping gets more scroll, so it moves at your pace
   const WS = 0.2;            // screens of scrolling per word on the wheel (matched to the page's scroll speed)
   const SWAP_EVERY = 70;     // px of scrolling between typeface changes in the rotation words
   const TRACK = 0.05;        // rotation words: tracking -50
@@ -241,11 +242,11 @@
 
     // 1 → 2: first the image opens to fill the frame; then Avg (leading) and Joe drop to the bottom;
     //        then the sentence closes up on top of the image
-    ft(el.hero, P.hero[1], P.hero[2], 1, { duration: 0.5 });
+    ft(el.hero, P.hero[1], P.hero[2], 1, { duration: 0.45 });
     ft(el.line, { color: '#0b0b0b' }, { color: '#ffffff' }, 1.1, { duration: 0.25 });
-    ft(el.avg, P.avg[1], P.avg[2], 1.56, { duration: 0.32, ease: 'power3.inOut' });   // only once the image is fully open
-    ft(el.joe, P.joe[1], P.joe[2], 1.63, { duration: 0.32, ease: 'power3.inOut' });
-    ft(el.slot1, { '--w': 1 }, { '--w': 0 }, 1.74, { duration: 0.26, ease: 'power2.inOut' });
+    ft(el.avg, P.avg[1], P.avg[2], 1.5, { duration: 0.34, ease: 'power2.inOut' });    // only once the image is fully open
+    ft(el.joe, P.joe[1], P.joe[2], 1.56, { duration: 0.34, ease: 'power2.inOut' });
+    ft(el.slot1, { '--w': 1 }, { '--w': 0 }, 1.76, { duration: 0.24, ease: 'power2.inOut' });
     tl.set(el.big, { autoAlpha: 1 }, 1.99);
 
     // 2 → 3: the image contracts into the big sentence, carrying the small one with it,
@@ -354,19 +355,22 @@
 
   const spacer = $('#scroll-space');
   let unit = 1, endPx = 0, maxPx = 0, cur = 0, ready = false, veiling = false, brandOn = false, travel = 0;
+  // scroll position <-> timeline time; section 1->2 is OPEN_LEN screens long, every other section one screen
+  const pxOf = t => unit * (t <= 1 ? t : t <= 2 ? 1 + (t - 1) * OPEN_LEN : OPEN_LEN + t - 1);
+  const tOf = px => { const s = px / unit; return s <= 1 ? s : s <= 1 + OPEN_LEN ? 1 + (s - 1) / OPEN_LEN : s - OPEN_LEN + 1; };
   function metrics() {
-    const t = unit > 1 ? cur / unit : 0, past = Math.max(0, cur - endPx);
+    const t = unit > 1 ? Math.min(tOf(cur), END) : 0, past = Math.max(0, cur - endPx);
     unit = innerHeight * UNIT;
-    endPx = END * unit;
+    endPx = pxOf(END);
     maxPx = endPx + Math.max(0, el.cases.scrollHeight - el.cases.clientHeight) + innerHeight;   // + one screen so the work slides up off
     spacer.style.height = (maxPx + innerHeight) + 'px';
     lenis.resize();
-    const to = t <= END ? t * unit : endPx + past;
+    const to = t < END ? pxOf(t) : endPx + past;
     lenis.scrollTo(to, { immediate: true, force: true });
     cur = to;
   }
   function render() {
-    const t = Math.min(cur / unit, END);
+    const t = Math.min(tOf(cur), END);
     if (Math.abs(t - tl.time()) > 1e-5) tl.time(t);
     const past = Math.max(0, cur - endPx), room = Math.max(0, el.cases.scrollHeight - el.cases.clientHeight);
     const st = Math.min(past, room);
@@ -392,15 +396,21 @@
       if (brandOn) cy.brand.step();
     }
   });
-  // The opening (Avg Joe parting to the sentence) is the one place that auto-scrolls and locks into place:
-  // nudge it either way and it carries on to the end, starting at the speed you were scrolling and easing
-  // to a stop (same curve as sumojoestudio.com). Scrolling is ignored until it lands.
-  let autoing = false;
+  // Opening Avg Joe from the top is the one place that auto-scrolls and locks into place: nudge it down and it
+  // carries on to the sentence, starting at the speed you were scrolling and easing to a stop (same curve as
+  // sumojoestudio.com). Scrolling is ignored until it lands, and the rest of that same flick is ignored after,
+  // so momentum can't throw Avg and Joe down. Scrolling back up is never automatic.
+  let autoing = false, lastWheel = 0;
+  addEventListener('wheel', () => { lastWheel = performance.now(); }, { passive: true });
+  function releaseAfterFlick() {
+    if (performance.now() - lastWheel < 180) { setTimeout(releaseAfterFlick, 60); return; }
+    lenis.start(); autoing = false;
+  }
   function autoOpen() {
     if (autoing || veiling) return;
     const pos = lenis.targetScroll, dir = lenis.direction;
-    if (pos <= 2 || pos >= unit - 2 || !dir) return;
-    const to = dir > 0 ? unit : 0, from = lenis.animatedScroll, dist = Math.abs(to - from);
+    if (dir <= 0 || pos <= 2 || pos >= unit - 2 || lenis.animatedScroll > unit * 0.5) return;   // only opening, from the top
+    const to = unit, from = lenis.animatedScroll, dist = Math.abs(to - from);
     if (dist < 2) return;
     const v = Math.max(1, Math.abs(lenis.velocity) * 60);                 // px per second, roughly
     const dur = RM ? 0.01 : Math.max(0.9, Math.min(2.2, 1.5 * dist / v));
@@ -409,7 +419,7 @@
     lenis.scrollTo(to, {
       duration: dur, lock: true, force: true,
       easing: e => k * e + (3 - 2 * k) * e * e + (k - 2) * e * e * e,
-      onComplete: () => { autoing = false; },
+      onComplete: () => { lenis.stop(); releaseAfterFlick(); },
     });
   }
 
@@ -417,13 +427,13 @@
   gsap.ticker.add(() => { if (ready && shown >= 0) cutImages(); });
 
   const inOut = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-  function goTo(t) { lenis.scrollTo(Math.min(maxPx, t * unit), { duration: 1.1, easing: inOut }); }
+  function goTo(t) { lenis.scrollTo(Math.min(maxPx, pxOf(t)), { duration: 1.1, easing: inOut }); }
   function jumpTo(t) {                // nav + logo: a soft cut instead of replaying everything
     if (veiling) return;
     veiling = true;
     gsap.timeline()
       .to(el.veil, { opacity: 1, duration: RM ? 0.01 : 0.45, ease: 'power2.inOut' })
-      .add(() => { lenis.scrollTo(t * unit, { immediate: true, force: true }); cur = t * unit; render(); })
+      .add(() => { lenis.scrollTo(pxOf(t), { immediate: true, force: true }); cur = pxOf(t); render(); })
       .to(el.veil, { opacity: 0, duration: RM ? 0.01 : 0.6, ease: 'power2.inOut' })
       .add(() => { veiling = false; });
   }
@@ -438,7 +448,7 @@
       lenis.scrollTo(to, { duration: 1 });
       return;
     }
-    const f = pos / unit;
+    const f = tOf(pos);
     const next = down ? RESTS.find(s => s > f + 0.01) : [...RESTS].reverse().find(s => s < f - 0.01);
     if (next !== undefined) goTo(next);
   });
@@ -523,6 +533,6 @@
   // for testing in the console
   window.__avg = {
     goTo, jumpTo, RESTS, lenis, cy, get intro() { return !!introTl; }, get gap() { return gapState.s; },
-    get t() { return tl && tl.time(); }, get target() { return lenis.targetScroll / unit; },
+    get t() { return tl && tl.time(); }, get target() { return tOf(lenis.targetScroll); }, pxOf: t => pxOf(t),
   };
 })();
