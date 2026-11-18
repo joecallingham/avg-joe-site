@@ -10,6 +10,7 @@
   // feel — tweak these
   const UNIT = 1;            // screens of scrolling per section (higher = slower)
   const OPEN_LEN = 1.7;      // the image opening + Avg/Joe dropping gets more scroll, so it moves at your pace
+  const HOLD = 0.4;          // screens of scrolling where nothing moves once the image has settled into the big sentence
   const WS = 0.2;            // screens of scrolling per word on the wheel (matched to the page's scroll speed)
   const SWAP_EVERY = 70;     // px of scrolling between typeface changes in the rotation words
   const TRACK = 0.05;        // rotation words: tracking -50
@@ -361,8 +362,10 @@
   const spacer = $('#scroll-space');
   let unit = 1, endPx = 0, maxPx = 0, cur = 0, ready = false, veiling = false, brandOn = false, travel = 0;
   // scroll position <-> timeline time; section 1->2 is OPEN_LEN screens long, every other section one screen
-  const pxOf = t => unit * (t <= 1 ? t : t <= 2 ? 1 + (t - 1) * OPEN_LEN : OPEN_LEN + t - 1);
-  const tOf = px => { const s = px / unit; return s <= 1 ? s : s <= 1 + OPEN_LEN ? 1 + (s - 1) / OPEN_LEN : s - OPEN_LEN + 1; };
+  // knots of [timeline time, screens scrolled]: section 1-2 is OPEN_LEN long, and there is a HOLD at 3 (a pause on the big sentence)
+  const KNOTS = () => [[0, 0], [1, 1], [2, 1 + OPEN_LEN], [3, 2 + OPEN_LEN], [3, 2 + OPEN_LEN + HOLD], [END, END - 1 + OPEN_LEN + HOLD]];
+  const pxOf = t => { const k = KNOTS(); for (let i = 1; i < k.length; i++) { const [t0, s0] = k[i - 1], [t1, s1] = k[i]; if (t <= t1 && t1 > t0) return unit * (s0 + (t - t0) / (t1 - t0) * (s1 - s0)); } const [tl1, sl1] = k[k.length - 1]; return unit * (sl1 + t - tl1); };
+  const tOf = px => { const s = px / unit, k = KNOTS(); for (let i = 1; i < k.length; i++) { const [t0, s0] = k[i - 1], [t1, s1] = k[i]; if (s <= s1) return s1 > s0 ? t0 + (s - s0) / (s1 - s0) * (t1 - t0) : t1; } const [tl1, sl1] = k[k.length - 1]; return tl1 + s - sl1; };
   function metrics() {
     const t = unit > 1 ? Math.min(tOf(cur), END) : 0, past = Math.max(0, cur - endPx);
     unit = innerHeight * UNIT;
