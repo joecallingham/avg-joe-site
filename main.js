@@ -211,7 +211,7 @@
 
   /* ---------- the timeline ---------- */
   let tl, geo = null;
-  const heroImg = $('#hero img');
+  const heroImg = $('#hero video');   // the Out-of-Office film (was the mushroom image)
   function measure() {
     const vw = innerWidth, vh = innerHeight, r = rem();
     el.slot1.style.removeProperty('--w'); gsap.set(el.slot1, { clearProps: '--w' });
@@ -538,6 +538,12 @@
     Object.values(cy).forEach(c => c.measure());
     resplit();
     build(); metrics(); setNav('studio'); notchGeo(); ready = true; render();
+    // start the film (autoplay alone isn't always honoured); keep it playing if the browser pauses it
+    heroImg.muted = true; heroImg.playsInline = true;
+    const playFilm = () => { if (heroImg.paused) heroImg.play().catch(() => {}); };
+    playFilm(); heroImg.addEventListener('canplay', playFilm, { once: true });
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) playFilm(); });
+    addEventListener('pointerdown', playFilm, { once: true }); addEventListener('wheel', playFilm, { once: true, passive: true });
     requestAnimationFrame(() => requestAnimationFrame(startReveal));
     gsap.fromTo('.logo', { opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0px)', duration: RM ? 0.01 : 1.2, ease: 'power2.out', stagger: 0.12, clearProps: 'filter' });
     if (cur <= 2) gsap.delayedCall(RM ? 0 : 1.1, () => { if (cur <= 2) introStart(); });

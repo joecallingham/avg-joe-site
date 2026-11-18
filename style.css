@@ -66,7 +66,7 @@ img{display:block;max-width:100%}
 /* ---------- travelling image ---------- */
 #hero{position:fixed;left:0;top:0;z-index:2;overflow:hidden;width:0;height:0;border-radius:.25rem;
   will-change:transform,width,height}
-#hero img{position:absolute;left:0;top:0;max-width:none;object-fit:cover;will-change:transform}
+#hero video{position:absolute;left:0;top:0;max-width:none;object-fit:cover;will-change:transform;display:block}
 /* intro: while you're at the top, Avg and Joe open on their own to show one of these */
 #intro{position:fixed;left:50%;top:50%;z-index:59;pointer-events:none;color:var(--ink)}
 #intro>*{position:absolute;left:0;top:0;visibility:hidden;opacity:0;display:block;max-width:none}
@@ -187,6 +187,10 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
   .boon-grid img{height:auto}
   .boon-grid figure,.boon-grid .van{grid-column:1/-1}
   .case-620 .txt,.case-620 figure{grid-column:1/-1}
+  /* phones: "View Case Study" straight under the copy, then the images */
+  .case-boon h2{margin-bottom:0}
+  .case-boon .more{order:1;margin:calc(var(--s1) - var(--gutter)) 0 calc(var(--s2) - var(--gutter))}
+  .boon-grid figure,.boon-grid .van{order:2}
   .case-620{padding-bottom:9rem}
   .case-620 h2{font-size:3.6rem}
   .notch{width:38rem;height:3.6rem;gap:1.6rem}
