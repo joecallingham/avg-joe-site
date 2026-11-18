@@ -39,7 +39,7 @@ a{color:inherit;text-decoration:none}
 ul{list-style:none}
 img{display:block;max-width:100%}
 
-#stage{position:fixed;inset:0;overflow:hidden}
+#stage{position:fixed;left:0;right:0;top:0;height:var(--vhs,100vh);overflow:hidden}
 .layer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
 #veil{position:fixed;inset:0;background:var(--cream);opacity:0;pointer-events:none;z-index:40}
 
@@ -68,7 +68,7 @@ img{display:block;max-width:100%}
   will-change:transform,width,height}
 #hero video{position:absolute;left:0;top:0;max-width:none;object-fit:cover;will-change:transform;display:block}
 /* intro: while you're at the top, Avg and Joe open on their own to show one of these */
-#intro{position:fixed;left:50%;top:50%;z-index:59;pointer-events:none;color:var(--ink)}
+#intro{position:fixed;left:50%;top:calc(var(--vhs,100vh) / 2);z-index:59;pointer-events:none;color:var(--ink)}
 #intro>*{position:absolute;left:0;top:0;visibility:hidden;opacity:0;display:block;max-width:none}
 #intro .globe{width:2.6rem;height:auto}
 #intro .bird{width:2.7rem;height:auto}
@@ -189,11 +189,16 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
 /* ---------- phones ---------- */
 @media (max-width:760px){
   html{font-size:2.35vw}
-  :root{--frame:.8rem;--cols:4;--margin:1.6rem;--gutter:2.2rem;--ov-wide:none;
-    /* roomier spacing steps on phones */
-    --s1:1.4rem;--s2:2.8rem;--s3:5.2rem;--s4:8.5rem}
-  .fw-grid{row-gap:var(--s3)}
-  .case{padding-top:var(--s3);min-height:0;align-content:start}
+  :root{--frame:.8rem;--cols:4;--margin:1.6rem;--gutter:1rem;--ov-wide:none}
+  /* phones: roomier vertical spacing only; side spacing stays on the margins */
+  .grid{row-gap:2.2rem}
+  .fw-grid{row-gap:5.2rem}
+  .case{padding-top:5.2rem;padding-bottom:8.5rem;min-height:0;align-content:start}
+  .sec-title{padding-top:2.8rem;padding-bottom:1.4rem}
+  .fw-panel{padding-top:2.4rem;padding-bottom:4.4rem}
+  .fw-panel .pills{margin-top:1.4rem}
+  .fw-panel h4{margin:2.6rem 0 4.4rem}
+  .case-boon .more{margin:1.4rem 0 1.2rem}
   /* phones: the sentence sits on three lines with the image in the middle one, close to the centre */
   .line{white-space:nowrap;text-align:center;font-size:3.1rem;line-height:1.18}
   .mbr{display:inline}

@@ -10,6 +10,12 @@
   // feel — tweak these
   // touch devices get their own, more even pace and their own native scrolling
   const TOUCH = matchMedia('(pointer: coarse)').matches;
+  // Phones: lay everything out against one stable height (the screen with the browser bars hidden),
+  // so the bars sliding in and out while you scroll never move anything.
+  const vhProbe = document.createElement('div');
+  vhProbe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:100vh;height:100lvh;pointer-events:none;visibility:hidden';
+  document.documentElement.appendChild(vhProbe);
+  const VH = () => TOUCH ? Math.max(vhProbe.offsetHeight, innerHeight) : innerHeight;
   const UNIT = TOUCH ? 0.85 : 1.2;   // screens of scrolling per section (higher = slower)
   const CROP = 0.5;          // how much the frame crops (vs scales) mid-move: 0 = only scales, 1 = only crops; none at the ends
   // scroll lengths (in sections) for the first three moves, which need a slower pace than the rest
@@ -171,7 +177,7 @@
   function navState() {
     const t = tl ? tl.time() : 0;
     const past = cur - endPx - Math.max(0, el.cases.scrollHeight - el.cases.clientHeight);
-    const where = past > innerHeight * 0.4 ? 'end' : t >= WE + 0.5 ? 'work' : t >= 3.6 ? 'wheel' : t >= 2.6 ? 'big' : 'top';
+    const where = past > VH() * 0.4 ? 'end' : t >= WE + 0.5 ? 'work' : t >= 3.6 ? 'wheel' : t >= 2.6 ? 'big' : 'top';
     say(SAYS[hoverSay && (hoverSay !== 'pick' || where === 'wheel') ? hoverSay : where]);
     $('.nb[data-k="work"]').classList.toggle('on', where === 'work');
   }
@@ -185,7 +191,8 @@
   let cutGeo = null;
   function notchGeo() {
     const b = el.notch.getBoundingClientRect(), fr = cssPx('--frame');
-    cutGeo = { x: b.left, y: b.top, w: b.width, h: b.height, base: innerHeight - fr, vw: innerWidth, vh: innerHeight };
+    // the notch follows the nav, which sits on the visible bottom edge
+    cutGeo = { x: b.left, y: b.top, w: b.width, h: b.height, base: b.bottom - 1, vw: innerWidth, vh: Math.max(VH(), innerHeight) };
   }
   function cutPath(ox, oy) {          // bar + notch outline, in an element's own coordinates
     // The flanks are drawn at a fixed size from the notch height, so a wider notch never stretches them:
@@ -215,7 +222,8 @@
   let tl, geo = null;
   const heroImg = $('#hero video');   // the Out-of-Office film (was the mushroom image)
   function measure() {
-    const vw = innerWidth, vh = innerHeight, r = rem();
+    const vw = innerWidth, vh = VH(), r = rem();
+    document.documentElement.style.setProperty('--vhs', vh + 'px');
     el.slot1.style.removeProperty('--w'); gsap.set(el.slot1, { clearProps: '--w' });
     gsap.set([el.avg, el.joe, el.line, el.big, ...$$('.big .ln')], { clearProps: 'transform' });
     const rect = n => { const b = n.getBoundingClientRect(); return { x: b.left, y: b.top, width: b.width, height: b.height }; };
@@ -386,7 +394,7 @@
 
   /* ---------- smooth scroll: Lenis (same settings as sumojoestudio.com) ---------- */
   const lenis = new Lenis({
-    lerp: 0.055, wheelMultiplier: 1, syncTouch: false, syncTouchLerp: 0.085, touchInertiaExponent: 1.35, touchMultiplier: 1,
+    lerp: 0.055, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.075, touchInertiaExponent: 1.1, touchMultiplier: 1,
     autoRaf: false,
   });
   gsap.ticker.add(t => lenis.raf(t * 1000));
@@ -401,9 +409,9 @@
   const tOf = px => { const s = px / unit, k = KNOTS(); for (let i = 1; i < k.length; i++) { const [t0, s0] = k[i - 1], [t1, s1] = k[i]; if (s <= s1) return s1 > s0 ? t0 + (s - s0) / (s1 - s0) * (t1 - t0) : t1; } const [tl1, sl1] = k[k.length - 1]; return tl1 + s - sl1; };
   function metrics() {
     const t = unit > 1 ? Math.min(tOf(cur), END) : 0, past = Math.max(0, cur - endPx);
-    unit = innerHeight * UNIT;
+    unit = VH() * UNIT;
     endPx = pxOf(END);
-    maxPx = endPx + Math.max(0, el.cases.scrollHeight - el.cases.clientHeight) + innerHeight;   // + one screen so the work slides up off
+    maxPx = endPx + Math.max(0, el.cases.scrollHeight - el.cases.clientHeight) + VH();   // + one screen so the work slides up off
     spacer.style.height = (maxPx + innerHeight) + 'px';
     lenis.resize();
     const to = t < END ? pxOf(t) : endPx + past;
@@ -585,9 +593,8 @@
     rz = setTimeout(() => {
       if (!ready) return;
       if (TOUCH && innerWidth === lastW) {
-        // just the browser bars sliding in or out: re-place everything for the new height,
-        // but keep the scroll distances as they are so the page doesn't jump under your finger
-        build(); notchGeo(); lenis.resize(); render(); return;
+        // just the browser bars sliding in or out: the layout uses a stable height, so only the notch follows
+        notchGeo(); cutImages(); return;
       }
       lastW = innerWidth;
       advCache.clear(); Object.values(cy).forEach(c => c.measure());
