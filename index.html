@@ -31,23 +31,41 @@
 
   <!-- 5. case studies (scrolls natively) -->
   <section id="s-cases" class="layer" aria-label="Work">
-    <!-- featured work: three projects on the grid, before the case studies -->
-    <section class="featured grid" aria-labelledby="fw-title">
-      <h3 id="fw-title" class="fw-title rv">Featured work</h3>
-      <article class="fw-card">
-        <a class="fw-img" href="#case-620" tabindex="-1" aria-hidden="true"><img class="rv" src="img/620.jpg" alt="" width="1800" height="1805"></a>
-        <div class="fw-meta rv"><h4>620 Tennis</h4><a class="fw-btn" href="#case-620">View project <span class="arw">↗</span></a></div>
-      </article>
-      <article class="fw-card">
-        <a class="fw-img" href="#case-boon" tabindex="-1" aria-hidden="true"><img class="rv" src="img/boon-sign.jpg" alt="" width="2200" height="1004" style="object-position:42% 50%"></a>
-        <div class="fw-meta rv"><h4>Brewed by Boon</h4><a class="fw-btn" href="#case-boon">View project <span class="arw">↗</span></a></div>
-      </article>
-      <article class="fw-card">
-        <a class="fw-img" href="#" tabindex="-1" aria-hidden="true"><img class="rv" src="img/bison.jpg" alt="" width="1100" height="1650" style="object-position:50% 52%"></a>
-        <div class="fw-meta rv"><h4>Bison Coffee</h4><a class="fw-btn" href="#">View project <span class="arw">↗</span></a></div>
-      </article>
+    <!-- featured work: section title on a full-bleed line, then three cards on the grid -->
+    <section class="featured" aria-labelledby="fw-title">
+      <h3 class="sec-title" id="fw-title">Featured Work</h3>
+      <div class="fw-grid grid">
+        <article class="fw-card" style="--fw-bg:#cdffab;--fw-ink:var(--ink)">
+          <a class="fw-img" href="#case-620" tabindex="-1" aria-hidden="true"><img class="rv" src="img/620.jpg" alt="" width="1800" height="1805"></a>
+          <div class="fw-panel rv">
+            <p class="fw-name">620 Tennis Multicamp</p>
+            <ul class="pills"><li>Branding</li><li>Automation</li><li>Art Direction</li><li>Photography</li></ul>
+            <h4>620 Tennis wanted more time coaching.</h4>
+            <a class="fw-link" href="#case-620">View Case Study ↘</a>
+          </div>
+        </article>
+        <article class="fw-card" style="--fw-bg:#ec3d0c;--fw-ink:var(--ink)">
+          <a class="fw-img" href="#case-boon" tabindex="-1" aria-hidden="true"><img class="rv" src="img/boon-sign.jpg" alt="" width="2200" height="1004" style="object-position:42% 50%"></a>
+          <div class="fw-panel rv">
+            <p class="fw-name">Brewed by Boon</p>
+            <ul class="pills"><li>Branding</li><li>Art Direction</li><li>App Build</li><li>Photography</li></ul>
+            <h4>Brewed by Boon offering more than coffee.</h4>
+            <a class="fw-link" href="#case-boon">View Case Study ↘</a>
+          </div>
+        </article>
+        <article class="fw-card" style="--fw-bg:#1f2a4b;--fw-ink:var(--cream)">
+          <a class="fw-img" href="#" tabindex="-1" aria-hidden="true"><img class="rv" src="img/bison.jpg" alt="" width="1100" height="1650" style="object-position:50% 50%"></a>
+          <div class="fw-panel rv">
+            <p class="fw-name">Bison Coffee</p>
+            <ul class="pills"><li>Branding</li><li>Packaging</li><li>Art Direction</li></ul>
+            <h4>Bison, bringing quality to a traditional scene.</h4>
+            <a class="fw-link" href="#">View Case Study ↘</a>
+          </div>
+        </article>
+      </div>
     </section>
 
+    <h3 class="sec-title">Case Studies</h3>
     <article class="case case-boon grid" id="case-boon">
       <h2>How do you build an inclusive community with trusted products? More than coffee, Brewed by Boon want to clean up the industry as well as serve.</h2>
       <div class="boon-grid">

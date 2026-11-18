@@ -179,7 +179,7 @@
   // The bar along the bottom and the notch are not drawn on top of the page; they are cut out of any image
   // that reaches them, so text and backgrounds pass underneath untouched and images get soft curves.
   const NOTCH_FLANK = 2.1;   // how wide each curved side of the notch is, in notch-heights
-  const masked = () => [el.hero, ...$$('.boon-grid img, .case-620 figure img, .work .ph, .fw-img')];
+  const masked = () => [el.hero, ...$$('.boon-grid img, .case-620 figure img, .work .ph, .fw-card')];
   let cutGeo = null;
   function notchGeo() {
     const b = el.notch.getBoundingClientRect(), fr = cssPx('--frame');
