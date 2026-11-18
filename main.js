@@ -446,6 +446,8 @@
       .add(() => { veiling = false; });
   }
 
+  // G toggles the grid overlay (for checking alignment)
+  addEventListener('keydown', e => { if ((e.key === 'g' || e.key === 'G') && !e.metaKey && !e.ctrlKey && !e.altKey) $('#grid-ov').classList.toggle('on'); });
   addEventListener('keydown', e => {
     const down = ['ArrowDown', 'PageDown', ' '].includes(e.key), up = ['ArrowUp', 'PageUp'].includes(e.key);
     if (!down && !up) return;

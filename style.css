@@ -16,7 +16,12 @@
 
 :root{
   --cream:#f1eee7; --ink:#0b0b0b; --white:#fff;
-  --pad:1.15rem; --frame:.625rem;
+  --frame:.625rem;
+  /* grid: one system for the whole site. Content edges sit on --margin; columns are split by --gutter;
+     vertical gaps use the --s steps only. Press G on the page to see the grid. */
+  --cols:12; --margin:1.25rem; --gutter:1.25rem;
+  --s1:.75rem; --s2:1.5rem; --s3:3rem; --s4:6rem;
+  --pad:var(--margin);
   --small:max(.8rem,11px);
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -102,25 +107,38 @@ img{display:block;max-width:100%}
 /* soft top edge: the panel fades in from see-through to cream, so it never draws a hard line over the gradient */
 #s-cases{z-index:5;display:block;overflow:hidden;background:linear-gradient(to bottom,rgba(241,238,231,0) 0,rgba(241,238,231,.85) 22vh,var(--cream) 38vh);visibility:hidden;scrollbar-width:none}
 #s-cases::-webkit-scrollbar{display:none}
-.case{padding:1.5rem var(--pad) 2rem;position:relative}
+.grid{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));column-gap:var(--gutter);row-gap:var(--gutter);padding:0 var(--margin)}
+.case{position:relative;align-items:start;padding-top:var(--s3);padding-bottom:var(--s4)}
 .case h2{font-weight:500;letter-spacing:-.05em}
-.pills{display:flex;flex-wrap:wrap;gap:.55rem}
+.pills{display:flex;flex-wrap:wrap;gap:var(--s1)}
 .pills li{background:#fff;border-radius:99rem;padding:.6em 1.5em;font-size:var(--small);letter-spacing:-.01em;line-height:1.2}
-.case-boon{padding-left:1.95rem;min-height:100vh;min-height:100svh}
-.case-boon h2{font-size:3.62rem;line-height:1.14;max-width:92rem}
-.case-boon .pills{margin:2rem 0 1.9rem}
-.boon-grid{display:grid;grid-template-columns:1035fr 505fr;gap:1.6rem;margin-left:-.85rem;margin-right:-.1rem}
+/* a hairline between case studies, inside the margins */
+.case + .case::before{content:"";grid-column:1/-1;height:1px;background:var(--ink);margin-bottom:calc(var(--s3) - var(--gutter))}
+.case + .case{padding-top:0}
+/* Boon: heading over 11 columns; images 8 + 4 columns, same height */
+.case-boon{min-height:100vh;min-height:100svh}
+.case-boon h2{grid-column:1/span 11;font-size:3.62rem;line-height:1.14}
+.case-boon .pills{grid-column:1/-1;margin:calc(var(--s2) - var(--gutter)) 0 calc(var(--s2) - var(--gutter))}
+.boon-grid{display:contents}
 .boon-grid img{width:100%;height:29.5rem;object-fit:cover}
-.case-boon .more{margin-top:1.4rem}
-.case-620{border-top:1px solid var(--ink);display:grid;grid-template-columns:1fr 49rem;gap:2rem;
-  padding:1.5rem .8rem 5rem 1.95rem;min-height:100vh;min-height:100svh}
-.case-620 .txt{display:flex;flex-direction:column;justify-content:space-between;padding-bottom:1.6rem}
-.case-620 h2{font-size:3.8rem;line-height:1.03;letter-spacing:-.055em;padding-top:1.2rem}
-.case-620 figure{position:relative}
+.boon-grid img:first-child{grid-column:1/span 8}
+.boon-grid img:last-child{grid-column:9/span 4}
+.case-boon .more{grid-column:1/-1;margin-top:calc(var(--s1) - var(--gutter))}
+/* 620: copy over 6 columns, image over the other 6; copy top and "View Case Study" line up with the image */
+.case-620{min-height:100vh;min-height:100svh;align-items:stretch}
+.case-620 .txt{grid-column:1/span 6;display:flex;flex-direction:column;justify-content:space-between}
+.case-620 h2{font-size:3.8rem;line-height:1.03;letter-spacing:-.055em;margin-top:-.12em}
+.case-620 .more{margin-top:var(--s2)}
+.case-620 figure{grid-column:7/span 6;position:relative}
 .case-620 figure img{width:100%;height:auto}
-.case-620 figure .pills{position:absolute;left:1.4rem;top:1.3rem;z-index:1}
+.case-620 figure .pills{position:absolute;left:var(--s2);top:var(--s2);z-index:1}
 .sys{transition:color .6s}
 .case-620:hover .sys{color:#3d6b12}
+/* grid overlay (press G) */
+#grid-ov{position:fixed;inset:0;z-index:200;pointer-events:none;display:none}
+#grid-ov.on{display:grid}
+#grid-ov i{background:rgba(255,40,90,.09);box-shadow:inset 1px 0 rgba(255,40,90,.35),inset -1px 0 rgba(255,40,90,.35)}
+#grid-ov i:nth-child(n+5){display:var(--ov-wide,block)}
 .rv{opacity:0;transform:translateY(2rem);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform 1.1s cubic-bezier(.2,.7,.2,1)}
 .rv.in{opacity:1;transform:none}
 .line-rv{display:block}
@@ -157,7 +175,7 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
 /* ---------- phones ---------- */
 @media (max-width:760px){
   html{font-size:2.35vw}
-  :root{--pad:1.6rem;--frame:.8rem}
+  :root{--frame:.8rem;--cols:4;--margin:1.6rem;--gutter:1rem;--ov-wide:none}
   .line{white-space:normal;text-align:center;max-width:27rem;font-size:2.1rem}
   .big{font-size:4.05rem}
   .work:nth-child(odd){left:60%!important;top:11%!important}
@@ -167,10 +185,11 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
   #logo-avg{font-size:1.9rem}#logo-joe{font-size:2.2rem}.logo{height:2.2rem;line-height:2.2rem}
   #wheel{left:-22rem}
   #wheel-list li{font-size:4.2rem}
-  .case-boon h2{font-size:3.1rem}
-  .boon-grid{grid-template-columns:1fr;margin:0}
+  .case-boon h2{font-size:3.1rem;grid-column:1/-1}
   .boon-grid img{height:auto}
-  .case-620{grid-template-columns:1fr;gap:2rem;padding-bottom:9rem}
+  .boon-grid img:first-child,.boon-grid img:last-child{grid-column:1/-1}
+  .case-620 .txt,.case-620 figure{grid-column:1/-1}
+  .case-620{padding-bottom:9rem}
   .case-620 h2{font-size:3.6rem}
   .strip{width:15rem}
   .notch{width:27rem;height:3.6rem;gap:1.4rem}
