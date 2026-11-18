@@ -243,9 +243,9 @@
     //        then the sentence closes up on top of the image
     ft(el.hero, P.hero[1], P.hero[2], 1, { duration: 0.5 });
     ft(el.line, { color: '#0b0b0b' }, { color: '#ffffff' }, 1.1, { duration: 0.25 });
-    ft(el.avg, P.avg[1], P.avg[2], 1.45, { duration: 0.3 });
-    ft(el.joe, P.joe[1], P.joe[2], 1.55, { duration: 0.3 });
-    ft(el.slot1, { '--w': 1 }, { '--w': 0 }, 1.7, { duration: 0.3 });
+    ft(el.avg, P.avg[1], P.avg[2], 1.56, { duration: 0.32, ease: 'power3.inOut' });   // only once the image is fully open
+    ft(el.joe, P.joe[1], P.joe[2], 1.63, { duration: 0.32, ease: 'power3.inOut' });
+    ft(el.slot1, { '--w': 1 }, { '--w': 0 }, 1.74, { duration: 0.26, ease: 'power2.inOut' });
     tl.set(el.big, { autoAlpha: 1 }, 1.99);
 
     // 2 → 3: the image contracts into the big sentence, carrying the small one with it,
@@ -380,6 +380,7 @@
     if (!ready) return;
     render();
     introCheck();
+    autoOpen();
     // rotation words only change while you're scrolling
     if (RM || veiling) return;
     travel = Math.min(travel + Math.abs(cur - prev), SWAP_EVERY * 2);
@@ -391,6 +392,27 @@
       if (brandOn) cy.brand.step();
     }
   });
+  // The opening (Avg Joe parting to the sentence) is the one place that auto-scrolls and locks into place:
+  // nudge it either way and it carries on to the end, starting at the speed you were scrolling and easing
+  // to a stop (same curve as sumojoestudio.com). Scrolling is ignored until it lands.
+  let autoing = false;
+  function autoOpen() {
+    if (autoing || veiling) return;
+    const pos = lenis.targetScroll, dir = lenis.direction;
+    if (pos <= 2 || pos >= unit - 2 || !dir) return;
+    const to = dir > 0 ? unit : 0, from = lenis.animatedScroll, dist = Math.abs(to - from);
+    if (dist < 2) return;
+    const v = Math.max(1, Math.abs(lenis.velocity) * 60);                 // px per second, roughly
+    const dur = RM ? 0.01 : Math.max(0.9, Math.min(2.2, 1.5 * dist / v));
+    const k = Math.max(0, Math.min(3, v * dur / dist));                    // starting slope = your current speed
+    autoing = true;
+    lenis.scrollTo(to, {
+      duration: dur, lock: true, force: true,
+      easing: e => k * e + (3 - 2 * k) * e * e + (k - 2) * e * e * e,
+      onComplete: () => { autoing = false; },
+    });
+  }
+
   // the work cards pop in on their own clock, so keep their cut-outs current while they animate
   gsap.ticker.add(() => { if (ready && shown >= 0) cutImages(); });
 
