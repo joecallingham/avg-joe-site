@@ -39,7 +39,7 @@
   const el = {
     avg: $('#logo-avg'), joe: $('#logo-joe'), line: $('#s-line'), slot1: $('#slot1'), hero: $('#hero'),
     big: $('#s-big'), slot2: $('#slot2'), wheel: $('#s-wheel'), wbg: $('#wheel-bg'), list: $('#wheel-list'),
-    works: $('#works'), cases: $('#s-cases'), veil: $('#veil'), track: $('.track'), strip: $('.strip'),
+    works: $('#works'), cases: $('#s-cases'), veil: $('#veil'), say: $('.say'),
     notch: $('.notch'),
   };
 
@@ -152,15 +152,27 @@
   }
 
   /* ---------- nav: stays on Studio ---------- */
-  function setNav(key) {
-    $$('a', el.track).forEach(a => {
-      const on = a.dataset.k === key;
-      a.classList.toggle('on', on);
-      if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
-    });
-    const a = $(`a[data-k="${key}"]`, el.track);
-    gsap.set(el.track, { x: el.strip.clientWidth / 2 - (a.offsetLeft + a.offsetWidth / 2) });
+  // The middle button talks: its words change with where you are (and with what you hover).
+  const SAYS = { top: 'Studio', big: "That's us", wheel: 'Pick one?', pick: 'Good choice', work: 'Have a nose', end: 'Say hello?', soon: 'Soon, promise' };
+  let saying = 'Studio', sayTl = null, hoverSay = null;
+  function say(text) {
+    if (text === saying) return;
+    saying = text;
+    if (sayTl) sayTl.kill();
+    if (RM) { el.say.textContent = text; return; }
+    sayTl = gsap.timeline()
+      .to(el.say, { yPercent: -70, autoAlpha: 0, duration: 0.16, ease: 'power2.in' })
+      .add(() => { el.say.textContent = text; })
+      .fromTo(el.say, { yPercent: 70, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.32, ease: 'power3.out' });
   }
+  function navState() {
+    const t = tl ? tl.time() : 0;
+    const past = cur - endPx - Math.max(0, el.cases.scrollHeight - el.cases.clientHeight);
+    const where = past > innerHeight * 0.4 ? 'end' : t >= WE + 0.5 ? 'work' : t >= 3.6 ? 'wheel' : t >= 2.6 ? 'big' : 'top';
+    say(SAYS[hoverSay && (hoverSay !== 'pick' || where === 'wheel') ? hoverSay : where]);
+    $('.nb[data-k="work"]').classList.toggle('on', where === 'work');
+  }
+  function setNav() { navState(); }
 
   /* ---------- the notch: cut out of images only ---------- */
   // The bar along the bottom and the notch are not drawn on top of the page; they are cut out of any image
@@ -390,6 +402,7 @@
     if (Math.abs(el.cases.scrollTop - st) > 0.5) el.cases.scrollTop = st;
     if (cur >= endPx) gsap.set(el.cases, { y: -(past - st) });      // after the last case study, the whole section slides up off screen
     cutImages();
+    navState();
   }
   lenis.on('scroll', l => {
     const prev = cur;
@@ -441,7 +454,7 @@
   gsap.ticker.add(() => { if (ready && shown >= 0) cutImages(); });
 
   const inOut = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-  function goTo(t) { lenis.scrollTo(Math.min(maxPx, pxOf(t)), { duration: 1.1, easing: inOut }); }
+  function goTo(t) { autoDone = true; lenis.scrollTo(Math.min(maxPx, pxOf(t)), { duration: 1.1, easing: inOut }); }
   function jumpTo(t) {                // nav + logo: a soft cut instead of replaying everything
     if (veiling) return;
     veiling = true;
@@ -469,10 +482,14 @@
     if (next !== undefined) goTo(next);
   });
 
-  $$('a', el.track).forEach(a => a.addEventListener('click', e => {
+  $$('.nb').forEach(a => a.addEventListener('click', e => {
     e.preventDefault();
-    if (a.dataset.k === 'studio') jumpTo(0);       // Work + Contact: not wired yet, nav stays on Studio
+    if (a.dataset.k === 'studio') jumpTo(0);
+    if (a.dataset.k === 'work') goTo(END);           // Contact: no page yet
   }));
+  const hov = (n, key) => { n.addEventListener('mouseenter', () => { hoverSay = key; navState(); }); n.addEventListener('mouseleave', () => { hoverSay = null; navState(); }); };
+  hov($('.nb[data-k="contact"]'), 'soon');
+  $$('.work').forEach(n => hov(n, 'pick'));
   $$('.logo').forEach(a => a.addEventListener('click', e => { e.preventDefault(); jumpTo(0); }));
   $$('a[href="#"]').forEach(a => a.addEventListener('click', e => e.preventDefault()));
 
