@@ -133,7 +133,7 @@ img{display:block;max-width:100%}
 .fw-name{order:0;font-size:var(--small);letter-spacing:-.01em}
 .fw-panel .pills{order:3;margin-top:auto}   /* pinned to the bottom, as far from it as from the side */
 .fw-panel .pills{gap:.4rem}
-.fw-panel .pills li{color:var(--ink);padding:.55em 1.15em}
+.fw-panel .pills li{color:var(--ink);padding:.55em 1.15em;background:rgba(255,255,255,.5)}
 .fw-panel h4{order:1;font-weight:500;font-size:2.75rem;line-height:1.06;letter-spacing:-.05em;margin:var(--s2) 0 var(--s2)}
 .fw-link{order:2;font-size:var(--small);letter-spacing:-.02em;margin-bottom:var(--s3)}
 .fw-link:hover{text-decoration:underline;text-underline-offset:.2em}
