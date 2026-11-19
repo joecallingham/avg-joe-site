@@ -33,7 +33,9 @@
   const SWAP_EVERY = 85;     // px of scrolling between typeface changes in the rotation words
   const TRACK = 0.05;        // rotation words: tracking -50
 
-  const SIZE = { 'snell-black': 1.22, kelsi: 0.82, campground: 1.08, postoni: 0.92 };   // optical size per face
+  // Each face is scaled so its lowercase (o, x, n) is exactly as tall as Nuckle's: measured from the font files
+  const SIZE = { avebury: 0.919, campground: 1.665, 'gilroy-heavy': 1.136, kelsi: 0.687, postoni: 1.289,
+    'iowan-black': 1.148, 'iowan-black-italic': 1.164, 'snell-black': 1.521 };
   const ROT = ['avebury', 'campground', 'gilroy-heavy', 'kelsi', 'postoni', 'iowan-black', 'iowan-black-italic', 'snell-black'];
 
   // Services on the wheel, each with the work that pops in beside it.
