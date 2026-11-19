@@ -558,10 +558,25 @@
     [...t].forEach(ch => {
       const s = document.createElement('span');
       s.textContent = ch;
-      if (ch.trim()) s.className = 'hl';
+      if (/\p{L}/u.test(ch)) s.className = 'hl';
       node.appendChild(s);
     });
-    node.querySelectorAll('.hl').forEach(s => { s.style.width = s.getBoundingClientRect().width.toFixed(2) + 'px'; });
+    // width from the font itself (not the screen), so a hidden or scaled-down card still gets the right boxes; in rem (each letter's own font-size changes as it swaps faces)
+    const cs = getComputedStyle(node), r = rem(), fs = parseFloat(cs.fontSize), ls = parseFloat(cs.letterSpacing) || 0;
+    node.querySelectorAll('.hl').forEach(s => { s.style.width = ((advance(s.textContent, '', fs) + ls) / r).toFixed(4) + 'rem'; });
+  }
+  function rotateOnHover(trigger, label) {      // label() returns the element whose letters change
+    let timer = 0;
+    const tick = () => {
+      const ls = [...label().querySelectorAll('.hl')];
+      if (!ls.length) return;
+      const s = ls[Math.floor(Math.random() * ls.length)];
+      let f; do { f = ROT[Math.floor(Math.random() * ROT.length)]; } while (f === s.dataset.f);
+      s.dataset.f = f; s.style.fontFamily = '"r-' + f + '"'; s.style.fontSize = (SIZE[f] || 1) + 'em';
+    };
+    const reset = () => label().querySelectorAll('.hl').forEach(s => { s.style.fontFamily = ''; s.style.fontSize = ''; delete s.dataset.f; });
+    trigger.addEventListener('mouseenter', () => { if (RM || TOUCH) return; clearInterval(timer); tick(); timer = setInterval(tick, 90); });
+    trigger.addEventListener('mouseleave', () => { clearInterval(timer); reset(); });
   }
   const navLabel = a => a.querySelector('.say') || a.querySelector('.nbt');
   $$('.nb').forEach(a => {
@@ -571,19 +586,12 @@
       const sp = document.createElement('span'); sp.className = 'nbt'; sp.setAttribute('aria-hidden', 'true'); sp.textContent = word;
       a.textContent = ''; a.appendChild(sp);
     }
-    let timer = 0;
-    const tick = () => {
-      const ls = [...navLabel(a).querySelectorAll('.hl')];
-      if (!ls.length) return;
-      const s = ls[Math.floor(Math.random() * ls.length)];
-      let f; do { f = ROT[Math.floor(Math.random() * ROT.length)]; } while (f === s.dataset.f);
-      s.dataset.f = f; s.style.fontFamily = '"r-' + f + '"'; s.style.fontSize = (SIZE[f] || 1) + 'em';
-    };
-    const reset = () => navLabel(a).querySelectorAll('.hl').forEach(s => { s.style.fontFamily = ''; s.style.fontSize = ''; delete s.dataset.f; });
-    a.addEventListener('mouseenter', () => { if (RM || TOUCH) return; clearInterval(timer); tick(); timer = setInterval(tick, 90); });
-    a.addEventListener('mouseleave', () => { clearInterval(timer); reset(); });
+    rotateOnHover(a, () => navLabel(a));
   });
   document.fonts.ready.then(() => $$('.nb').forEach(a => navLetters(navLabel(a))));
+  const csLinks = [...$$('.fw-link, .more').map(a => [a, a]), ...$$('.work').map(a => [a, a.querySelector('span')])];
+  csLinks.forEach(([trigger, lab]) => { if (!lab.getAttribute('aria-label') && trigger === lab) lab.setAttribute('aria-label', lab.textContent.trim()); rotateOnHover(trigger, () => lab); });
+  document.fonts.ready.then(() => csLinks.forEach(([, lab]) => navLetters(lab)));
   hov($('.nb[data-k="contact"]'), 'soon');
   hov($('.nb[data-k="studio"]'), 'play');
   $$('.work').forEach(n => hov(n, 'pick'));
