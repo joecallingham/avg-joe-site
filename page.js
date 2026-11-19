@@ -170,6 +170,63 @@
     }
     $$('.sw[aria-pressed="true"]', p).forEach(press);
   });
+  /* ---------- part: the theme picker in the notch ---------- */
+  // Each swatch is a whole theme from the brand's own pairings (page, text, panel, panel ink), so a colour can only ever
+  // land where the brand allows it. It rises out of the notch once you've scrolled past the opening.
+  const themes = $('.themes');
+  if (themes) {
+    const root = document.documentElement;
+    const apply = b => {
+      $$('.sw', themes).forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+      b.dataset.theme.split(';').forEach(kv => { const [k, v] = kv.split(':'); root.style.setProperty(k.trim(), v.trim()); });
+      $$('[data-hex]').forEach(n => { n.textContent = getComputedStyle(root).getPropertyValue(n.dataset.hex).trim().toUpperCase(); });
+      const tc = $('meta[name=theme-color]'); if (tc) tc.content = getComputedStyle(root).getPropertyValue('--page').trim();
+    };
+    $$('.sw', themes).forEach(b => b.addEventListener('click', () => apply(b)));
+    const hero = $('.cs-hero');
+    const showAt = () => (hero ? hero.offsetTop + hero.offsetHeight * 0.45 : 200);
+    const check = y => themes.classList.toggle('show', y > showAt());
+    lenis.on('scroll', l => check(l.scroll)); check(scrollY);
+  }
+
+  /* ---------- Work index: Mother-style grid + the categories menu ---------- */
+  const wks = $$('.wk');
+  if (wks.length) {
+    // small, small, big / big, small, small ... over whatever is showing, so the rhythm survives a filter
+    const PATTERN = ['', '', 'big', 'big', '', ''];
+    const layout = () => wks.filter(w => !w.hidden).forEach((w, i) => w.classList.toggle('wk-big', PATTERN[i % 6] === 'big'));
+    const panel = $('#cats'), veil = $('.cats-veil'), opener = $('.cats-open'), list = $('ul', panel);
+    const counts = new Map();
+    wks.forEach(w => w.dataset.cats.split('|').forEach(c => counts.set(c, (counts.get(c) || 0) + 1)));
+    const cats = [['All', wks.length], ...[...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))];
+    cats.forEach(([name, n]) => {
+      const li = document.createElement('li'), b = document.createElement('button');
+      b.type = 'button'; b.dataset.cat = name; b.setAttribute('aria-pressed', String(name === 'All'));
+      b.innerHTML = `<span class="cn">${name}</span><sup>${n}</sup>`;
+      b.addEventListener('click', () => pick(name));
+      li.appendChild(b); list.appendChild(li);
+    });
+    let byKey = false;
+    const open = on => {
+      panel.classList.toggle('open', on); veil.classList.toggle('open', on);
+      panel.setAttribute('aria-hidden', String(!on)); opener.setAttribute('aria-expanded', String(on));
+      if (on) { lenis.stop(); if (byKey) setTimeout(() => $('[aria-pressed="true"]', list).focus({ preventScroll: true }), 350); } else { lenis.start(); if (byKey) opener.focus({ preventScroll: true }); }
+    };
+    function pick(name) {
+      $$('button', list).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === name)));
+      wks.forEach(w => { w.hidden = name !== 'All' && !w.dataset.cats.split('|').includes(name); });
+      $('.cats-label').textContent = name; $('.wk-count').textContent = wks.filter(w => !w.hidden).length;
+      layout(); open(false);
+      wks.filter(w => !w.hidden).forEach((w, i) => { const im = $('img', w); im.classList.remove('in'); setTimeout(() => im.classList.add('in'), 60 + i * 70); });
+      lenis.scrollTo(0, { duration: 0.8 });
+    }
+    opener.addEventListener('click', e => { byKey = e.detail === 0; open(true); });
+    $('.cats-close').addEventListener('click', () => open(false));
+    veil.addEventListener('click', () => open(false));
+    addEventListener('keydown', e => { if (e.key === 'Escape' && panel.classList.contains('open')) open(false); });
+    layout();
+  }
+
   // logo shape buttons: <button data-logo="url"> swaps the mask image on the stage
   $$('[data-logo]').forEach(b => b.addEventListener('click', () => {
     const stage = b.closest('[data-palette-stage]');

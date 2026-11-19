@@ -12,67 +12,40 @@
 <body>
 
 <main>
-  <header class="wk-head">
-    <h1 class="rv">Work that puts the extra into ordinary.</h1>
-  </header>
+  <h2 class="sec-title"><span>Work</span>
+    <span class="wk-bar"><span>Filter by:</span><button type="button" class="cats-open" aria-expanded="false" aria-controls="cats"><span class="cats-label">All</span> (<span class="wk-count">5</span>)</button></span>
+  </h2>
 
-  <section aria-labelledby="wk-title">
-    <h2 class="sec-title" id="wk-title"><span>All Work</span><span class="hint">05 projects</span></h2>
-    <div class="fw-grid wk-grid grid">
-
-      <article class="fw-card wide" style="--fw-bg:#131f37;--fw-ink:#fffaf4">
-        <a class="fw-img" href="/work/bison/" tabindex="-1" aria-hidden="true"><img class="rv" src="/img/work/bison/cup.jpg" alt="" width="2000" height="1092"><span class="credit rv">Bison Coffee</span></a>
-        <div class="fw-panel rv">
-          <p class="fw-name">Bison Coffee</p>
-          <ul class="pills"><li>Branding</li><li>Packaging</li><li>Art Direction</li></ul>
-          <h4>Bison, bringing quality to a traditional scene.</h4>
-          <a class="fw-link" href="/work/bison/" data-rot>View Case Study ↘</a>
-        </div>
-      </article>
-
-      <article class="fw-card soon" style="--fw-bg:#cdffab;--fw-ink:var(--ink)">
-        <span class="fw-img"><img class="rv" src="/img/620.jpg" alt="" width="1800" height="1805"><span class="credit rv">620 Tennis Multicamp</span></span>
-        <div class="fw-panel rv">
-          <p class="fw-name">620 Tennis Multicamp</p>
-          <ul class="pills"><li>Branding</li><li>Automation</li><li>Art Direction</li><li>Photography</li></ul>
-          <h4>620 Tennis wanted more time coaching.</h4>
-          <span class="fw-link">Case study on its way</span>
-        </div>
-      </article>
-
-      <article class="fw-card soon" style="--fw-bg:#ec3d0c;--fw-ink:var(--ink)">
-        <span class="fw-img"><img class="rv" src="/img/boon-sign.jpg" alt="" width="2200" height="1004" style="object-position:42% 50%"><span class="credit rv">Brewed by Boon</span></span>
-        <div class="fw-panel rv">
-          <p class="fw-name">Brewed by Boon</p>
-          <ul class="pills"><li>Branding</li><li>Art Direction</li><li>App Build</li><li>Photography</li></ul>
-          <h4>Brewed by Boon offering more than coffee.</h4>
-          <span class="fw-link">Case study on its way</span>
-        </div>
-      </article>
-
-      <article class="fw-card soon" style="--fw-bg:#0b0b0b;--fw-ink:var(--cream)">
-        <span class="fw-img"><img class="rv" src="/img/the-hunna-hero.jpg" alt="" width="1200" height="1500" style="object-position:50% 12%"><span class="credit rv">The Hunna</span></span>
-        <div class="fw-panel rv">
-          <p class="fw-name">The Hunna</p>
-          <ul class="pills"><li>Tour Artwork</li><li>Campaign</li><li>Merch</li><li>Website</li></ul>
-          <h4>The Hunna, back from a hiatus on their own terms.</h4>
-          <span class="fw-link">Case study on its way</span>
-        </div>
-      </article>
-
-      <article class="fw-card soon" style="--fw-bg:#fff;--fw-ink:var(--ink)">
-        <span class="fw-img"><img class="rv" src="/img/download-hero.jpg" alt="" width="1080" height="1920" style="object-position:50% 38%"><span class="credit rv">Download x Mary Wyatt</span></span>
-        <div class="fw-panel rv">
-          <p class="fw-name">Download x Mary Wyatt</p>
-          <ul class="pills"><li>Direction</li><li>Film &amp; Edit</li><li>Social Content</li></ul>
-          <h4>Mary Wyatt's collection, live at Download Festival.</h4>
-          <span class="fw-link">Case study on its way</span>
-        </div>
-      </article>
-
-    </div>
-  </section>
+  <!-- small cards sit beside one big image; the pattern (small, small, big / big, small, small) is set in page.js so it holds when you filter -->
+  <div class="grid wk-list">
+    <article class="wk soon" data-cats="Branding|Automation|Art Direction|Photography" data-rot-hover>
+      <div><span class="wk-img"><img class="rv" src="/img/620.jpg" alt="" width="1800" height="1805" loading="lazy"></span>
+      <p class="wk-name" data-rot>620 Tennis Multicamp</p><p class="wk-line">More time coaching, less time promoting</p></div>
+    </article>
+    <article class="wk soon" data-cats="Branding|Art Direction|App Build|Photography" data-rot-hover>
+      <div><span class="wk-img"><img class="rv" src="/img/boon-sign.jpg" alt="" width="2200" height="1004" loading="lazy" style="object-position:42% 50%"></span>
+      <p class="wk-name" data-rot>Brewed by Boon</p><p class="wk-line">More than coffee: a community with trusted products</p></div>
+    </article>
+    <article class="wk" data-cats="Branding|Packaging|Art Direction" data-rot-hover>
+      <a href="/work/bison/"><span class="wk-img"><img class="rv" src="/img/work/bison/cup.jpg" alt="" width="2000" height="1092"></span>
+      <p class="wk-name" data-rot>Bison Coffee</p><p class="wk-line">Bringing quality to a traditional scene</p></a>
+    </article>
+    <article class="wk soon" data-cats="Tour Artwork|Campaign|Merch|Website" data-rot-hover>
+      <div><span class="wk-img"><img class="rv" src="/img/the-hunna-hero.jpg" alt="" width="1200" height="1500" loading="lazy" style="object-position:50% 12%"></span>
+      <p class="wk-name" data-rot>The Hunna</p><p class="wk-line">Back from a hiatus on their own terms</p></div>
+    </article>
+    <article class="wk soon" data-cats="Direction|Film &amp; Edit|Social Content" data-rot-hover>
+      <div><span class="wk-img"><img class="rv" src="/img/download-hero.jpg" alt="" width="1080" height="1920" loading="lazy" style="object-position:50% 38%"></span>
+      <p class="wk-name" data-rot>Download x Mary Wyatt</p><p class="wk-line">A collection, live at Download Festival</p></div>
+    </article>
+  </div>
 </main>
+
+<div class="cats-veil" aria-hidden="true"></div>
+<aside class="cats" id="cats" aria-label="Filter work by category" aria-hidden="true">
+  <div class="cats-top"><span>Categories</span><button type="button" class="cats-close">Close</button></div>
+  <ul></ul>
+</aside>
 
 <a id="logo-avg" class="logo" href="/" aria-label="Avg Joe, home">Avg</a>
 <a id="logo-joe" class="logo" href="/" aria-hidden="true" tabindex="-1">Joe</a>

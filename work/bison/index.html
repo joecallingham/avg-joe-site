@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="page">
+<html lang="en" class="page cs-page" style="--page:#fffaf4;--text:#131f37;--panel:#131f37;--panel-ink:#fffaf4">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -14,8 +14,8 @@
 </head>
 <body>
 
-<!-- the colours picked in "Logo & colour" are set on <main>, so the type tester and the 3D bag follow them -->
-<main data-palette-stage style="--bg:#131f37;--fg:#fffaf4;--logo:url(/img/work/bison/logo-lockup.png);--logo-ar:6.13;--tt-font:'Bison Sans'">
+<!-- the colour picked in the notch sets a whole Bison theme (page, text, panels, logo) on <html>, from the brand's own pairings -->
+<main data-palette-stage style="--logo:url(/img/work/bison/logo-lockup.png);--logo-ar:6.13;--tt-font:'Bison Sans'">
 
   <h2 class="sec-title"><a href="/work/" data-rot>Work</a><span class="hint">Bison Coffee, 2026</span></h2>
 
@@ -47,52 +47,28 @@
   </section>
 
   <section class="cs-sec">
-    <h2 class="sec-title"><span>Logo &amp; Colour</span><span class="hint">Pick a background and a logo colour ↘</span></h2>
+    <h2 class="sec-title"><span>Logo &amp; Colour</span></h2>
     <div class="grid">
       <div class="panel pal-stage rv">
         <div class="pal-logo" role="img" aria-label="Bison logo in the colours you picked"></div>
-        <span class="pal-hex"><span data-hex="--fg">#FFFAF4</span> on <span data-hex="--bg">#131F37</span></span>
+        <span class="pal-hex"><span data-hex="--panel-ink">#FFFAF4</span> on <span data-hex="--panel">#131F37</span></span>
       </div>
-      <div class="ctl pal-ctl rv" data-palette>
-        <div>
-          <div style="margin-bottom:var(--s2)">
-            <h4>Background</h4>
-            <div class="sws">
-              <button class="sw" data-var="--bg" data-val="#131f37" aria-pressed="true" aria-label="Background: navy"></button>
-              <button class="sw" data-var="--bg" data-val="#243348" aria-pressed="false" aria-label="Background: slate"></button>
-              <button class="sw" data-var="--bg" data-val="#fffaf4" aria-pressed="false" aria-label="Background: cream"></button>
-              <button class="sw" data-var="--bg" data-val="#fb7b30" aria-pressed="false" aria-label="Background: orange"></button>
-            </div>
-          </div>
-          <div style="margin-bottom:var(--s2)">
-            <h4>Logo</h4>
-            <div class="sws">
-              <button class="sw" data-var="--fg" data-val="#fffaf4" aria-pressed="true" aria-label="Logo: cream"></button>
-              <button class="sw" data-var="--fg" data-val="#131f37" aria-pressed="false" aria-label="Logo: navy"></button>
-              <button class="sw" data-var="--fg" data-val="#243348" aria-pressed="false" aria-label="Logo: slate"></button>
-              <button class="sw" data-var="--fg" data-val="#fb7b30" aria-pressed="false" aria-label="Logo: orange"></button>
-            </div>
-          </div>
-          <div>
-            <h4>Mark</h4>
-            <div class="chips">
-              <button class="chip" data-logo="/img/work/bison/logo-lockup.png" data-ar="6.13" aria-pressed="true">Lock-up</button>
-              <button class="chip" data-logo="/img/work/bison/logo-wordmark.png" data-ar="5.776" aria-pressed="false">Logotype</button>
-              <button class="chip" data-logo="/img/work/bison/logo-bison.png" data-ar="1.2915" aria-pressed="false">Logomark</button>
-              <button class="chip" data-logo="/img/work/bison/logo-box.png" data-ar="1" aria-pressed="false">Badge</button>
-            </div>
-          </div>
+      <div class="ctl pal-ctl rv">
+        <div class="chips" role="group" aria-label="Logo version">
+          <button class="chip" data-logo="/img/work/bison/logo-lockup.png" data-ar="6.13" aria-pressed="true">Lock-up</button>
+          <button class="chip" data-logo="/img/work/bison/logo-wordmark.png" data-ar="5.776" aria-pressed="false">Logotype</button>
+          <button class="chip" data-logo="/img/work/bison/logo-bison.png" data-ar="1.2915" aria-pressed="false">Logomark</button>
+          <button class="chip" data-logo="/img/work/bison/logo-box.png" data-ar="1" aria-pressed="false">Badge</button>
         </div>
-        <p class="cap">Four colours, and the logo never sits on its own. Whatever you pick here carries through the type and the bag below.</p>
       </div>
     </div>
   </section>
 
   <section class="cs-sec">
-    <h2 class="sec-title"><span>Bison Sans</span><span class="hint">Click the words and type your own ↘</span></h2>
+    <h2 class="sec-title"><span>Bison Sans</span></h2>
     <div class="grid">
       <div class="tt" data-type>
-        <div class="panel tt-stage rv" style="--tt-bg:var(--bg);--tt-fg:var(--fg);transition:background .5s,color .5s">
+        <div class="panel tt-stage rv">
           <div class="tt-text" contenteditable="true" spellcheck="false" role="textbox" aria-label="Type to try Bison Sans" data-ph="Type something">WE MAKE COFFEE</div>
         </div>
         <div class="ctl tt-ctl rv">
@@ -101,18 +77,17 @@
             <label class="slider"><span>Tracking</span><input type="range" min="-60" max="300" step="5" value="0" data-prop="track"><output data-out="track"></output></label>
             <label class="slider"><span>Leading</span><input type="range" min="0.75" max="1.4" step="0.01" value="0.95" data-prop="lead"><output data-out="lead"></output></label>
           </div>
-          <p class="cap">A bespoke face drawn for Bison: wide, heavy and capitals only, for headlines and never for body copy. It has letters A to Z, so numbers fall back to our own type.</p>
+          <p class="cap">A bespoke face drawn for Bison: wide, heavy and capitals only, for headlines and never for body copy.</p>
         </div>
       </div>
     </div>
   </section>
 
   <section class="cs-sec">
-    <h2 class="sec-title"><span>Packaging</span><span class="hint">Drag the bag to turn it ↘</span></h2>
+    <h2 class="sec-title"><span>Packaging</span></h2>
     <div class="grid">
-      <div class="panel model rv" data-model="/img/work/bison/bag.glb" data-alt="Bison coffee bag, in 3D: drag to turn it" data-orbit="12deg 80deg auto">
+      <div class="panel model rv" data-model="/img/work/bison/bag.glb" data-alt="Bison coffee bag in 3D. Drag to turn it." data-orbit="12deg 80deg auto">
         <img class="poster" src="/img/work/bison/bag.jpg" alt="" width="1400" height="1400" loading="lazy">
-        <span class="tip">Drag to turn</span>
       </div>
       <div class="model-side">
         <span class="shot rv"><img src="/img/work/bison/cup.jpg" alt="Bison takeaway cup" width="2000" height="1092" loading="lazy"><span class="credit">Bison Coffee</span></span>
@@ -122,7 +97,7 @@
   </section>
 
   <section class="cs-sec">
-    <h2 class="sec-title"><span>Brand Guidelines</span><span class="hint">Drag through all 25 pages ↘ <span id="gl-count"></span></span></h2>
+    <h2 class="sec-title"><span>Brand Guidelines</span><span class="hint" id="gl-count"></span></h2>
     <div class="strip rv" data-strip data-count="#gl-count" aria-label="Bison brand guidelines, 25 pages">
       <img src="/img/work/bison/gl/p001.jpg" alt="Guidelines page 1" width="1500" height="843" loading="lazy">
       <img src="/img/work/bison/gl/p002.jpg" alt="Guidelines page 2" width="1500" height="843" loading="lazy">
@@ -153,7 +128,7 @@
   </section>
 
   <section class="cs-sec">
-    <h2 class="sec-title"><span>Routes We Explored</span><span class="hint">Click to skip through ↘</span></h2>
+    <h2 class="sec-title"><span>Routes We Explored</span></h2>
     <div class="grid routes">
       <div class="fader-wrap rv">
         <div class="fader" data-fader="2400" role="img" aria-label="Nine early directions for Bison, cross-fading">
@@ -183,6 +158,13 @@
 <a id="logo-joe" class="logo" href="/" aria-hidden="true" tabindex="-1">Joe</a>
 <div id="frame-bottom" aria-hidden="true"></div>
 <nav id="nav" aria-label="Main">
+  <div class="themes" role="group" aria-label="Colour theme">
+    <button class="sw" style="--sw:#fffaf4" data-theme="--page:#fffaf4;--text:#131f37;--panel:#131f37;--panel-ink:#fffaf4" aria-pressed="true" aria-label="Cream theme"></button>
+    <button class="sw" style="--sw:#131f37" data-theme="--page:#131f37;--text:#fffaf4;--panel:#243348;--panel-ink:#fffaf4" aria-pressed="false" aria-label="Navy theme"></button>
+    <button class="sw" style="--sw:#243348" data-theme="--page:#243348;--text:#fffaf4;--panel:#131f37;--panel-ink:#fb7b30" aria-pressed="false" aria-label="Slate theme"></button>
+    <button class="sw" style="--sw:#fb7b30" data-theme="--page:#fb7b30;--text:#131f37;--panel:#131f37;--panel-ink:#fffaf4" aria-pressed="false" aria-label="Orange theme"></button>
+    <i class="leg l" aria-hidden="true"></i><i class="leg r" aria-hidden="true"></i>
+  </div>
   <div class="notch">
     <a class="nb here" href="/work/" data-k="work" data-rot>Work</a>
     <a class="nb on" href="/" data-k="studio" data-say="Studio" aria-expanded="false" aria-controls="synth" aria-label="Studio: play the drum machine" data-rot><span class="say" aria-live="polite">Studio</span></a>
