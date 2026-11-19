@@ -1,0 +1,149 @@
+/* Avg Joe — Work page and case studies. Loaded after style.css and built on the same grid (--cols, --margin, --gutter, --s1…--s4),
+   the same section titles on full-bleed lines, lozenges, credits and the notch. */
+
+/* ---------- page chrome: these pages scroll normally ---------- */
+html.page{overscroll-behavior:auto;--edge:calc(var(--s2) * .5)}
+.page body{min-height:100vh;padding-bottom:calc(var(--frame) + 7rem)}
+.page .logo{opacity:1;top:auto;bottom:calc(var(--frame) + .5rem);will-change:auto}
+.page #logo-avg{left:var(--margin)}
+.page #logo-joe{left:auto;right:var(--margin)}
+.page .nb.here{color:var(--ink)}
+.page main{display:block}
+.page ::selection{background:var(--ink);color:var(--cream)}
+
+/* ---------- shared pieces ---------- */
+.sec-title{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s2)}
+.sec-title .hint{font-size:var(--small);color:rgba(11,11,11,.55);letter-spacing:-.02em;white-space:nowrap}
+.sec-title a:hover{text-decoration:underline;text-underline-offset:.2em}
+.cs-sec{padding-bottom:var(--s4)}
+.cs-sec>.grid{padding-top:var(--gutter);align-items:start}
+.panel{position:relative;overflow:hidden;background:var(--panel,#fff)}
+.cap{font-size:var(--small);letter-spacing:-.02em;line-height:1.3;color:rgba(11,11,11,.62);max-width:22rem}
+.lab{font-size:var(--small);letter-spacing:-.02em;line-height:1.3}
+.page .credit{z-index:2}
+.shot img,.panel>img{width:100%;height:100%;object-fit:cover}
+
+/* ---------- Work index: every project as a card on the grid (same card as Featured Work) ---------- */
+.wk-head{padding:var(--s3) var(--margin) var(--s3)}
+.wk-head h1{font-weight:500;font-size:6.4rem;line-height:.98;letter-spacing:-.06em;max-width:70rem}
+.wk-grid{row-gap:var(--frame)}
+.wk-grid .fw-card{grid-column:span 4}
+.wk-grid .fw-card.wide{grid-column:span 8}
+.wk-grid .fw-card.wide .fw-img{aspect-ratio:auto;flex:1;min-height:0}
+.wk-grid .fw-card .fw-img{position:relative}
+.fw-card.soon .fw-link{opacity:.55;pointer-events:none}
+.wk-grid .fw-card:nth-of-type(n) .rv{transition-delay:0s}
+
+/* ---------- case study hero: the home page's case layout (statement left, image right) ---------- */
+/* the hero fills the screen between the title line and the notch bar, so nothing sits under Avg, Joe or the nav */
+.cs-hero{padding-top:var(--s2);padding-bottom:var(--s3);align-items:stretch;height:calc(100vh - 6.6rem - var(--frame));height:calc(100svh - 6.6rem - var(--frame));min-height:30rem}
+.cs-hero .txt{grid-column:1/span 6;display:flex;flex-direction:column;justify-content:space-between;gap:var(--s3)}
+.cs-hero h1{font-weight:500;font-size:4.6rem;line-height:1.02;letter-spacing:-.055em;margin-top:-.1em}
+.cs-hero figure{grid-column:7/span 6;position:relative;--edge:calc(var(--s2) * .5)}
+.cs-hero figure .pills{position:absolute;left:var(--edge);top:var(--edge);right:var(--edge);z-index:1}
+.cs-hero figure .shot{height:100%}
+.cs-hero figure{min-height:0}
+.cs-hero figure img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gutter);font-size:var(--small);letter-spacing:-.02em;line-height:1.35}
+.facts dt{color:rgba(11,11,11,.55)}
+/* the brief: a label on the margin, the copy on the right half */
+.cs-brief .lab{grid-column:1/span 3}
+.cs-brief .copy{grid-column:7/span 6;font-size:2.1rem;line-height:1.12;letter-spacing:-.045em}
+.cs-brief .copy p + p{margin-top:.7em}
+.cs-brief .ticks{grid-column:7/span 6;display:flex;flex-wrap:wrap;gap:var(--s1);margin-top:var(--s2)}
+
+/* ---------- controls: one look for every interactive part (36px tall, as the notch buttons) ---------- */
+.ctl{display:flex;flex-direction:column;gap:var(--s2)}
+.ctl h4{font-weight:500;font-size:var(--small);letter-spacing:-.02em;color:rgba(11,11,11,.55);margin-bottom:.55rem}
+.sws{display:flex;flex-wrap:wrap;gap:.5rem}
+.sw{appearance:none;border:0;cursor:pointer;width:36px;height:36px;min-width:36px;border-radius:50%;background:var(--sw);box-shadow:inset 0 0 0 1px rgba(11,11,11,.18);transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .25s}
+.sw:hover{transform:scale(1.08)}
+.sw[aria-pressed="true"]{box-shadow:inset 0 0 0 1px rgba(11,11,11,.18),0 0 0 2px var(--cream),0 0 0 3.5px var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.chip{appearance:none;border:0;cursor:pointer;font:inherit;font-size:var(--small);letter-spacing:-.01em;line-height:1.2;height:36px;padding:0 1.15em;border-radius:99rem;background:#fff;color:var(--ink);transition:background .25s,color .25s}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--cream)}
+.slider{display:grid;grid-template-columns:5.5rem 1fr 3.2rem;align-items:center;gap:var(--s1);font-size:var(--small);letter-spacing:-.02em;height:36px}
+.slider output{text-align:right;font-variant-numeric:tabular-nums;color:rgba(11,11,11,.55)}
+.slider input{appearance:none;-webkit-appearance:none;width:100%;height:36px;background:transparent;cursor:pointer;--p:50%}
+.slider input::-webkit-slider-runnable-track{height:1px;background:linear-gradient(to right,var(--ink) var(--p),rgba(11,11,11,.25) var(--p))}
+.slider input::-moz-range-track{height:1px;background:rgba(11,11,11,.25)}
+.slider input::-moz-range-progress{height:1px;background:var(--ink)}
+.slider input::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--ink);margin-top:-7.5px;transition:transform .2s}
+.slider input::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:var(--ink)}
+.slider input:active::-webkit-slider-thumb{transform:scale(1.35)}
+.sw:focus-visible,.chip:focus-visible,.slider input:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+
+/* ---------- part: palette stage (pick the background and the logo colour) ---------- */
+.pal-stage{grid-column:1/span 8;aspect-ratio:16/10;display:grid;place-items:center;background:var(--bg);transition:background .5s cubic-bezier(.2,.7,.2,1)}
+.pal-logo{width:min(62%,calc(34% * var(--logo-ar)));aspect-ratio:var(--logo-ar);background:var(--fg);transition:background .5s cubic-bezier(.2,.7,.2,1);
+  -webkit-mask:var(--logo) center/contain no-repeat;mask:var(--logo) center/contain no-repeat}
+.pal-ctl{grid-column:9/span 4;align-self:stretch;justify-content:space-between}
+.pal-hex{position:absolute;left:var(--s2);bottom:var(--s2);font-size:var(--small);letter-spacing:-.01em;color:var(--fg);transition:color .5s;font-variant-numeric:tabular-nums}
+
+/* ---------- part: type tester ---------- */
+.tt{grid-column:1/-1;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter);row-gap:var(--gutter)}
+.tt-stage{grid-column:1/span 8;min-height:26rem;display:flex;align-items:center;padding:var(--s2);background:var(--tt-bg,#131f37);color:var(--tt-fg,#fffaf4);overflow:hidden}
+.tt-text{width:100%;outline:none;font-family:var(--tt-font);line-height:.95;letter-spacing:0;word-break:break-word;caret-color:currentColor;cursor:text}
+.tt-text:empty::before{content:attr(data-ph);opacity:.35}
+.tt-ctl{grid-column:9/span 4;justify-content:space-between}
+.tt-ctl .ctl{gap:.2rem}
+
+/* ---------- part: 3D model ---------- */
+.model{grid-column:1/span 6;aspect-ratio:1/1.1;background:var(--bg,#131f37);transition:background .5s cubic-bezier(.2,.7,.2,1);cursor:grab}
+.model:active{cursor:grabbing}
+.model model-viewer{position:absolute;inset:0;width:100%;height:100%;--poster-color:transparent;opacity:0;transition:opacity .8s}
+.model.loaded model-viewer{opacity:1}
+.model .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .8s}
+.model.loaded .poster{opacity:0;pointer-events:none}
+.model .tip{position:absolute;left:var(--s2);bottom:var(--s2);font-size:var(--small);letter-spacing:-.01em;color:#fffaf4;mix-blend-mode:difference;pointer-events:none;z-index:2}
+.model-side{grid-column:7/span 6;display:flex;flex-direction:column;gap:var(--gutter);align-self:stretch}
+.model-side .shot{flex:1;min-height:0}
+.model-ctl{display:flex;justify-content:space-between;align-items:flex-end;gap:var(--s2)}
+
+/* ---------- part: a strip you drag ---------- */
+.strip{display:flex;gap:var(--frame);overflow-x:auto;overflow-y:hidden;padding:var(--gutter) var(--frame) 0;scrollbar-width:none;cursor:grab;user-select:none;-webkit-user-select:none;overscroll-behavior-x:contain}
+.strip::-webkit-scrollbar{display:none}
+.strip.dragging{cursor:grabbing}
+.strip img{flex:none;height:26rem;width:auto;max-width:none;pointer-events:none;background:#fff}
+
+/* ---------- part: cross-fading images ---------- */
+.fader{position:relative;cursor:pointer;aspect-ratio:16/9;overflow:hidden;background:#131f37}
+.fader img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .9s cubic-bezier(.2,.7,.2,1)}
+.fader img.on{opacity:1}
+.fader-count{position:absolute;left:calc(var(--s2) * .5);bottom:calc(var(--s2) * .5);z-index:2;font-size:calc(var(--small) * .8);line-height:1;padding:.42em .8em .46em;border-radius:99px;background:rgba(255,255,255,.82);pointer-events:none;font-variant-numeric:tabular-nums}
+.routes .fader-wrap{grid-column:1/span 8;position:relative}
+.routes .shot{grid-column:9/span 4;align-self:stretch}
+
+/* ---------- next project ---------- */
+.cs-next{border-top:1px solid var(--ink);padding:var(--s3) var(--margin) 0;display:flex;justify-content:space-between;align-items:flex-end;gap:var(--s2)}
+.cs-next a.big{font-size:4.6rem;line-height:1;letter-spacing:-.055em}
+.cs-next .lab{display:block;color:rgba(11,11,11,.55);margin-bottom:var(--s1)}
+
+/* ---------- phones: one column, same order ---------- */
+@media (max-width:760px){
+  .page .logo{bottom:auto;top:calc(var(--frame) + .5rem)}
+  .page body{padding-top:3.4rem;padding-bottom:calc(var(--frame) + 9rem)}
+  .wk-head h1{font-size:3.9rem}
+  .wk-grid .fw-card,.wk-grid .fw-card.wide{grid-column:1/-1}
+  .wk-grid .fw-card.wide .fw-img{aspect-ratio:3/2;flex:none}
+  .cs-hero{height:auto;min-height:0;row-gap:2.2rem}
+  .cs-hero figure .shot{height:auto}
+  .cs-hero figure img{position:static;height:auto}
+  .cs-hero .txt,.cs-hero figure{grid-column:1/-1}
+  .cs-hero h1{font-size:3.4rem}
+  .cs-hero figure img{max-height:none;aspect-ratio:4/5}
+  .cs-brief .lab,.cs-brief .copy,.cs-brief .ticks{grid-column:1/-1}
+  .cs-brief .copy{font-size:1.9rem}
+  .pal-stage,.pal-ctl,.tt-stage,.tt-ctl,.model,.model-side,.routes .fader-wrap,.routes .shot{grid-column:1/-1}
+  .tt{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .pal-stage{aspect-ratio:1/1}
+  .pal-ctl,.tt-ctl{gap:2rem}
+  .tt-stage{min-height:17rem}
+  .slider{grid-template-columns:5rem 1fr 3.4rem}
+  .strip img{height:15rem}
+  .cs-next{flex-direction:column;align-items:flex-start}
+  .cs-next a.big{font-size:3.2rem}
+  .cs-sec{padding-bottom:6rem}
+  .sec-title .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){.fader img,.pal-stage,.pal-logo,.model{transition:none}}

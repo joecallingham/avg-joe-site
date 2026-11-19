@@ -131,7 +131,7 @@ html.intro-run .nb{transition:none}
 .pills{display:flex;flex-wrap:wrap;gap:var(--s1)}
 .pills li{background:#fff;border-radius:99rem;padding:.6em 1.5em;font-size:var(--small);letter-spacing:-.01em;line-height:1.2}
 /* section titles: small, left on the margin, sitting on a full-bleed line */
-.sec-title{font-size:max(1rem,13px);font-weight:500;letter-spacing:-.02em;padding:var(--s2) var(--margin) var(--s1);border-bottom:1px solid var(--ink)}
+.sec-title{display:flex;justify-content:space-between;align-items:baseline;font-size:max(1rem,13px);font-weight:500;letter-spacing:-.02em;padding:var(--s2) var(--margin) var(--s1);border-bottom:1px solid var(--ink)}
 /* featured work: three cards across 4 columns each; image over a coloured panel */
 .featured{padding-bottom:var(--s3)}
 .fw-grid{padding-top:var(--gutter);align-items:stretch;padding-left:var(--frame);padding-right:var(--frame);gap:var(--frame)}   /* edges and gaps all match the opening image's frame */   /* card edges match the opening image's frame */
@@ -286,3 +286,5 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
 @media (min-width:761px){.case-620.img-left{grid-auto-flow:row dense}.case-620.img-left figure{grid-column:1/span 6}.case-620.img-left .txt{grid-column:7/span 6}}
 /* capability description: right-hand side, on the grid's last two columns (desktop) */
 @media (min-width:761px){#wheel-desc{left:calc(var(--margin) + 10 * ((100% - 2 * var(--margin) - 11 * var(--gutter)) / 12 + var(--gutter)));width:calc(2 * (100% - 2 * var(--margin) - 11 * var(--gutter)) / 12 + var(--gutter))}}
+.all-work{font-size:var(--small);letter-spacing:-.02em}
+.all-work:hover{text-decoration:underline;text-underline-offset:.2em}
