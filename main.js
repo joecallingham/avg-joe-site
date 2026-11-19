@@ -16,6 +16,11 @@
   vhProbe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:100vh;height:100lvh;pointer-events:none;visibility:hidden';
   document.documentElement.appendChild(vhProbe);
   const VH = () => TOUCH ? Math.max(vhProbe.offsetHeight, innerHeight) : innerHeight;
+  // ...but centre things on the area you can see with the bars showing (the small viewport)
+  const svProbe = document.createElement('div');
+  svProbe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:100vh;height:100svh;pointer-events:none;visibility:hidden';
+  document.documentElement.appendChild(svProbe);
+  const SVH = () => TOUCH ? Math.min(svProbe.offsetHeight || innerHeight, VH()) : innerHeight;
   const UNIT = TOUCH ? 0.85 : 1.2;   // screens of scrolling per section (higher = slower)
   const CROP = 0.5;          // how much the frame crops (vs scales) mid-move: 0 = only scales, 1 = only crops; none at the ends
   // scroll lengths (in sections) for the first three moves, which need a slower pace than the rest
@@ -235,6 +240,7 @@
   function measure() {
     const vw = innerWidth, vh = VH(), r = rem();
     document.documentElement.style.setProperty('--vhs', vh + 'px');
+    const vs = SVH(); document.documentElement.style.setProperty('--vsm', vs + 'px');
     el.slot1.style.removeProperty('--w'); gsap.set(el.slot1, { clearProps: '--w' });
     gsap.set([el.avg, el.joe, el.line, el.big, ...$$('.big .ln')], { clearProps: 'transform' });
     const rect = n => { const b = n.getBoundingClientRect(); return { x: b.left, y: b.top, width: b.width, height: b.height }; };
@@ -249,7 +255,7 @@
     const base = n => { const m = document.createElement('i'); m.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline'; n.appendChild(m); const y = m.offsetTop; m.remove(); return y; };
     const jy = base(el.avg) - base(el.joe);
     const phone = matchMedia('(max-width:760px)').matches;
-    const mid = (vh - h) / 2, low = phone ? pad * 0.95 : vh - pad * 0.95 - h;   // phones: Avg Joe live at the top, not the bottom
+    const mid = (vs - h) / 2, low = phone ? pad * 0.95 : vh - pad * 0.95 - h;   // phones: Avg Joe live at the top, not the bottom
     const ax0 = (vw - (wa + gap + wj)) / 2;
     return {
       vh, vw, wa, wj, gap, r, full: vw - 2 * fr, fullH: vh - 2 * fr,

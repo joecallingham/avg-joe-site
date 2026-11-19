@@ -40,6 +40,8 @@ ul{list-style:none}
 img{display:block;max-width:100%}
 
 #stage{position:fixed;left:0;right:0;top:0;height:var(--vhs,100vh);overflow:hidden}
+/* the centred layers use the visible height (browser bars showing), so they sit in the middle of what you see */
+#s-line,#s-big,#s-wheel{bottom:auto;height:var(--vsm,100%)}
 .layer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
 #veil{position:fixed;inset:0;background:var(--cream);opacity:0;pointer-events:none;z-index:40}
 
@@ -68,7 +70,7 @@ img{display:block;max-width:100%}
   will-change:transform,width,height}
 #hero video{position:absolute;left:0;top:0;max-width:none;object-fit:cover;will-change:transform;transform-origin:0 0;display:block}
 /* intro: while you're at the top, Avg and Joe open on their own to show one of these */
-#intro{position:fixed;left:50%;top:calc(var(--vhs,100vh) / 2);z-index:59;pointer-events:none;color:var(--ink)}
+#intro{position:fixed;left:50%;top:calc(var(--vsm,100vh) / 2);z-index:59;pointer-events:none;color:var(--ink)}
 #intro>*{position:absolute;left:0;top:0;visibility:hidden;opacity:0;display:block;max-width:none}
 #intro .globe{width:2.6rem;height:auto}
 #intro .bird{width:2.7rem;height:auto}
