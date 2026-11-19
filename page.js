@@ -170,9 +170,11 @@
     }
     $$('.sw[aria-pressed="true"]', p).forEach(press);
   });
-  /* ---------- part: the theme picker in the notch ---------- */
-  // Each swatch is a whole theme from the brand's own pairings (page, text, panel, panel ink), so a colour can only ever
-  // land where the brand allows it. It rises out of the notch once you've scrolled past the opening.
+  /* ---------- part: the colour picker in the notch ---------- */
+  // Each swatch is a panel colour with the ink the brand pairs it with (--panel / --panel-ink), so a colour only ever lands
+  // where the brand allows it. It changes the asset panels, never the page. Always up.
+  // The cream bubbles + stems are one SVG shape run through a "goo" filter (blur, then a hard alpha cut), so every join,
+  // bubble to bubble and stem to notch, comes out as a smooth curve that blends into the notch.
   const themes = $('.themes');
   if (themes) {
     const root = document.documentElement;
@@ -180,13 +182,38 @@
       $$('.sw', themes).forEach(o => o.setAttribute('aria-pressed', String(o === b)));
       b.dataset.theme.split(';').forEach(kv => { const [k, v] = kv.split(':'); root.style.setProperty(k.trim(), v.trim()); });
       $$('[data-hex]').forEach(n => { n.textContent = getComputedStyle(root).getPropertyValue(n.dataset.hex).trim().toUpperCase(); });
-      const tc = $('meta[name=theme-color]'); if (tc) tc.content = getComputedStyle(root).getPropertyValue('--page').trim();
     };
     $$('.sw', themes).forEach(b => b.addEventListener('click', () => apply(b)));
-    const hero = $('.cs-hero');
-    const showAt = () => (hero ? hero.offsetTop + hero.offsetHeight * 0.45 : 200);
-    const check = y => themes.classList.toggle('show', y > showAt());
-    lenis.on('scroll', l => check(l.scroll)); check(scrollY);
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'goo'); svg.setAttribute('aria-hidden', 'true');
+    svg.innerHTML = '<defs><filter id="goo" x="-20%" y="-40%" width="140%" height="180%" color-interpolation-filters="sRGB">' +
+      '<feGaussianBlur in="SourceGraphic" stdDeviation="3.4" result="b"/>' +
+      '<feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9"/></filter></defs><g filter="url(#goo)"></g>';
+    themes.prepend(svg);
+    const drawGoo = () => {
+      // layout offsets, not screen boxes, so a running animation or transform can never skew the shape
+      const sws = $$('.sw', themes), tw = themes.offsetWidth, th = themes.offsetHeight;
+      const pad = parseFloat(getComputedStyle(themes).getPropertyValue('--ring')) || 7;
+      const drop = parseFloat(getComputedStyle(themes).getPropertyValue('--drop')) * rem();   // gap down to the notch's flat top
+      const ox = 24, W = tw + ox * 2, H = th + drop + 24;
+      svg.setAttribute('viewBox', `0 0 ${W.toFixed(1)} ${H.toFixed(1)}`);
+      svg.style.width = W + 'px'; svg.style.height = H + 'px'; svg.style.left = -ox + 'px'; svg.style.top = '0px';
+      const d = sws[0].offsetWidth, stem = d * 0.46, n = v => v.toFixed(1);
+      let g = '';
+      sws.forEach(s => {
+        const cx = s.offsetLeft + s.offsetWidth / 2 + ox, cy = s.offsetTop + s.offsetHeight / 2, r = s.offsetWidth / 2 + pad;
+        g += `<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(r)}"/><rect x="${n(cx - stem / 2)}" y="${n(cy)}" width="${n(stem)}" height="${n(th / 2 + drop + 24)}"/>`;
+      });
+      // a strip lying along the notch's top edge, so each stem flares out into it (it sits on the notch's own cream)
+      const x0 = sws[0].offsetLeft + ox - 16, x1 = sws[sws.length - 1].offsetLeft + d + ox + 16;
+      g += `<rect x="${n(x0)}" y="${n(th + drop)}" width="${n(x1 - x0)}" height="24"/>`;
+      svg.querySelector('g').innerHTML = g;
+    };
+    new ResizeObserver(drawGoo).observe(themes);
+    themes.classList.add('show');
+    apply($('.sw[aria-pressed="true"]', themes) || $('.sw', themes));
+    drawGoo();
   }
 
   /* ---------- Work index: Mother-style grid + the categories menu ---------- */
@@ -316,7 +343,12 @@
   $$('video[data-auto]').forEach(v => { v.muted = true; v.playsInline = true; vio.observe(v); });
 
   /* ---------- start ---------- */
-  let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { adv.clear(); drawNotch(); }, 120); });
+  // a case study opens on its hero alone: it runs to the bottom of the first screen, so nothing peeks out under Avg or Joe
+  const hero = $('.cs-hero');
+  let heroW = 0;
+  const sizeHero = () => { if (!hero || (TOUCH && innerWidth === heroW)) return; heroW = innerWidth; hero.style.setProperty('--hero-h', Math.max(0, innerHeight - hero.offsetTop) + 'px'); };
+  sizeHero();
+  let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { adv.clear(); drawNotch(); sizeHero(); }, 120); });
   // the letter boxes are measured in Nuckle, so wait for it (not just "fonts ready", which can fire before it is asked for)
   const fonts = Promise.all([document.fonts.load('500 1em Nuckle'), document.fonts.load('500 1em Nuckle', '↘↗'), document.fonts.ready]);
   Promise.race([fonts, new Promise(r => setTimeout(r, 2500))]).then(() => {

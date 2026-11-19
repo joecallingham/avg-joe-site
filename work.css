@@ -35,8 +35,7 @@ html.page{overscroll-behavior:auto;--edge:calc(var(--s2) * .5)}
 .wk-grid .fw-card:nth-of-type(n) .rv{transition-delay:0s}
 
 /* ---------- case study hero: the home page's case layout (statement left, image right) ---------- */
-/* the hero fills the screen between the title line and the notch bar, so nothing sits under Avg, Joe or the nav */
-.cs-hero{padding-top:var(--s2);padding-bottom:var(--s3);align-items:stretch;height:calc(100vh - 6.6rem - var(--frame));height:calc(100svh - 6.6rem - var(--frame));min-height:30rem}
+.cs-hero{padding-top:var(--s2);padding-bottom:calc(var(--frame) + 3.75rem + 64px);align-items:stretch;height:var(--hero-h,calc(100svh - 3.6rem));min-height:32rem}   /* fills the first screen exactly (page.js sets --hero-h); the bottom padding keeps Avg, Joe, the notch and the swatches clear */
 .cs-hero .txt{grid-column:1/span 6;display:flex;flex-direction:column;justify-content:space-between;gap:var(--s3)}
 .cs-hero h1{font-weight:500;font-size:4.6rem;line-height:1.02;letter-spacing:-.055em;margin-top:-.1em}
 .cs-hero figure{grid-column:7/span 6;position:relative;--edge:calc(var(--s2) * .5)}
@@ -120,8 +119,7 @@ html.page{overscroll-behavior:auto;--edge:calc(var(--s2) * .5)}
 .cs-next .lab{display:block;color:rgba(11,11,11,.55);margin-bottom:var(--s1)}
 
 /* ---------- case study themes: picked in the notch, set on <html> as --page / --text / --panel / --panel-ink ---------- */
-html.cs-page{background:var(--page);transition:background .6s cubic-bezier(.2,.7,.2,1)}
-.cs-page body{background:var(--page);color:var(--text);transition:background .6s cubic-bezier(.2,.7,.2,1),color .6s cubic-bezier(.2,.7,.2,1)}
+html.cs-page{--page:var(--cream);--text:var(--ink)}
 .cs-page .sec-title,.cs-page .cs-next{border-color:var(--text);transition:border-color .6s}
 .cs-page .cap,.cs-page .facts dt,.cs-page .sec-title .hint,.cs-page .cs-next .lab,.cs-page .slider output{color:color-mix(in srgb,var(--text) 62%,transparent)}
 .cs-page .pills li,.cs-page .credit,.cs-page .fader-count{color:#0b0b0b}
@@ -136,17 +134,15 @@ html.cs-page{background:var(--page);transition:background .6s cubic-bezier(.2,.7
 .cs-page ::selection{background:var(--text);color:var(--page)}
 .pal-ctl{justify-content:flex-start}
 
-/* the swatch pill: a cream lozenge that rises out of the notch, joined to it by two short legs */
-.themes{position:absolute;left:50%;bottom:calc(100% + .7rem);display:flex;gap:.55rem;padding:.42rem;border-radius:99rem;background:var(--cream);
-  transform:translate(-50%,1.6rem) scale(.6);opacity:0;pointer-events:none;
-  transition:transform .55s cubic-bezier(.3,1.45,.5,1),opacity .3s ease}
-.themes.show{transform:translate(-50%,0) scale(1);opacity:1;pointer-events:auto}
-.themes .leg{position:absolute;top:calc(100% - 1px);height:calc(.7rem + 2px);width:2.4rem;background:var(--cream);border-radius:0 0 .55rem .55rem}
-.themes .leg.l{left:calc(50% - 4.6rem)}
-.themes .leg.r{right:calc(50% - 4.6rem)}
-.themes .sw{box-shadow:inset 0 0 0 1px rgba(11,11,11,.14)}
-.themes .sw[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--sw),inset 0 0 0 4px var(--cream),inset 0 0 0 5.5px rgba(11,11,11,.55)}
-@media (prefers-reduced-motion:reduce){.themes{transition:opacity .2s}}
+/* the colour picker: each swatch in its own cream bubble on a stem, melting into the notch (shape drawn in page.js) */
+.themes{--ring:7px;--drop:1.15;position:absolute;left:50%;bottom:calc(100% + 1.15rem);display:flex;gap:17px;transform:translateX(-50%);z-index:1}
+.themes .goo{position:absolute;overflow:visible;pointer-events:none;z-index:-1}
+.themes .goo g{fill:var(--cream)}
+.themes .sw{position:relative;width:34px;height:34px;min-width:34px;box-shadow:inset 0 0 0 1px rgba(11,11,11,.12);outline:0 solid transparent;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.themes .sw:hover{transform:scale(1.06)}
+.themes .sw[aria-pressed="true"]{box-shadow:none;outline:1.5px solid var(--cream);outline-offset:-5px}
+.themes .sw[style*="#fffaf4"][aria-pressed="true"]{box-shadow:inset 0 0 0 1px rgba(11,11,11,.12);outline-color:#131f37}
+@media (prefers-reduced-motion:reduce){.themes .sw{transition:none}}
 
 /* ---------- Work index, after Mother: small cards beside one big image, a name and one line under each ---------- */
 .wk-bar{display:flex;gap:var(--s2);align-items:baseline;font-size:var(--small);letter-spacing:-.02em;color:rgba(11,11,11,.55)}
@@ -210,7 +206,7 @@ html.cs-page{background:var(--page);transition:background .6s cubic-bezier(.2,.7
   .wk-list{row-gap:2.2rem}
   .cats{width:100vw;padding:1.6rem 1.6rem 6rem}
   .cats li button{font-size:3.1rem}
-  .themes{gap:.45rem}
 }
 @media (prefers-reduced-motion:reduce){.fader img,.pal-stage,.pal-logo,.model{transition:none}}
 .cats button:focus-visible{outline:1px solid var(--cream);outline-offset:4px}
+.page .notch .nb{z-index:2}
