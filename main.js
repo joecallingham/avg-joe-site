@@ -42,14 +42,14 @@
   // x/y are % of the screen, w is rem, ar is width/height. href is ready for case-study links.
   const W = (img, x, y, w, ar, href = '#') => ({ img, x, y, w, ar, href });
   const SERVICES = [
-    { name: 'AI Content',      works: [W('mushroom', 66, 20, 10, 1.5), W('portrait', 80, 55, 8, 0.95)] },
-    { name: 'Art Direction',   works: [W('boon-sign', 58, 26, 11, 1.6), W('620', 76, 52, 8.5, 1)] },
-    { name: 'Branding',        works: [W('boon-van', 72, 18, 8.5, 1.07), W('620', 58, 56, 8, 1)] },
-    { name: 'Design',          works: [W('mushroom', 57.8, 25, 8, 1.53), W('portrait', 72.8, 59, 8, 0.95)] },
-    { name: 'Digital',         works: [W('620', 64, 22, 8.5, 1), W('boon-sign', 76, 58, 10, 1.6)] },
-    { name: 'Packaging',       works: [W('boon-van', 60, 30, 9, 1.07), W('mushroom', 78, 60, 8, 1.53)] },
-    { name: 'Strategy',        works: [W('boon-sign', 68, 24, 10, 1.6), W('portrait', 58, 58, 7.5, 0.95)] },
-    { name: 'Visual Identity', works: [W('620', 74, 20, 8, 1), W('boon-van', 60, 54, 8.5, 1.07)] },
+    { name: 'AI Content',      desc: "We direct AI like a camera crew, making imagery and film that feels crafted, at the pace you post.", works: [W('mushroom', 66, 20, 10, 1.5), W('portrait', 80, 55, 8, 0.95)] },
+    { name: 'Art Direction',   desc: "We set the look of every shoot, campaign and drop, so each frame feels like it came from the same hand.", works: [W('boon-sign', 58, 26, 11, 1.6), W('620', 76, 52, 8.5, 1)] },
+    { name: 'Branding',        desc: "We find what makes you you, then shape it into a name, a mark and a voice people remember.", works: [W('boon-van', 72, 18, 8.5, 1.07), W('620', 58, 56, 8, 1)] },
+    { name: 'Design',          desc: "We curate every typeface, colour and grid around your brand, then build it into a design system that grows with you.", works: [W('mushroom', 57.8, 25, 8, 1.53), W('portrait', 72.8, 59, 8, 0.95)] },
+    { name: 'Digital',         desc: "Websites and apps that move nicely, load fast and feel easy on any screen.", works: [W('620', 64, 22, 8.5, 1), W('boon-sign', 76, 58, 10, 1.6)] },
+    { name: 'Packaging',       desc: "Packs that earn their spot on the shelf, from structure and print to the moment they're opened.", works: [W('boon-van', 60, 30, 9, 1.07), W('mushroom', 78, 60, 8, 1.53)] },
+    { name: 'Strategy',        desc: "We dig into your audience and your market first, so every creative call has a reason behind it.", works: [W('boon-sign', 68, 24, 10, 1.6), W('portrait', 58, 58, 7.5, 0.95)] },
+    { name: 'Visual Identity', desc: "Logo, type, colour and imagery pulled into one kit your team can use without us.", works: [W('620', 74, 20, 8, 1), W('boon-van', 60, 54, 8.5, 1.07)] },
   ];
 
   const el = {
@@ -155,7 +155,29 @@
       li.style.opacity = ad > 4.6 ? 0 : Math.max(0.12, 1 - ad * 0.22).toFixed(3);
     });
   }
+  /* a short line about each capability, beside the wheel; it swaps word by word as each one comes into focus */
+  const descEl = document.createElement('p');
+  descEl.id = 'wheel-desc'; descEl.setAttribute('aria-live', 'polite');
+  el.wheel.appendChild(descEl);
+  let descTl = null;
+  function showDesc(i) {
+    if (descTl) descTl.kill();
+    const out = descEl.children.length ? descEl.children : null;
+    descTl = gsap.timeline();
+    if (out) descTl.to(out, { autoAlpha: 0, y: '-0.4em', duration: RM ? 0.01 : 0.18, ease: 'power2.in', stagger: RM ? 0 : 0.004 });
+    descTl.add(() => {
+      descEl.textContent = '';
+      if (i < 0) return;
+      SERVICES[i].desc.split(' ').forEach((w, k, all) => {
+        const s = document.createElement('span'); s.className = 'dw'; s.textContent = w;
+        descEl.appendChild(s); if (k < all.length - 1) descEl.appendChild(document.createTextNode(' '));
+      });
+      gsap.fromTo(descEl.children, { autoAlpha: 0, y: '0.7em' },
+        { autoAlpha: 1, y: 0, duration: RM ? 0.01 : 0.5, ease: 'power3.out', stagger: RM ? 0 : 0.018 });
+    });
+  }
   function showWorks(i) {
+    showDesc(i);
     cards.forEach((set, k) => {
       if (k === i) {
         gsap.fromTo(set, { autoAlpha: 0, scale: 0.7, y: 24 },
@@ -555,11 +577,16 @@
   function navLetters(node) {
     const t = node.textContent;
     node.textContent = '';
-    [...t].forEach(ch => {
-      const s = document.createElement('span');
-      s.textContent = ch;
-      if (/\p{L}/u.test(ch)) s.className = 'hl';
-      node.appendChild(s);
+    t.split(' ').forEach((word, k) => {         // each word stays in one piece so it can't break mid-word
+      if (k) node.appendChild(document.createTextNode(' '));
+      const w = document.createElement('span'); w.className = 'hw';
+      [...word].forEach(ch => {
+        const s = document.createElement('span');
+        s.textContent = ch;
+        if (/\p{L}/u.test(ch)) s.className = 'hl';
+        w.appendChild(s);
+      });
+      node.appendChild(w);
     });
     // width from the font itself (not the screen), so a hidden or scaled-down card still gets the right boxes; in rem (each letter's own font-size changes as it swaps faces)
     const cs = getComputedStyle(node), r = rem(), fs = parseFloat(cs.fontSize), ls = parseFloat(cs.letterSpacing) || 0;
