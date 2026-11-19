@@ -191,6 +191,9 @@ html.intro-run .nb{transition:none}
 #nav{position:fixed;left:50%;bottom:calc(var(--frame) - 1px);transform:translateX(-50%);z-index:50}
 /* one soft shape: big rounded shoulders that flare out into the bottom edge */
 .notch{position:relative;width:29rem;height:2.6rem;display:flex;align-items:center;justify-content:center;gap:1.6rem;padding-top:.3rem}
+/* a solid cream bar along the bottom edge, so the notch's curves run into it (over everything, like the notch) */
+#frame-bottom{position:fixed;left:0;right:0;bottom:0;height:var(--frame);background:var(--cream);z-index:49;pointer-events:none}
+html.intro-dark #frame-bottom{background:#0b0b0b}
 /* the notch: a solid cream shape over everything, reaching down to the screen edge */
 .notch-fill{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;z-index:-1}
 .notch-fill path{fill:var(--cream)}
