@@ -204,6 +204,8 @@ html.intro-dark .notch-fill path{fill:#0b0b0b}
 .nb:hover,.nb.on{color:var(--ink)}
 .nb[data-k="studio"]{min-width:6.6rem;text-align:center;overflow:hidden}
 .say{display:inline-block;white-space:nowrap}
+.nbt{white-space:nowrap}
+.hl{display:inline-block;text-align:center;line-height:0;vertical-align:baseline;white-space:nowrap}
 a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
 
 /* ---------- phones ---------- */

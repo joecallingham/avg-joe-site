@@ -178,7 +178,7 @@
     if (RM) { el.say.textContent = text; return; }
     sayTl = gsap.timeline()
       .to(el.say, { yPercent: -70, autoAlpha: 0, duration: 0.16, ease: 'power2.in' })
-      .add(() => { el.say.textContent = text; })
+      .add(() => { el.say.textContent = text; navLetters(el.say); })
       .fromTo(el.say, { yPercent: 70, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.32, ease: 'power3.out' });
   }
   function navState() {
@@ -550,6 +550,40 @@
     if (a.dataset.k === 'work') goTo(END);
   }));
   const hov = (n, key) => { n.addEventListener('mouseenter', () => { hoverSay = key; navState(); }); n.addEventListener('mouseleave', () => { hoverSay = null; navState(); }); };
+  /* nav buttons: on hover their letters run through the rotation faces. Each letter keeps the box of its Nuckle width,
+     and the new face is centred in it, so the word and the other buttons never move. */
+  function navLetters(node) {
+    const t = node.textContent;
+    node.textContent = '';
+    [...t].forEach(ch => {
+      const s = document.createElement('span');
+      s.textContent = ch;
+      if (ch.trim()) s.className = 'hl';
+      node.appendChild(s);
+    });
+    node.querySelectorAll('.hl').forEach(s => { s.style.width = s.getBoundingClientRect().width.toFixed(2) + 'px'; });
+  }
+  const navLabel = a => a.querySelector('.say') || a.querySelector('.nbt');
+  $$('.nb').forEach(a => {
+    if (!a.querySelector('.say')) {
+      const word = a.textContent.trim();
+      if (!a.getAttribute('aria-label')) a.setAttribute('aria-label', word);
+      const sp = document.createElement('span'); sp.className = 'nbt'; sp.setAttribute('aria-hidden', 'true'); sp.textContent = word;
+      a.textContent = ''; a.appendChild(sp);
+    }
+    let timer = 0;
+    const tick = () => {
+      const ls = [...navLabel(a).querySelectorAll('.hl')];
+      if (!ls.length) return;
+      const s = ls[Math.floor(Math.random() * ls.length)];
+      let f; do { f = ROT[Math.floor(Math.random() * ROT.length)]; } while (f === s.dataset.f);
+      s.dataset.f = f; s.style.fontFamily = '"r-' + f + '"'; s.style.fontSize = (SIZE[f] || 1) + 'em';
+    };
+    const reset = () => navLabel(a).querySelectorAll('.hl').forEach(s => { s.style.fontFamily = ''; s.style.fontSize = ''; delete s.dataset.f; });
+    a.addEventListener('mouseenter', () => { if (RM || TOUCH) return; clearInterval(timer); tick(); timer = setInterval(tick, 90); });
+    a.addEventListener('mouseleave', () => { clearInterval(timer); reset(); });
+  });
+  document.fonts.ready.then(() => $$('.nb').forEach(a => navLetters(navLabel(a))));
   hov($('.nb[data-k="contact"]'), 'soon');
   hov($('.nb[data-k="studio"]'), 'play');
   $$('.work').forEach(n => hov(n, 'pick'));
