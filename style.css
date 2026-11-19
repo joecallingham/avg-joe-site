@@ -276,3 +276,6 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
   .case:not(:last-child){padding-bottom:4.4rem}
 }
 @media (max-width:760px){#wheel-desc{top:auto;bottom:calc(var(--frame) + 4.6rem);transform:none;width:auto;right:var(--margin);max-width:20rem}}
+
+/* case studies alternate: image left, then right, then left (desktop; phones stack) */
+@media (min-width:761px){.case-620.img-left{grid-auto-flow:row dense}.case-620.img-left figure{grid-column:1/span 6}.case-620.img-left .txt{grid-column:7/span 6}}
