@@ -416,12 +416,13 @@
     gsap.set(introItems, { xPercent: -50, yPercent: -50 });
     introTl = gsap.timeline({ repeat: -1, delay: 0.5 });
     document.documentElement.classList.add('intro-run');
-    introItems.forEach(it => {
+    introItems.forEach((it, i) => {
       const half = it.getBoundingClientRect().width / 2 + 0.85 * r;
       introTl
-        .call(() => introDark(true))                    // the screen snaps to black as they open...
+        .addLabel('open' + i)
         .to(gapState, { s: half, duration: 0.85, ease: 'power3.inOut', onUpdate: applyGap })
-        .fromTo(it, { autoAlpha: 0, scale: 0.86 }, { autoAlpha: 1, scale: 1, duration: 0.55, ease: 'power2.out' }, '<0.3')
+        .call(() => introDark(true), null, 'open' + i + '+=0.85')   // the screen snaps to black the moment they're fully open...
+        .fromTo(it, { autoAlpha: 0, scale: 0.86 }, { autoAlpha: 1, scale: 1, duration: 0.55, ease: 'power2.out' }, 'open' + i + '+=0.3')
         .to({}, { duration: 1.5 })
         .to(it, { autoAlpha: 0, scale: 0.92, duration: 0.35, ease: 'power2.in' })
         .to(gapState, { s: 0, duration: 0.75, ease: 'power3.inOut', onUpdate: applyGap }, '<0.1')
