@@ -130,10 +130,11 @@ img{display:block;max-width:100%}
 .fw-card:hover .fw-img img.in{transform:scale(1.035)}
 .fw-panel{flex:1;display:flex;flex-direction:column;align-items:flex-start;padding:var(--s2)}
 /* same order as the case studies: headline, View Case Study, lozenges (the project name sits above as a label) */
+.fw-name{order:0;font-size:var(--small);letter-spacing:-.01em}
 .fw-panel .pills{order:3;margin-top:auto}   /* pinned to the bottom, as far from it as from the side */
 .fw-panel .pills{gap:.4rem}
 .fw-panel .pills li{color:var(--ink);padding:.55em 1.15em}
-.fw-panel h4{order:1;font-weight:500;font-size:2.75rem;line-height:1.06;letter-spacing:-.05em;margin:-.12em 0 var(--s2)}
+.fw-panel h4{order:1;font-weight:500;font-size:2.75rem;line-height:1.06;letter-spacing:-.05em;margin:var(--s2) 0 var(--s2)}
 .fw-link{order:2;font-size:var(--small);letter-spacing:-.02em;margin-bottom:var(--s3)}
 .fw-link:hover{text-decoration:underline;text-underline-offset:.2em}
 .fw-card:nth-of-type(2) .rv{transition-delay:.1s}
@@ -197,7 +198,7 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
   .fw-grid{row-gap:var(--frame)}
   .case{padding-top:5.2rem;padding-bottom:8.5rem;min-height:0;align-content:start}
   .sec-title{padding-top:2.8rem;padding-bottom:1.4rem}
-  .fw-panel h4{margin:-.12em 0 2rem}
+  .fw-panel h4{margin:2.4rem 0 2rem}
   .fw-link{margin-bottom:5rem}
   .case-boon .more{margin:1.4rem 0 1.2rem}
   /* phones: the sentence sits on three lines with the image in the middle one, close to the centre */
