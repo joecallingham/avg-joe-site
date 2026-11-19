@@ -272,7 +272,7 @@
     gsap.set(el.slot1, { '--w': 1 });   // the sentence starts in its final position
     gsap.set(el.big, { autoAlpha: 0, y: 0 });
     gsap.set(lines, { autoAlpha: 0, y: P.bigFs * 0.45 });
-    gsap.set(el.wheel, { y: vh, autoAlpha: 1, visibility: 'visible' });
+    gsap.set(el.wheel, { y: 0, autoAlpha: 0 });
     gsap.set(el.cases, { y: vh, visibility: 'visible' });
     gsap.set(el.wbg, { opacity: 0 });
     wp.v = -SPIN;
@@ -302,7 +302,7 @@
     // 3 → 4: everything but the logo and nav moves up, the wheel comes in spinning
     ft(el.big, { y: 0 }, { y: -vh }, 3);
     ft(el.hero, P.hero[3], P.hero[4], 3);
-    ft(el.wheel, { y: vh }, { y: 0 }, 3);
+    ft(el.wheel, { autoAlpha: 0 }, { autoAlpha: 1 }, 3, { duration: 0.3 });   // the wheel doesn't slide in: it's in place and just rotates in
     ft(wp, { v: -SPIN }, { v: 0 }, 3);                               // spins in at the same speed
     ft(el.wbg, { opacity: 0 }, { opacity: 1 }, 3.2, { duration: 0.8 });
 
