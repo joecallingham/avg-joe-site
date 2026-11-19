@@ -410,6 +410,15 @@
   const gapState = { s: 0 };          // how far each of Avg / Joe is pushed out (px); separate from the scroll timeline
   const applyGap = () => { el.avg.style.translate = `${(-gapState.s).toFixed(2)}px 0`; el.joe.style.translate = `${gapState.s.toFixed(2)}px 0`; };
   let introTl = null, introWait = 0;
+  /* the open/close ease measured from Joe's AVG_JOE.mp4: cubic-bezier(.35,.05,.1,1) over 1s (fits the video within ~1px);
+     closing is the same curve played backwards */
+  const bezier = (x1, y1, x2, y2) => x => {
+    if (x <= 0) return 0; if (x >= 1) return 1;
+    let lo = 0, hi = 1, t = x;
+    for (let k = 0; k < 24; k++) { t = (lo + hi) / 2; const bx = 3 * (1 - t) ** 2 * t * x1 + 3 * (1 - t) * t * t * x2 + t ** 3; if (bx < x) lo = t; else hi = t; }
+    return 3 * (1 - t) ** 2 * t * y1 + 3 * (1 - t) * t * t * y2 + t ** 3;
+  };
+  const EASE_OPEN = bezier(0.35, 0.05, 0.1, 1), EASE_CLOSE = bezier(0.9, 0, 0.65, 0.95), OPEN_T = 1.0, DARK_AT = 0.34;
   function introStart() {
     if (RM || introTl) return;
     const r = rem();
@@ -417,16 +426,15 @@
     introTl = gsap.timeline({ repeat: -1, delay: 0.5 });
     document.documentElement.classList.add('intro-run');
     introItems.forEach((it, i) => {
-      const half = it.getBoundingClientRect().width / 2 + 0.85 * r;
+      const half = it.getBoundingClientRect().width / 2 + 0.85 * r, o = 'open' + i;
       introTl
-        .addLabel('open' + i)
-        .to(gapState, { s: half, duration: 0.85, ease: 'power3.inOut', onUpdate: applyGap })
-        .call(() => introDark(true), null, 'open' + i + '+=0.85')   // the screen snaps to black the moment they're fully open...
-        .fromTo(it, { autoAlpha: 0, scale: 0.86 }, { autoAlpha: 1, scale: 1, duration: 0.55, ease: 'power2.out' }, 'open' + i + '+=0.3')
-        .to({}, { duration: 1.5 })
-        .to(it, { autoAlpha: 0, scale: 0.92, duration: 0.35, ease: 'power2.in' })
-        .to(gapState, { s: 0, duration: 0.75, ease: 'power3.inOut', onUpdate: applyGap }, '<0.1')
-        .call(() => introDark(false), null, '<')        // ...and snaps back to cream as they close
+        .addLabel(o)
+        .to(gapState, { s: half, duration: OPEN_T, ease: EASE_OPEN, onUpdate: applyGap }, o)
+        .call(() => introDark(true), null, o + '+=' + DARK_AT)                // black comes in ~63% of the way open, as in the video...
+        .fromTo(it, { autoAlpha: 0, scale: 0.86 }, { autoAlpha: 1, scale: 1, duration: 0.55, ease: 'power2.out' }, o + '+=0.3')
+        .to(it, { autoAlpha: 0, scale: 0.92, duration: 0.35, ease: 'power2.in' }, o + '+=' + (OPEN_T + 1.5))
+        .to(gapState, { s: 0, duration: OPEN_T, ease: EASE_CLOSE, onUpdate: applyGap }, o + '+=' + (OPEN_T + 1.6))
+        .call(() => introDark(false), null, o + '+=' + (OPEN_T + 1.6 + OPEN_T - DARK_AT))   // ...and leaves at the mirrored point on the way back
         .to({}, { duration: 0.45 });
     });
   }
