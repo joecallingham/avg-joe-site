@@ -82,7 +82,7 @@ img{display:block;max-width:100%}
 .big .ln{display:block;white-space:nowrap}
 .slot2{display:inline-block;vertical-align:middle;width:7.95rem;height:5.2rem;margin:0 1.9rem 0 2.3rem;position:relative;top:-.05em}
 .swallow{display:inline-block;vertical-align:middle;width:7.4rem;height:auto;margin:0 .6rem 0 .3rem;position:relative;top:-.04em}
-.amp{font-family:"snell",cursive;letter-spacing:0;font-size:1.4em;margin:0 .1em 0 .06em;display:inline-block;line-height:0;vertical-align:baseline}
+.amp{font-family:"snell",cursive;letter-spacing:0;font-size:1.4em;margin:0 .1em 0 -.135em;display:inline-block;line-height:0;vertical-align:baseline}
 .ai{letter-spacing:-.04em;color:transparent;
   background:linear-gradient(100deg,#ff5a1f,#ff9248,#5d86c8,#d59bc0,#ff5a1f,#ff9248,#5d86c8);
   background-size:300% 100%;-webkit-background-clip:text;background-clip:text;animation:ai 7s linear infinite}
