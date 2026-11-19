@@ -170,7 +170,12 @@ html.intro-run .nb{transition:none}
 .case-620 figure img{width:100%;height:auto;aspect-ratio:1800 / 1805;object-fit:cover}   /* every case study in this layout shares one image shape */
 /* lozenges sit on the image, top left, in every case study */
 .case figure{position:relative}
-.case figure .pills{position:absolute;left:var(--s2);top:var(--s2);right:var(--s2);z-index:1}
+/* each case-study image carries a small credit, bottom right, saying which job it is */
+.case{--edge:calc(var(--s2) * .5)}   /* how far the lozenges and the credit sit in from the image edge */
+.shot{position:relative;display:block}
+.shot>img{display:block}
+.credit{position:absolute;right:var(--edge);bottom:var(--edge);font-size:calc(var(--small) * .8);letter-spacing:-.02em;line-height:1;padding:.42em .8em .46em;border-radius:99px;background:rgba(255,255,255,.82);color:var(--ink);pointer-events:none;white-space:nowrap}
+.case figure .pills{position:absolute;left:var(--edge);top:var(--edge);right:var(--edge);z-index:1}
 .sys{transition:color .6s}
 .case-620:hover .sys{color:#3d6b12}
 /* grid overlay (press G) */
@@ -270,7 +275,7 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
   /* lozenges come off the image and sit between "View Case Study" and the image */
   .case figure{display:contents}
   .case figure .pills{position:static;grid-column:1/-1;order:2}
-  .case figure img{grid-column:1/-1;order:3}
+  .case figure .shot{grid-column:1/-1;order:3}
   .case + .case::before{order:-2;margin-bottom:calc(4.4rem - 2.2rem)}   /* (the grid adds its 2.2rem row gap) */
   /* the same space above and below the line between case studies */
   .case:not(:last-child){padding-bottom:4.4rem}
