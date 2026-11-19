@@ -167,7 +167,7 @@
 
   /* ---------- nav: stays on Studio ---------- */
   // The middle button talks: its words change with where you are (and with what you hover).
-  const SAYS = { top: 'Studio', big: "That's us", wheel: 'Pick one?', pick: 'Good choice', work: 'Have a nose', end: 'Say hello?', soon: "Let's chat" };
+  const SAYS = { top: 'Studio', big: "That's us", wheel: 'Pick one?', pick: 'Good choice', work: 'Have a nose', end: 'Say hello?', soon: "Let's chat", play: 'Make a beat?', beat: 'Put it away' };
   let saying = 'Studio', sayTl = null, hoverSay = null;
   function say(text) {
     if (text === saying) return;
@@ -183,7 +183,7 @@
     const t = tl ? tl.time() : 0;
     const past = cur - endPx - room;
     const where = past > VH() * 0.4 ? 'end' : t >= WE + 0.5 ? 'work' : t >= 3.6 ? 'wheel' : t >= 2.6 ? 'big' : 'top';
-    say(SAYS[hoverSay && (hoverSay !== 'pick' || where === 'wheel') ? hoverSay : where]);
+    say(beatOpen ? SAYS.beat : SAYS[hoverSay && (hoverSay !== 'pick' || where === 'wheel') ? hoverSay : where]);
     if (workBtn._on !== (where === 'work')) { workBtn._on = where === 'work'; workBtn.classList.toggle('on', workBtn._on); }
   }
   const workBtn = $('.nb[data-k="work"]');
@@ -495,8 +495,9 @@
   }
 
   // G toggles the grid overlay (for checking alignment)
-  addEventListener('keydown', e => { if ((e.key === 'g' || e.key === 'G') && !e.metaKey && !e.ctrlKey && !e.altKey) $('#grid-ov').classList.toggle('on'); });
+  addEventListener('keydown', e => { if (beatOpen) return; if ((e.key === 'g' || e.key === 'G') && !e.metaKey && !e.ctrlKey && !e.altKey) $('#grid-ov').classList.toggle('on'); });
   addEventListener('keydown', e => {
+    if (beatOpen) return;
     const down = ['ArrowDown', 'PageDown', ' '].includes(e.key), up = ['ArrowUp', 'PageUp'].includes(e.key);
     if (!down && !up) return;
     e.preventDefault();
@@ -514,11 +515,12 @@
   $$('.nb').forEach(a => a.addEventListener('click', e => {
     if (a.dataset.k === 'contact') return;          // Contact opens WhatsApp in a new tab
     e.preventDefault();
-    if (a.dataset.k === 'studio') jumpTo(0);
+    if (a.dataset.k === 'studio') loadBeat(() => window.AvgBeat.toggle());   // Studio brings up the drum machine
     if (a.dataset.k === 'work') goTo(END);
   }));
   const hov = (n, key) => { n.addEventListener('mouseenter', () => { hoverSay = key; navState(); }); n.addEventListener('mouseleave', () => { hoverSay = null; navState(); }); };
   hov($('.nb[data-k="contact"]'), 'soon');
+  hov($('.nb[data-k="studio"]'), 'play');
   $$('.work').forEach(n => hov(n, 'pick'));
   $$('.logo').forEach(a => a.addEventListener('click', e => { e.preventDefault(); jumpTo(0); }));
   $$('a[href^="#case-"]').forEach(a => a.addEventListener('click', e => {
@@ -573,6 +575,24 @@
   new IntersectionObserver(es => es.forEach(en => { brandOn = en.isIntersecting; })).observe(cy.brand.el);
   $$('#s-cases img').forEach(i => i.addEventListener('load', () => ready && metrics()));
 
+  /* ---------- the drum machine (from the Sumo Joe Studio site), brought up by Studio ---------- */
+  // Loaded only the first time it's opened, so it costs nothing until then.
+  let beatOpen = false, beatLoading = false;
+  function loadBeat(cb) {
+    if (window.AvgBeat) return cb();
+    addEventListener('avgbeat-ready', cb, { once: true });
+    if (beatLoading) return;
+    beatLoading = true;
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'beat/beat.css'; document.head.appendChild(l);
+    const s = document.createElement('script'); s.src = 'beat/beat.js'; s.async = true; document.body.appendChild(s);
+  }
+  addEventListener('avgbeat', e => {
+    beatOpen = !!e.detail;
+    if (beatOpen) lenis.stop(); else lenis.start();     // the page stays put while you play
+    $('.nb[data-k="studio"]').setAttribute('aria-expanded', String(beatOpen));
+    navState();
+  });
+
   /* ---------- sound: the same interface sounds as sumojoestudio.com, synthesised (no files) ---------- */
   // Browsers only allow sound after a click or tap, so it starts with your first one.
   let actx = null, master = null, hoverAt = 0, tickAt = 0, tickTravel = 0, lastHover = null;
@@ -596,7 +616,7 @@
     src.buffer = b; f.type = 'bandpass'; f.frequency.value = 3200; f.Q.value = 1.2; g.gain.value = 0.25;
     src.connect(f).connect(g).connect(master); src.start(t);
   }
-  const clickable = n => (n instanceof Element ? n.closest('a, button, [role=button], #wheel-list li') : null);
+  const clickable = n => (n instanceof Element && !n.closest('.sp') ? n.closest('a, button, [role=button], #wheel-list li') : null);
   document.addEventListener('pointerdown', e => {
     audio();
     if (clickable(e.target)) { blip(1500, 700, 0.045, 0.16, 'triangle'); crackle(); }          // click: a short "tock"

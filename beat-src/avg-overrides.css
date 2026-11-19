@@ -1,0 +1,9 @@
+/* Avg Joe: sit the drum machine centred above the notch (it sat beside the Sumo Joe rail) */
+.sp{--rail:0px;--sq:calc(2.6rem + var(--frame,10px));z-index:70;
+  left:max(16px,calc((100vw - 720px) / 2));right:max(16px,calc((100vw - 720px) / 2));width:auto;
+  font-family:"Nuckle",system-ui,sans-serif}
+/* phones: full width, but stopping above the notch so Studio can always put it away */
+@media (max-width: 759px), (max-width: 1100px) and (orientation: portrait){
+  .sp{left:8px;right:8px;bottom:calc(3.6rem + var(--frame,8px) + 6px);
+    max-height:calc(100vh - 3.6rem - var(--frame,8px) - 22px);max-height:calc(100dvh - 3.6rem - var(--frame,8px) - 22px)}
+}

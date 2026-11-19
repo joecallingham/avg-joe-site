@@ -1,0 +1,5 @@
+beat-src/node_modules
+beat-src/*.ts
+beat-src/*.tsx
+beat-src/package*.json
+serve.mjs
