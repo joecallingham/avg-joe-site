@@ -245,4 +245,9 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
   .case-620 .more{margin:0}
   .boon-grid .van{display:none}
   .boon-grid figure img{height:auto;aspect-ratio:1800 / 1805;object-fit:cover}
+  /* lozenges come off the image and sit above the copy */
+  .case figure{display:contents}
+  .case figure .pills{position:static;grid-column:1/-1;order:-1}
+  .case figure img{grid-column:1/-1;order:2}
+  .case + .case::before{order:-2}
 }
