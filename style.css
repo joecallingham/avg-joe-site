@@ -156,7 +156,7 @@ img{display:block;max-width:100%}
 .case-620 h2{font-size:3.8rem;line-height:1.03;letter-spacing:-.055em;margin-top:-.12em}
 .case-620 .more{margin-top:var(--s2)}
 .case-620 figure{grid-column:7/span 6}
-.case-620 figure img{width:100%;height:auto}
+.case-620 figure img{width:100%;height:auto;aspect-ratio:1800 / 1805;object-fit:cover}   /* every case study in this layout shares one image shape */
 /* lozenges sit on the image, top left, in every case study */
 .case figure{position:relative}
 .case figure .pills{position:absolute;left:var(--s2);top:var(--s2);right:var(--s2);z-index:1}
@@ -251,5 +251,5 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
   .case figure img{grid-column:1/-1;order:3}
   .case + .case::before{order:-2;margin-bottom:calc(4.4rem - 2.2rem)}   /* (the grid adds its 2.2rem row gap) */
   /* the same space above and below the line between case studies */
-  .case-boon{padding-bottom:4.4rem}
+  .case:not(:last-child){padding-bottom:4.4rem}
 }
