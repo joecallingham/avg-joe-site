@@ -25,7 +25,7 @@
   const CROP = 0.5;          // how much the frame crops (vs scales) mid-move: 0 = only scales, 1 = only crops; none at the ends
   // scroll lengths (in sections) for the first three moves, which need a slower pace than the rest
   const LEN_PART = TOUCH ? 0.75 : 1.5;      // Avg Joe parting to the sentence
-  const OPEN_LEN = TOUCH ? 1.25 : 2.5;      // the image opening + Avg/Joe dropping
+  const OPEN_LEN = TOUCH ? 1.6 : 2.5;      // the image opening + Avg/Joe dropping
   const LEN_SHRINK = TOUCH ? 0.8 : 1.6;    // the image cropping in to the big sentence
   const EXPAND = LEN_SHRINK / OPEN_LEN;   // share of the open section the image expand takes: same scroll length as the shrink
   const HOLD = 0;            // screens of scrolling where nothing moves once the image has settled into the big sentence
@@ -293,8 +293,9 @@
     //        then Avg (leading) and Joe drop to the bottom
     ft(el.hero, P.hero[1], P.hero[2], 1, { duration: EXPAND });
     ft(el.line, { color: '#0b0b0b' }, { color: '#ffffff' }, 1.1, { duration: 0.25 });
-    ft(el.avg, P.avg[1], P.avg[2], 1 + EXPAND + 0.02, { duration: 0.3 });    // only once the image is fully open; linear, so it moves 1:1 with the scroll
-    ft(el.joe, P.joe[1], P.joe[2], 1 + EXPAND + 0.05, { duration: 0.3 });
+    const dropDur = 0.96 - (EXPAND + 0.02);                          // the rest of the section after the image opens
+    ft(el.avg, P.avg[1], P.avg[2], 1 + EXPAND + 0.02, { duration: dropDur });    // only once the image is fully open; linear, so it moves 1:1 with the scroll
+    ft(el.joe, P.joe[1], P.joe[2], 1 + EXPAND + 0.05, { duration: dropDur - 0.01 });
     ft(el.slot1, { '--w': 1 }, { '--w': 0 }, 1, { duration: EXPAND });   // the sentence closes up while the image expands
     tl.set(el.big, { autoAlpha: 1 }, 1.99);
 
