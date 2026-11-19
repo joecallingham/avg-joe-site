@@ -75,6 +75,15 @@ img{display:block;max-width:100%}
 #intro .globe{width:2.6rem;height:auto}
 #intro .bird{width:2.7rem;height:auto}
 #intro .pic{width:3.1rem;height:2.05rem;object-fit:cover;border-radius:.3rem}
+/* while Avg Joe are open in the intro loop: black screen, off-white type and icons (snaps, no fades) */
+#intro-bg{position:fixed;inset:0;z-index:45;background:#0b0b0b;pointer-events:none;visibility:hidden}
+html.intro-dark #intro-bg{visibility:visible}
+html.intro-dark #intro{color:var(--cream)}
+html.intro-dark #intro .bird{filter:invert(1) sepia(.12) brightness(.95)}
+html.intro-dark .logo{color:var(--cream)}
+html.intro-dark .nb{color:rgba(241,238,231,.5)}
+html.intro-dark .nb.on,html.intro-dark .nb:hover{color:var(--cream)}
+html.intro-run .nb{transition:none}
 
 /* ---------- big sentence ---------- */
 #s-big{z-index:1;visibility:hidden}
@@ -182,6 +191,11 @@ img{display:block;max-width:100%}
 #nav{position:fixed;left:50%;bottom:calc(var(--frame) - 1px);transform:translateX(-50%);z-index:50}
 /* one soft shape: big rounded shoulders that flare out into the bottom edge */
 .notch{position:relative;width:29rem;height:2.6rem;display:flex;align-items:center;justify-content:center;gap:1.6rem;padding-top:.3rem}
+/* the notch: a solid cream shape over everything, reaching down to the screen edge */
+.notch-fill{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;z-index:-1}
+.notch-fill path{fill:var(--cream)}
+html.intro-dark .notch-fill path{fill:#0b0b0b}
+.notch>.nb{position:relative}
 /* three plain buttons; the middle one changes its words with where you are */
 .nb{position:relative;font-size:var(--small);letter-spacing:-.02em;line-height:1.6;padding:.2rem 0;color:#8e8b86;transition:color .35s}
 .nb:hover,.nb.on{color:var(--ink)}

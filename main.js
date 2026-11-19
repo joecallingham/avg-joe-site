@@ -200,6 +200,21 @@
     const b = el.notch.getBoundingClientRect(), fr = cssPx('--frame');
     // the notch follows the nav, which sits on the visible bottom edge
     cutGeo = { x: b.left, y: b.top, w: b.width, h: b.height, base: b.bottom - 1, vw: innerWidth, vh: Math.max(VH(), innerHeight) };
+    drawNotch(b.width, b.height, fr);
+  }
+  // The notch itself is a solid shape on top of everything (same outline as the cut-outs), filled down to the screen edge.
+  function drawNotch(w, h, fr) {
+    let svg = el.notch.querySelector('svg.notch-fill');
+    if (!svg) {
+      svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('class', 'notch-fill'); svg.setAttribute('aria-hidden', 'true');
+      svg.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
+      el.notch.prepend(svg);
+    }
+    const B = h - 1, F = NOTCH_FLANK * (h - 1), H = h + fr + 4, n = v => v.toFixed(1);
+    svg.setAttribute('viewBox', `0 0 ${n(w)} ${n(H)}`);
+    svg.style.width = w + 'px'; svg.style.height = H + 'px';
+    svg.firstChild.setAttribute('d', `M0 ${n(B)}C${n(0.55 * F)} ${n(B)} ${n(0.42 * F)} 0 ${n(F)} 0H${n(w - F)}C${n(w - 0.42 * F)} 0 ${n(w - 0.55 * F)} ${n(B)} ${n(w)} ${n(B)}V${n(H)}H0Z`);
   }
   function cutPath(ox, oy) {          // bar + notch outline, in an element's own coordinates
     // The flanks are drawn at a fixed size from the notch height, so a wider notch never stretches them:
@@ -400,21 +415,26 @@
     const r = rem();
     gsap.set(introItems, { xPercent: -50, yPercent: -50 });
     introTl = gsap.timeline({ repeat: -1, delay: 0.5 });
+    document.documentElement.classList.add('intro-run');
     introItems.forEach(it => {
       const half = it.getBoundingClientRect().width / 2 + 0.85 * r;
       introTl
+        .call(() => introDark(true))                    // the screen snaps to black as they open...
         .to(gapState, { s: half, duration: 0.85, ease: 'power3.inOut', onUpdate: applyGap })
         .fromTo(it, { autoAlpha: 0, scale: 0.86 }, { autoAlpha: 1, scale: 1, duration: 0.55, ease: 'power2.out' }, '<0.3')
         .to({}, { duration: 1.5 })
         .to(it, { autoAlpha: 0, scale: 0.92, duration: 0.35, ease: 'power2.in' })
         .to(gapState, { s: 0, duration: 0.75, ease: 'power3.inOut', onUpdate: applyGap }, '<0.1')
+        .call(() => introDark(false), null, '<')        // ...and snaps back to cream as they close
         .to({}, { duration: 0.45 });
     });
   }
+  const introDark = on => document.documentElement.classList.toggle('intro-dark', on);
   function introStop() {
     clearTimeout(introWait);
     if (!introTl) return;
     introTl.kill(); introTl = null;
+    introDark(false); document.documentElement.classList.remove('intro-run');
     gsap.to(introItems, { autoAlpha: 0, scale: 0.92, duration: 0.25, ease: 'power2.in', overwrite: true });
     gsap.to(gapState, { s: 0, duration: 0.45, ease: 'power3.out', onUpdate: applyGap, overwrite: true });
   }
