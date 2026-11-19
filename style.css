@@ -234,3 +234,15 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
   .ai,#wheel-bg{animation:none}
   .rv{transition:none}
 }
+
+/* phones: every case study laid out the same way: copy, "View Case Study", then one image with its lozenges */
+@media (max-width:760px){
+  .case h2,.case-620 h2{font-size:3.4rem;margin-top:0}
+  .case-boon h2{margin-bottom:0}
+  .case-boon .more{order:1;margin:0}
+  .case-620{align-items:start;padding-bottom:8.5rem}
+  .case-620 .txt{justify-content:flex-start;gap:2.2rem}
+  .case-620 .more{margin:0}
+  .boon-grid .van{display:none}
+  .boon-grid figure img{height:auto;aspect-ratio:1800 / 1805;object-fit:cover}
+}
