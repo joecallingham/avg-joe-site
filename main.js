@@ -42,7 +42,7 @@
   // x/y are % of the screen, w is rem, ar is width/height. href is ready for case-study links.
   const W = (img, x, y, w, ar, href = '#') => ({ img, x, y, w, ar, href });
   const SERVICES = [
-    { name: 'AI Content',      desc: "We direct AI like a camera crew, making imagery and film that feels crafted, at the pace you post.", works: [W('mushroom', 66, 20, 10, 1.5), W('portrait', 70, 55, 8, 0.95)] },
+    { name: 'AI Content',      desc: "We art direct every frame, then AI handles the production, so your imagery and film keep up with how often you post.", works: [W('mushroom', 66, 20, 10, 1.5), W('portrait', 70, 55, 8, 0.95)] },
     { name: 'Art Direction',   desc: "We set the look of every shoot, campaign and drop, so each frame feels like it came from the same hand.", works: [W('boon-sign', 58, 26, 11, 1.6), W('620', 66, 52, 8.5, 1)] },
     { name: 'Branding',        desc: "We find what makes you you, then shape it into a name, a mark and a voice people remember.", works: [W('boon-van', 72, 18, 8.5, 1.07), W('620', 58, 56, 8, 1)] },
     { name: 'Design',          desc: "We curate every typeface, colour and grid around your brand, then build it into a design system that grows with you.", works: [W('mushroom', 57.8, 25, 8, 1.53), W('portrait', 72.8, 59, 8, 0.95)] },
