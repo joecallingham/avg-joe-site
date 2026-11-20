@@ -22,7 +22,7 @@
     <span class="shot"><video data-auto data-src="/video/out-of-office.mp4" poster="/img/out-of-office.jpg" muted loop playsinline preload="none" width="1600" height="900" aria-label="Out of Office, a short film by the studio"></video><span class="credit">Out of Office</span></span>
   </div>
 
-  <section class="cs-sec">
+  <section class="cs-sec ab-sec">
     <h2 class="sec-title"><span>About Us</span></h2>
     <div class="grid cs-brief">
       <p class="lab rv">Small, hands-on, allergic to jargon</p>
@@ -31,51 +31,60 @@
         <p>We started out as designers and art directors. Then AI turned up and, rather than panic, we put it to work. Now it does the heavy lifting and we do the thinking.</p>
       </div>
     </div>
-  </section>
-
-  <!-- Craft & AI: two full screens. Craft: copy left, a picture through blue holes right. AI: the same, flipped -->
-  <section class="ca-split draw" aria-label="What we mean by Craft">
-    <div class="ca-text">
-      <p class="ca-lab rv">What we mean by Craft</p>
-      <p class="ca-copy" data-lines>The good stuff we do by hand. We get to know you, find the idea and <span class="ca-craft" data-rot data-rot-auto>craft</span> a brand that feels like you, checked by people who care.</p>
-    </div>
-    <div class="ca-pic">
-      <img src="/img/mushroom.jpg" alt="" loading="lazy">
-      <svg viewBox="1000 0 1000 1125" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <defs><mask id="ca-m1" maskUnits="userSpaceOnUse" x="-1000" y="-1000" width="4000" height="3125">
-          <rect x="-1000" y="-1000" width="4000" height="3125" fill="#fff"/>
-            <g>
-              <g class="h"><ellipse cx="1510" cy="265" rx="400" ry="190" transform="rotate(25 1510 265)" fill="#000"/></g>
-              <g class="h"><ellipse cx="1137" cy="450" rx="52" ry="118" transform="rotate(8 1137 450)" fill="#000"/></g>
-              <g class="h"><ellipse cx="1498" cy="752" rx="205" ry="375" transform="rotate(-36 1498 752)" fill="#000"/></g>
-              <g class="h"><ellipse cx="1811" cy="638" rx="120" ry="120" transform="rotate(0 1811 638)" fill="#000"/></g>
-              <g class="h"><ellipse cx="1167" cy="918" rx="153" ry="153" transform="rotate(0 1167 918)" fill="#000"/></g>
-            </g>
-        </mask></defs>
-        <rect x="-1000" y="-1000" width="4000" height="3125" fill="#97d6ef" mask="url(#ca-m1)"/>
-      </svg>
-    </div>
-  </section>
-  <section class="ca-split ca-flip draw" aria-label="What we mean by AI">
-    <div class="ca-pic">
-      <img src="/img/ai-desk.jpg" alt="" loading="lazy">
-      <svg viewBox="1000 0 1000 1125" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <defs><mask id="ca-m2" maskUnits="userSpaceOnUse" x="-1000" y="-1000" width="4000" height="3125">
-          <rect x="-1000" y="-1000" width="4000" height="3125" fill="#fff"/>
-            <g transform="translate(3000 0) scale(-1 1)">
-              <g class="h"><ellipse cx="1510" cy="265" rx="400" ry="190" transform="rotate(25 1510 265)" fill="#000"/></g>
-              <g class="h"><ellipse cx="1137" cy="450" rx="52" ry="118" transform="rotate(8 1137 450)" fill="#000"/></g>
-              <g class="h"><ellipse cx="1498" cy="752" rx="205" ry="375" transform="rotate(-36 1498 752)" fill="#000"/></g>
-              <g class="h"><ellipse cx="1811" cy="638" rx="120" ry="120" transform="rotate(0 1811 638)" fill="#000"/></g>
-              <g class="h"><ellipse cx="1167" cy="918" rx="153" ry="153" transform="rotate(0 1167 918)" fill="#000"/></g>
-            </g>
-        </mask></defs>
-        <rect x="-1000" y="-1000" width="4000" height="3125" fill="#97d6ef" mask="url(#ca-m2)"/>
-      </svg>
-    </div>
-    <div class="ca-text">
-      <p class="ca-lab rv">What we mean by AI</p>
-      <p class="ca-copy" data-lines>The busy stuff AI handles. Automated content, implementing brand rules, curated tools all ticking along in the background. Which leaves you free to run the place.</p>
+    <!-- Craft | AI: hover (or tap) a side for what it means; the other side blurs under the pattern -->
+    <div class="hv" id="hv">
+      <div class="hv-half" data-k="craft" tabindex="0" role="button" aria-expanded="false" aria-label="What we mean by craft">
+        <p class="hv-word" aria-hidden="true"><span class="ca-craft" data-rot data-rot-auto>Craft</span></p>
+        <div class="hv-copy">
+          <p class="hv-lab">What we mean by Craft</p>
+          <p class="hv-txt">The good stuff we do by hand. We get to know you, find the idea and craft a brand that feels like you, checked by people who care.</p>
+        </div>
+        <svg class="hv-pat" viewBox="0 0 1000 1060" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs><clipPath id="hvp-craft">
+            <ellipse cx="505" cy="305" rx="372" ry="172" transform="rotate(23 505 305)"/>
+            <ellipse cx="138" cy="490" rx="52" ry="110" transform="rotate(8 138 490)"/>
+            <ellipse cx="505" cy="800" rx="212" ry="318" transform="rotate(-36 505 800)"/>
+            <ellipse cx="803" cy="667" rx="117" ry="117" transform="rotate(0 803 667)"/>
+            <ellipse cx="167" cy="930" rx="152" ry="152" transform="rotate(0 167 930)"/></clipPath><filter id="hvp-craft-b" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="26"/></filter></defs>
+          <rect width="1000" height="1060" fill="#97d6ef"/>
+          <g>
+            <g class="s"><ellipse cx="505" cy="305" rx="372" ry="172" transform="rotate(23 505 305)" fill="#ff3a1a"/></g>
+            <g class="s"><ellipse cx="138" cy="490" rx="52" ry="110" transform="rotate(8 138 490)" fill="#ff3a1a"/></g>
+            <g class="s"><ellipse cx="505" cy="800" rx="212" ry="318" transform="rotate(-36 505 800)" fill="#ff3a1a"/></g>
+            <g class="s"><ellipse cx="803" cy="667" rx="117" ry="117" transform="rotate(0 803 667)" fill="#ff3a1a"/></g>
+            <g class="s"><ellipse cx="167" cy="930" rx="152" ry="152" transform="rotate(0 167 930)" fill="#ff3a1a"/></g>
+          </g>
+          <g class="w" clip-path="url(#hvp-craft)">
+            <text x="500" y="560" text-anchor="middle" dominant-baseline="middle" font-family="Nuckle, sans-serif" font-weight="500" font-size="290" letter-spacing="-16" fill="#5a0e05" fill-opacity=".85" filter="url(#hvp-craft-b)">Craft</text>
+          </g>
+        </svg>
+      </div>
+      <div class="hv-half" data-k="ai" tabindex="0" role="button" aria-expanded="false" aria-label="What we mean by AI">
+        <p class="hv-word" aria-hidden="true">AI</p>
+        <div class="hv-copy">
+          <p class="hv-lab">What we mean by AI</p>
+          <p class="hv-txt">The busy stuff AI handles. Automated content, implementing brand rules, curated tools all ticking along in the background. Which leaves you free to run the place.</p>
+        </div>
+        <svg class="hv-pat" viewBox="0 0 1000 1060" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs><clipPath id="hvp-ai">
+            <ellipse cx="505" cy="305" rx="372" ry="172" transform="translate(1000 0) scale(-1 1) rotate(23 505 305)"/>
+            <ellipse cx="138" cy="490" rx="52" ry="110" transform="translate(1000 0) scale(-1 1) rotate(8 138 490)"/>
+            <ellipse cx="505" cy="800" rx="212" ry="318" transform="translate(1000 0) scale(-1 1) rotate(-36 505 800)"/>
+            <ellipse cx="803" cy="667" rx="117" ry="117" transform="translate(1000 0) scale(-1 1) rotate(0 803 667)"/>
+            <ellipse cx="167" cy="930" rx="152" ry="152" transform="translate(1000 0) scale(-1 1) rotate(0 167 930)"/></clipPath><filter id="hvp-ai-b" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="26"/></filter></defs>
+          <rect width="1000" height="1060" fill="#97d6ef"/>
+          <g transform="translate(1000 0) scale(-1 1)">
+            <g class="s"><ellipse cx="505" cy="305" rx="372" ry="172" transform="rotate(23 505 305)" fill="#ff3a1a"/></g>
+            <g class="s"><ellipse cx="138" cy="490" rx="52" ry="110" transform="rotate(8 138 490)" fill="#ff3a1a"/></g>
+            <g class="s"><ellipse cx="505" cy="800" rx="212" ry="318" transform="rotate(-36 505 800)" fill="#ff3a1a"/></g>
+            <g class="s"><ellipse cx="803" cy="667" rx="117" ry="117" transform="rotate(0 803 667)" fill="#ff3a1a"/></g>
+            <g class="s"><ellipse cx="167" cy="930" rx="152" ry="152" transform="rotate(0 167 930)" fill="#ff3a1a"/></g>
+          </g>
+          <g class="w" clip-path="url(#hvp-ai)">
+            <text x="500" y="560" text-anchor="middle" dominant-baseline="middle" font-family="Nuckle, sans-serif" font-weight="500" font-size="290" letter-spacing="-16" fill="#5a0e05" fill-opacity=".85" filter="url(#hvp-ai-b)">AI</text>
+          </g>
+        </svg>
+      </div>
     </div>
   </section>
 
@@ -187,6 +196,7 @@
 
 <script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
 <script src="/page.js"></script>
+<script src="/information/hv.js"></script>
 <script src="/information/wd.js"></script>
 <script src="/footer.js"></script>
 <script>
