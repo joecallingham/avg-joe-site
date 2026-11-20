@@ -42,14 +42,13 @@
     const key = q * 100 + p;
     if (key === last) return;
     last = key;
-    // entry: the names, the window's lines, the picture and the copy all arrive from the right
+    // entry: the names, the window's lines, the picture and the counter arrive from the right
     const e = RM ? 1 : 1 - Math.pow(1 - q, 3), off = (1 - e) * innerWidth;
     const x = win - gap / 2 - p * gap + off;
     winEl.style.transform = `translate3d(${(off * 0.8).toFixed(1)}px,0,0)`;
-    rule.style.transform = `scaleX(${e.toFixed(4)})`;
     picsBox.style.clipPath = `inset(0 0 0 ${((1 - e) * 100).toFixed(2)}%)`;
     picsBox.style.transform = `translate3d(${(off * 0.35).toFixed(1)}px,0,0)`;
-    [desc, countEl].forEach((el, k) => { el.style.translate = `${(off * (0.6 + k * 0.2)).toFixed(1)}px 0`; el.style.opacity = e.toFixed(3); });
+    countEl.style.translate = `${(off * 0.8).toFixed(1)}px 0`; countEl.style.opacity = e.toFixed(3);   // the line on the left and the horizontal rule just stay put
     tracks.forEach(t => t.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`);
     // picture i wipes in from the right over picture i-1 as p goes from i-1 to i
     pics.forEach((im, i) => { const f = i === 0 ? 1 : Math.max(0, Math.min(1, p - (i - 1))); im.style.clipPath = `inset(0 0 0 ${((1 - f) * 100).toFixed(2)}%)`; });
