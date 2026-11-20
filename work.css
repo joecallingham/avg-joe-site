@@ -395,3 +395,19 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 .hv-say{position:absolute;inset:0;display:grid;place-items:center;margin:0;color:#fff;font-weight:500;font-size:clamp(1.6rem,1.75vw,2.6rem);letter-spacing:-.03em;opacity:0;transform:translateY(.6em);transition:opacity .3s ease,transform .3s ease;pointer-events:none}
 .hv-half.dim .hv-say{opacity:1;transform:none;transition:opacity .6s ease .35s,transform .7s cubic-bezier(.22,1,.36,1) .35s}
 .hv-half.dim .hv-word,.hv-half[data-k=ai].dim .hv-word{opacity:0;filter:blur(18px)}
+
+/* ---------- Information: how we work, four columns under What We Do ---------- */
+.steps4{display:grid;grid-template-columns:repeat(4,1fr);height:calc(100vh - 3.5rem);height:calc(100svh - 3.5rem);border-bottom:1px solid var(--ink);list-style:none;margin:0;padding:0}
+.st{position:relative;padding:2.4rem var(--margin)}
+.st + .st{border-left:1px solid var(--ink)}
+.st-no{font-size:var(--small);letter-spacing:-.02em;color:rgba(11,11,11,.55)}
+.st-word{position:absolute;inset:0;display:grid;place-items:center;margin:0;font-weight:500;font-size:clamp(2.6rem,3.9vw,5.6rem);letter-spacing:-.05em;line-height:1;pointer-events:none}
+.st-txt{position:absolute;left:var(--margin);right:var(--margin);bottom:calc(var(--frame) + 3.6rem);font-size:var(--small);line-height:1.35;letter-spacing:-.02em;max-width:20rem}
+@media (max-width:760px){
+  .steps4{grid-template-columns:1fr 1fr;height:auto}
+  .st{min-height:62vw;padding:1.4rem var(--margin)}
+  .st:nth-child(3){border-left:0}
+  .st:nth-child(n+3){border-top:1px solid var(--ink)}
+  .st-word{font-size:2.4rem}
+  .st-txt{bottom:1.2rem}
+}
