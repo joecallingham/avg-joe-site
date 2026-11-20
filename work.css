@@ -317,12 +317,17 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 .wd-count{position:absolute;right:var(--margin);top:calc(var(--split) + 1rem);display:flex;gap:1.2rem;font-size:var(--small);letter-spacing:-.02em}
 .wd-cnum{color:rgba(11,11,11,.55)}
 @media (max-width:760px){
-  .wd{--wl:14%;--ww:72%;--split:42%}
+  /* phone: everything starts on the page margin, like the titles. The window is the full width (its lines hidden),
+     so the current name sits on the left and the next one slides in from the right; the line runs under the names,
+     the description sits under the line and the picture runs edge to edge below it */
+  .wd{--wl:var(--margin);--ww:calc(100% - 2 * var(--margin));--split:29%;--wd-bot:calc(var(--frame) + 4.4rem)}
+  .wd-win{border-color:transparent}
   .wd-row{font-size:2.9rem}
-  .wd{--wd-bot:calc(var(--frame) + 4.4rem)}
-  .wd-desc{top:auto;bottom:calc(100% - var(--split) + 4.4rem);left:var(--margin);width:auto;right:var(--margin);max-width:none;font-size:1.25rem}
-  .wd-count{top:calc(var(--split) + .6rem);right:auto;left:var(--margin);flex-direction:column;gap:.2rem;width:calc(var(--wl) - var(--margin) - .4rem);font-size:.7rem}
-  .wd-cname{display:none}
+  .wd-track span{text-align:left}
+  .wd-sharp{clip-path:none}
+  .wd-desc{top:calc(var(--split) + 1rem);left:var(--margin);right:var(--margin);width:auto;max-width:none;font-size:1.25rem}
+  .wd-pics{left:0;right:0;width:auto;top:calc(var(--split) + 6.6rem)}
+  .wd-count{top:calc(var(--split) - 2.9rem * 1.25 - 1.4rem);left:var(--margin);right:auto;gap:.8rem;font-size:var(--small)}
 }
 @media (prefers-reduced-motion:reduce){.wd-desc{transition:none}}
 /* a line along the bottom of the section, where the pictures end */

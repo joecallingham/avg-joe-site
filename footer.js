@@ -11,7 +11,7 @@
     'Avg Joe never lets the robot have the last word.',
   ];
   const tag = foot.querySelector('.foot-tag');
-  if (tag) tag.textContent = LINES[Math.floor(Math.random() * LINES.length)];
+  // the footer line is fixed to Joe's pick for now (LINES kept for a rotation later)
   // the notch drops away while the footer is in view (on the home page main.js does this, as its footer is a layer)
   if (!foot.classList.contains('layer'))
     new IntersectionObserver(([e]) => document.documentElement.classList.toggle('foot-in', e.isIntersecting), { rootMargin: '0px 0px -35% 0px' }).observe(foot);

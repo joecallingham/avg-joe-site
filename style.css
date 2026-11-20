@@ -311,16 +311,20 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
 .fc a:hover,.foot-c a:hover{text-decoration:underline;text-underline-offset:.2em}
 .fc-side{grid-column:10/span 3;border-left:1px solid var(--ink);padding-left:var(--gutter);grid-row:1/span 2}
 /* the line of the day and the © sit together at the foot of the Say hello column */
-.foot-base{grid-column:7/span 3;grid-row:2;align-self:end;padding-bottom:calc(var(--frame) + 1.4rem);color:rgba(11,11,11,.62)}
-.foot-c{margin-top:.4em}
+.foot-base{display:contents}
+/* the line sits at the foot of the Say hello column, the © at the foot of Pages */
+.foot-tag,.foot-c{grid-row:2;align-self:end;padding-bottom:calc(var(--frame) + 1.4rem);color:rgba(11,11,11,.62)}
+.foot-tag{grid-column:4/span 3}
+.foot-c{grid-column:7/span 3}
 @media (max-width:760px){
   .foot-mark{font-size:12.4vw}
   .foot:not(.layer){min-height:0;padding-bottom:0}
   .foot-cols{grid-template-columns:1fr 1fr;row-gap:var(--s2);grid-template-rows:none;align-content:start}
-  .foot-base{margin-top:var(--s2)}
+  .foot-tag{margin-top:var(--s2)}
   .fc{grid-column:span 1}
   .fc-side{grid-column:1/-1;grid-row:auto;border-left:0;border-top:1px solid var(--ink);padding-left:0}
-  .foot-base{grid-column:1/-1;grid-row:auto;padding-bottom:calc(var(--frame) + 2.4rem)}
+  .foot-tag,.foot-c{grid-column:1/-1;grid-row:auto;padding-bottom:0}
+  .foot-c{padding-bottom:calc(var(--frame) + 2.4rem)}
 }
 .page body:has(#foot){padding-bottom:0}   /* the footer keeps the frame clear itself */
 /* the notch drops away below the screen once the footer is in view */
@@ -345,7 +349,3 @@ html.foot-in #nav{transform:translate(-50%,calc(100% + var(--frame) + 5rem))}   
 #s-cases .sec-title{position:sticky;top:0;z-index:4;background:var(--cream)}
 @media (max-width:760px){#s-cases .sec-title{top:3.4rem}
   #s-cases .sec-title::before{content:'';position:absolute;left:0;right:0;bottom:100%;height:3.5rem;background:var(--cream)}}
-/* Pages and Say hello share the third column, one above the other */
-.fc-stack{grid-column:7/span 3}
-.fc-stack .fc + .fc{margin-top:var(--s2)}
-@media (max-width:760px){.fc-stack{grid-column:span 1}}
