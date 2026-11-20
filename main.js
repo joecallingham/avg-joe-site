@@ -496,6 +496,7 @@
   gsap.ticker.lagSmoothing(0);
 
   const spacer = $('#scroll-space');
+  const foot = $('#foot');
   let room = 0, unit = 1, endPx = 0, maxPx = 0, cur = 0, ready = false, veiling = false, brandOn = false, travel = 0;
   // scroll position <-> timeline time; section 1->2 is OPEN_LEN screens long, every other section one screen
   // knots of [timeline time, screens scrolled]: section 1-2 is OPEN_LEN long, and there is a HOLD at 3 (a pause on the big sentence)
@@ -522,6 +523,7 @@
     const st = Math.min(past, room);
     if (Math.abs(lastSt - st) > 0.5) { el.cases.scrollTop = st; lastSt = st; }
     if (cur >= endPx) put(el.cases, 'transform', `translate3d(0,${(-(past - st)).toFixed(1)}px,0)`);      // after the last case study, the whole section slides up off screen
+    if (foot) foot.style.visibility = past > room + 1 ? 'visible' : 'hidden';   // ...uncovering the footer behind it
     cutImages();
     navState();
   }
