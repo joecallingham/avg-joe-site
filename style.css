@@ -16,7 +16,7 @@
 @font-face{font-family:"snell";src:url(fonts/snell-regular.woff2) format("woff2");font-display:swap}
 
 :root{
-  --cream:#f1eee7; --notch-bg:#f7f5f0;   /* the notch and bottom bar: a touch lighter than the page */ --ink:#0b0b0b; --white:#fff;
+  --cream:#f1eee7; --notch-bg:var(--cream);   /* the notch and bottom bar: the page cream */ --ink:#0b0b0b; --white:#fff;
   --frame:.625rem;
   /* grid: one system for the whole site. Content edges sit on --margin; columns are split by --gutter;
      vertical gaps use the --s steps only. Press G on the page to see the grid. */

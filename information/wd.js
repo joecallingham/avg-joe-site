@@ -9,7 +9,7 @@
   const N = items.length, PER = 0.6;          // screens of scrolling per service
   // everything slides in from the right while the section is still coming up the screen, so once it holds,
   // every bit of scrolling turns a service, and it lets go as soon as the last one is in (no dead scroll either end)
-  run.style.height = (100 + (N - 1) * PER * 100 + 8) + 'vh';
+  run.style.height = (100 + (N - 1) * PER * 100) + 'vh';   // lets go the moment the last service is in
 
   const stick = run.querySelector('.wd-stick');
   const tracks = [...run.querySelectorAll('.wd-track')];
@@ -36,20 +36,21 @@
   const frame = () => {
     requestAnimationFrame(frame);
     const r = run.getBoundingClientRect();
-    if (r.bottom < 0 || r.top > innerHeight) return;
+    if (r.bottom < -innerHeight || r.top > innerHeight * 1.5) return;
     const s = -r.top / innerHeight;                                   // screens scrolled into the section
-    const q = Math.max(0, Math.min(1, (s + 0.85) / 0.85));            // entry: from 85% of a screen before it holds
-    const p = Math.max(0, Math.min(N - 1, s / PER));
-    const key = q * 100 + p;
-    if (key === last) return;
-    last = key;
-    // entry: the names, the window's lines, the picture and the counter arrive from the right
-    const e = RM ? 1 : 1 - Math.pow(1 - q, 3), off = (1 - e) * innerWidth;
-    const x = win - gap / 2 - p * gap + off;
+    // the names run straight off the scroll at one pace the whole way: in from the right as the section arrives,
+    // through the window while it holds, and on off to the left as it leaves (no easing, no hold, no clamp)
+    const run_ = s / PER;
+    const p = Math.max(0, Math.min(N - 1, run_));                    // which service is in: pictures, line, counter
+    const q = Math.max(0, Math.min(1, (s + 0.85) / 0.85));            // how far the window, picture and counter have arrived
+    if (run_ === last) return;
+    last = run_;
+    const e = RM ? 1 : q, off = (1 - e) * innerWidth;                 // linear, so it moves with the scroll, not ahead of it
+    const x = win - gap / 2 - run_ * gap;
     winEl.style.transform = `translate3d(${(off * 0.8).toFixed(1)}px,0,0)`;
     picsBox.style.clipPath = `inset(0 0 0 ${((1 - e) * 100).toFixed(2)}%)`;
     picsBox.style.transform = `translate3d(${(off * 0.35).toFixed(1)}px,0,0)`;
-    countEl.style.translate = `${(off * 0.8).toFixed(1)}px 0`; countEl.style.opacity = e.toFixed(3);   // the line on the left and the horizontal rule just stay put
+    countEl.style.translate = `${(off * 0.8).toFixed(1)}px 0`; countEl.style.opacity = e.toFixed(3);
     tracks.forEach(t => t.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`);
     // picture i wipes in from the right over picture i-1 as p goes from i-1 to i
     pics.forEach((im, i) => { const f = i === 0 ? 1 : Math.max(0, Math.min(1, p - (i - 1))); im.style.clipPath = `inset(0 0 0 ${((1 - f) * 100).toFixed(2)}%)`; });
