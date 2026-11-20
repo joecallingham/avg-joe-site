@@ -312,10 +312,10 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
 .fc-side{grid-column:10/span 3;border-left:1px solid var(--ink);padding-left:var(--gutter);grid-row:1/span 2}
 /* the line of the day and the © sit together at the foot of the Say hello column */
 .foot-base{display:contents}
-/* the line sits at the foot of the Say hello column, the © at the foot of Pages */
+/* the © sits at the foot of the Say hello column, the line at the foot of Pages */
 .foot-tag,.foot-c{grid-row:2;align-self:end;padding-bottom:calc(var(--frame) + 1.4rem);color:rgba(11,11,11,.62)}
-.foot-tag{grid-column:4/span 3}
-.foot-c{grid-column:7/span 3}
+.foot-c{grid-column:4/span 3}
+.foot-tag{grid-column:7/span 3}
 @media (max-width:760px){
   .foot-mark{font-size:12.4vw}
   .foot:not(.layer){min-height:0;padding-bottom:0}
