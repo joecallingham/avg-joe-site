@@ -32,20 +32,4 @@
     h.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); set(open === h ? null : h); } if (e.key === 'Escape') set(null); });
   });
   if (HOVER) hv.addEventListener('mouseleave', () => set(null));
-  // on a phone there is no hover: the panel holds under the About Us title and opens Craft, then AI, as you scroll
-  if (!HOVER) {
-    const wrap = hv.parentNode, title = document.querySelector('.ab-sec > .sec-title');
-    const fit = () => { const top = parseFloat(getComputedStyle(title).top) + title.offsetHeight; hv.style.top = top + 'px'; hv.style.height = (innerHeight - top) + 'px'; };
-    fit(); addEventListener('resize', fit);
-    let last;
-    const tick = () => {
-      requestAnimationFrame(tick);
-      // how far through its hold the panel is: 0 when it first sits under the title, 1 when it's about to move on
-      const r = wrap.getBoundingClientRect(), m = parseFloat(getComputedStyle(hv).marginTop);
-      const prog = (parseFloat(hv.style.top) - r.top - m) / Math.max(1, r.height - m - hv.offsetHeight);
-      const k = prog < -0.05 || prog > 1.05 ? null : prog < 0.5 ? halves[0] : halves[1];
-      if (k !== last) { last = k; set(k); }
-    };
-    requestAnimationFrame(tick);
-  }
 })();
