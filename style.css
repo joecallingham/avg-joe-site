@@ -341,3 +341,8 @@ html.foot-in #nav{transform:translate(-50%,calc(100% + var(--frame) + 5rem))}   
   .fw-grid{row-gap:0}
   .fw-card + .fw-card{border-left:0;border-top:1px solid var(--ink)}
 }
+
+/* the home page titles stay at the top while their section scrolls under them (as on Information) */
+#s-cases .sec-title{position:sticky;top:0;z-index:4;background:var(--cream)}
+@media (max-width:760px){#s-cases .sec-title{top:3.4rem}
+  #s-cases .sec-title::before{content:'';position:absolute;left:0;right:0;bottom:100%;height:3.5rem;background:var(--cream)}}
