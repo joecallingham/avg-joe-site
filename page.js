@@ -109,6 +109,30 @@
   /* ---------- things slide and fade up as they come into view ---------- */
   const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }), { threshold: 0.12 });
   $$('.rv').forEach(n => io.observe(n));
+  $$('.draw').forEach(n => io.observe(n));
+
+  /* ---------- text that rises in line by line, like the home page sentence ---------- */
+  // each word becomes its own unit (inline elements such as a rotating word or an image stay whole);
+  // when the block comes into view, words on the same line share a delay, so it reads as lines rising
+  $$('[data-lines]').forEach(el => {
+    const units = [];
+    [...el.childNodes].forEach(n => {
+      if (n.nodeType === 3) n.textContent.split(/(\s+)/).forEach(t => {
+        if (!t) return;
+        if (/^\s+$/.test(t)) return units.push(document.createTextNode(' '));
+        const w = document.createElement('span'); w.className = 'lw'; w.textContent = t; units.push(w);
+      });
+      else { const w = document.createElement('span'); w.className = 'lw'; w.appendChild(n); units.push(w); }
+    });
+    el.replaceChildren(...units);
+    new IntersectionObserver((es, ob) => es.forEach(en => {
+      if (!en.isIntersecting) return;
+      ob.disconnect();
+      let top = null, line = -1;
+      $$('.lw', el).forEach(w => { if (w.offsetTop !== top) { top = w.offsetTop; line++; } w.style.transitionDelay = (line * 0.18) + 's'; });
+      el.classList.add('in');
+    }), { threshold: 0.3 }).observe(el);
+  });
 
   /* ---------- sound: the same synthesised interface sounds as the home page ---------- */
   let actx = null, master = null, hoverAt = 0, tickAt = 0, tickTravel = 0, lastHover = null;

@@ -261,28 +261,36 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .hello .big-line{font-size:3.3rem}
 }
 
-/* ---------- Information: Craft & AI halves, then the statement ---------- */
-.ca-two{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;min-height:100svh;margin-top:var(--s3)}
-.ca-half{padding:calc(var(--frame) + 2.2rem) 2.2rem 4rem}
-.ca-ai-h{color:var(--ink);background:
-  radial-gradient(55% 45% at 45% 32%,#ff4a00 0,rgba(255,74,0,.85) 35%,rgba(255,74,0,0) 100%),
-  radial-gradient(50% 38% at 38% 82%,#2f78a8 0,rgba(47,120,168,.75) 40%,rgba(47,120,168,0) 100%),
-  radial-gradient(40% 40% at 100% 90%,#ff5a10 0,rgba(255,90,16,0) 100%),
-  linear-gradient(90deg,#d9d2cc 0,#e9b7a0 30%,#f3d9cf 100%)}
+/* ---------- Information: Craft & AI rows, then the statement ---------- */
+.ca-rows{margin-top:var(--s3)}
+.ca-row{position:relative;min-height:45vh;min-height:45svh;padding-top:2.4rem;padding-bottom:4rem;align-content:start}
+.ca-row::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:var(--ink);z-index:2;transform:scaleX(0);transform-origin:left;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.ca-row.in::before{transform:none}
+.ca-row > *{position:relative;z-index:1}
+.ca-ai-row::after{content:'';position:absolute;inset:0;z-index:0;clip-path:inset(0 100% 0 0);transition:clip-path 1.4s cubic-bezier(.65,0,.35,1) .15s;background:
+  radial-gradient(38% 70% at 36% 55%,#ff3d00 0,rgba(255,61,0,.9) 30%,rgba(255,96,0,.55) 60%,rgba(255,96,0,0) 100%),
+  radial-gradient(30% 75% at 78% 70%,#2c74a3 0,rgba(44,116,163,.8) 40%,rgba(44,116,163,0) 100%),
+  linear-gradient(90deg,#f8e2d8 0,#f7b896 18%,#ff7a3a 40%,#c4614a 60%,#6f8db0 82%,#c9b3c4 100%)}
+.ca-ai-row.in::after{clip-path:inset(0 0 0 0)}
 .ca-aiw{color:#fff}
-.ca-lab{font-size:.85rem;letter-spacing:-.01em;margin-bottom:2.2rem}
-.ca-copy{font-weight:500;font-size:clamp(2.2rem,4.75vw,6.4rem);line-height:1.04;letter-spacing:-.055em}
+.ca-lab{grid-column:1/span 6;font-size:.85rem;letter-spacing:-.01em}
+.ca-copy{grid-column:7/span 6;font-weight:500;font-size:clamp(2.1rem,3.05vw,4.4rem);line-height:1.04;letter-spacing:-.05em}
 .ca-craft,.ca-never{display:inline-block}
+/* line-by-line rise, as the home page sentence does */
+[data-lines] .lw{display:inline-block;opacity:0;transform:translateY(.45em);transition:opacity .55s cubic-bezier(.33,1,.68,1),transform .55s cubic-bezier(.33,1,.68,1)}
+[data-lines].in .lw{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){[data-lines] .lw{opacity:1;transform:none;transition:none}.ca-row::before{transform:none}.ca-ai-row::after{clip-path:none}}
 .ca-say{min-height:100vh;min-height:100svh;display:grid;place-items:center;padding:var(--s4) 8vw}
 .ca-state{text-align:center;font-weight:500;font-size:clamp(2.6rem,6.4vw,8.2rem);line-height:1.08;letter-spacing:-.055em}
 .ca-cow{display:inline-block;height:.86em;width:auto;vertical-align:-.06em;margin:0 .06em}
 .ca-blob{display:inline-block;width:2.1em;height:.92em;vertical-align:-.08em;border-radius:70% 0 70% 0/100% 0 100% 0;
   background:radial-gradient(circle at 42% 18%,#ff4400 0,#f4683a 30%,#8a7c9c 62%,#2f80b8 100%)}
 @media (max-width:760px){
-  .ca-two{grid-template-columns:1fr;min-height:0}
-  .ca-half{padding:4.6rem 1.6rem 3.6rem}
-  .ca-copy{font-size:3.3rem}
+  .ca-row{min-height:0;padding-top:1.6rem;padding-bottom:3.2rem}
+  .ca-lab,.ca-copy{grid-column:1/-1}
   .ca-lab{margin-bottom:1.2rem}
+  .ca-copy{font-size:2.6rem}
   .ca-say{min-height:80svh;padding:var(--s4) 1.2rem}
   .ca-state{font-size:3.6rem}
+}
 }
