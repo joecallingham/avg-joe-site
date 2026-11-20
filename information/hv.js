@@ -17,12 +17,13 @@
   let open = null;
   const set = h => {
     open = h;
+    // the side you pick takes its own pattern and "What we mean by…"; the other side carries its copy
     halves.forEach(x => {
-      const on = x === h;
-      if (on) lineDelays(x); else x.querySelectorAll('.hv-txt .lw').forEach(w => w.style.transitionDelay = '0s');
-      x.classList.toggle('open', on);
-      x.classList.toggle('dim', !!h && !on);
-      x.setAttribute('aria-expanded', String(on));
+      const picked = x === h, copy = !!h && !picked;
+      if (copy) lineDelays(x); else x.querySelectorAll('.hv-txt .lw').forEach(w => w.style.transitionDelay = '0s');
+      x.classList.toggle('open', copy);
+      x.classList.toggle('dim', picked);
+      x.setAttribute('aria-expanded', String(picked));
     });
   };
   halves.forEach(h => {
