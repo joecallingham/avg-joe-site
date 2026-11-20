@@ -435,3 +435,18 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .wd-row{top:calc(var(--split) - 1.25em)}
   .wd-count{top:calc(var(--split) - var(--fs-head) * 1.25 - 1.4rem)}
 }
+
+/* phone: more breathing room between the dividers */
+@media (max-width:760px){
+  .cs-sec>.grid{padding-top:var(--s3)}
+  .cs-brief .lab{margin-bottom:var(--s3)}
+  .cs-sec:not(.wd-sec):not(.ab-sec){padding-bottom:8rem}
+  .sec-title{padding-top:3.4rem;padding-bottom:1.8rem}
+  .hv{margin-top:var(--s4)}
+  .hv-copy{padding:var(--s3) var(--margin)}
+  .hv-lab{margin-bottom:var(--s2)}
+  .st{padding:var(--s3) var(--margin)}
+  .st-word{margin-top:var(--s4)}
+  .ca-say{padding-top:8rem;padding-bottom:8rem}
+  .clients{padding-top:var(--s3)}
+}
