@@ -33,20 +33,47 @@
     </div>
   </section>
 
-  <!-- Craft & AI: one ruled band, two halves. Craft on blue with red shapes, AI on cream with a soft drifting blush -->
-  <section class="ca-pair draw" aria-label="Craft and AI">
-    <div class="ca-p ca-p-craft">
-      <svg class="ca-shapes" viewBox="0 0 1000 680" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <g><ellipse cx="465" cy="285" rx="352" ry="150" transform="rotate(23 465 285)"/></g>
-        <g><ellipse cx="128" cy="452" rx="48" ry="104" transform="rotate(10 128 452)"/></g>
-        <g><ellipse cx="445" cy="705" rx="185" ry="300" transform="rotate(-36 445 705)"/></g>
-        <g><circle cx="733" cy="617" r="106"/></g>
-      </svg>
+  <!-- Craft & AI: two full screens. Craft: copy left, a picture through blue holes right. AI: the same, flipped -->
+  <section class="ca-split draw" aria-label="What we mean by Craft">
+    <div class="ca-text">
       <p class="ca-lab rv">What we mean by Craft</p>
       <p class="ca-copy" data-lines>The good stuff we do by hand. We get to know you, find the idea and <span class="ca-craft" data-rot data-rot-auto>craft</span> a brand that feels like you, checked by people who care.</p>
     </div>
-    <div class="ca-p ca-p-ai">
-      <div class="ca-blush" aria-hidden="true"></div>
+    <div class="ca-pic">
+      <img src="/img/mushroom.jpg" alt="" loading="lazy">
+      <svg viewBox="1000 0 1000 1125" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs><mask id="ca-m1" maskUnits="userSpaceOnUse" x="-1000" y="-1000" width="4000" height="3125">
+          <rect x="-1000" y="-1000" width="4000" height="3125" fill="#fff"/>
+            <g>
+              <g class="h"><ellipse cx="1510" cy="265" rx="400" ry="190" transform="rotate(25 1510 265)" fill="#000"/></g>
+              <g class="h"><ellipse cx="1137" cy="450" rx="52" ry="118" transform="rotate(8 1137 450)" fill="#000"/></g>
+              <g class="h"><ellipse cx="1498" cy="752" rx="205" ry="375" transform="rotate(-36 1498 752)" fill="#000"/></g>
+              <g class="h"><ellipse cx="1811" cy="638" rx="120" ry="120" transform="rotate(0 1811 638)" fill="#000"/></g>
+              <g class="h"><ellipse cx="1167" cy="918" rx="153" ry="153" transform="rotate(0 1167 918)" fill="#000"/></g>
+            </g>
+        </mask></defs>
+        <rect x="-1000" y="-1000" width="4000" height="3125" fill="#97d6ef" mask="url(#ca-m1)"/>
+      </svg>
+    </div>
+  </section>
+  <section class="ca-split ca-flip draw" aria-label="What we mean by AI">
+    <div class="ca-pic">
+      <img src="/img/ai-desk.jpg" alt="" loading="lazy">
+      <svg viewBox="1000 0 1000 1125" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs><mask id="ca-m2" maskUnits="userSpaceOnUse" x="-1000" y="-1000" width="4000" height="3125">
+          <rect x="-1000" y="-1000" width="4000" height="3125" fill="#fff"/>
+            <g transform="translate(3000 0) scale(-1 1)">
+              <g class="h"><ellipse cx="1510" cy="265" rx="400" ry="190" transform="rotate(25 1510 265)" fill="#000"/></g>
+              <g class="h"><ellipse cx="1137" cy="450" rx="52" ry="118" transform="rotate(8 1137 450)" fill="#000"/></g>
+              <g class="h"><ellipse cx="1498" cy="752" rx="205" ry="375" transform="rotate(-36 1498 752)" fill="#000"/></g>
+              <g class="h"><ellipse cx="1811" cy="638" rx="120" ry="120" transform="rotate(0 1811 638)" fill="#000"/></g>
+              <g class="h"><ellipse cx="1167" cy="918" rx="153" ry="153" transform="rotate(0 1167 918)" fill="#000"/></g>
+            </g>
+        </mask></defs>
+        <rect x="-1000" y="-1000" width="4000" height="3125" fill="#97d6ef" mask="url(#ca-m2)"/>
+      </svg>
+    </div>
+    <div class="ca-text">
       <p class="ca-lab rv">What we mean by AI</p>
       <p class="ca-copy" data-lines>The busy stuff AI handles. Automated content, implementing brand rules, curated tools all ticking along in the background. Which leaves you free to run the place.</p>
     </div>
