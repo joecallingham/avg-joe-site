@@ -299,7 +299,7 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
 #wheel-list li{pointer-events:auto}
 
 /* ---------- footer (every page): a big wordmark, then the details, as Mother does ---------- */
-.foot{position:relative;display:flex;flex-direction:column;min-height:100vh;min-height:100svh;background:var(--cream);color:var(--ink);padding-bottom:calc(var(--frame) + 3.4rem)}
+.foot{position:relative;display:flex;flex-direction:column;min-height:100vh;min-height:100svh;background:var(--cream);color:var(--ink);padding-bottom:0}   /* no dead space: the side column's line runs to the bottom edge */
 .foot.layer{display:flex;align-items:stretch;justify-content:flex-start;z-index:5;visibility:hidden}
 .foot-mark{display:flex;justify-content:space-between;align-items:baseline;padding:var(--s3) var(--margin) .08em;border-bottom:1px solid var(--ink);line-height:1;white-space:nowrap;font-size:12.6vw}
 .fm-avg{font-weight:600;letter-spacing:-.06em}
@@ -310,16 +310,17 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
 .fc p + p{margin-top:.6em}
 .fc a:hover,.foot-c a:hover{text-decoration:underline;text-underline-offset:.2em}
 .fc-side{grid-column:10/span 3;border-left:1px solid var(--ink);padding-left:var(--gutter);grid-row:1/span 2}
-.foot-tag{grid-column:1/span 6;align-self:end;padding-bottom:var(--s1);color:rgba(11,11,11,.62)}
-.foot-c{grid-column:7/span 3;align-self:end;padding-bottom:var(--s1);color:rgba(11,11,11,.62)}
+/* the line of the day and the © sit together at the foot of the Say hello column */
+.foot-base{grid-column:7/span 3;grid-row:2;align-self:end;padding-bottom:calc(var(--frame) + 1.4rem);color:rgba(11,11,11,.62)}
+.foot-c{margin-top:.4em}
 @media (max-width:760px){
   .foot-mark{font-size:12.4vw}
-  .foot:not(.layer){min-height:0;padding-bottom:calc(var(--frame) + 6rem)}
+  .foot:not(.layer){min-height:0;padding-bottom:0}
   .foot-cols{grid-template-columns:1fr 1fr;row-gap:var(--s2);grid-template-rows:none;align-content:start}
-  .foot-tag{margin-top:var(--s2)}
+  .foot-base{margin-top:var(--s2)}
   .fc{grid-column:span 1}
   .fc-side{grid-column:1/-1;grid-row:auto;border-left:0;border-top:1px solid var(--ink);padding-left:0}
-  .foot-tag,.foot-c{grid-column:1/-1;padding-bottom:0}
+  .foot-base{grid-column:1/-1;grid-row:auto;padding-bottom:calc(var(--frame) + 2.4rem)}
 }
 .page body:has(#foot){padding-bottom:0}   /* the footer keeps the frame clear itself */
 /* the notch drops away below the screen once the footer is in view */
