@@ -12,6 +12,9 @@
   ];
   const tag = foot.querySelector('.foot-tag');
   if (tag) tag.textContent = LINES[Math.floor(Math.random() * LINES.length)];
+  // the notch drops away while the footer is in view (on the home page main.js does this, as its footer is a layer)
+  if (!foot.classList.contains('layer'))
+    new IntersectionObserver(([e]) => document.documentElement.classList.toggle('foot-in', e.isIntersecting), { rootMargin: '0px 0px -35% 0px' }).observe(foot);
   const t = foot.querySelector('.foot-time');
   if (!t) return;
   const tick = () => {

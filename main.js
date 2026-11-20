@@ -524,6 +524,7 @@
     if (Math.abs(lastSt - st) > 0.5) { el.cases.scrollTop = st; lastSt = st; }
     if (cur >= endPx) put(el.cases, 'transform', `translate3d(0,${(-(past - st)).toFixed(1)}px,0)`);      // after the last case study, the whole section slides up off screen
     if (foot) foot.style.visibility = past > room + 1 ? 'visible' : 'hidden';   // ...uncovering the footer behind it
+    document.documentElement.classList.toggle('foot-in', past > room + VH() * 0.35);   // and the notch drops away
     cutImages();
     navState();
   }
