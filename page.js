@@ -77,8 +77,9 @@
     let lab = a.querySelector('.say, .nbt');
     if (!lab) {
       const word = a.textContent.trim();
-      if (!a.getAttribute('aria-label')) a.setAttribute('aria-label', word);
-      lab = document.createElement('span'); lab.className = 'nbt'; lab.setAttribute('aria-hidden', 'true'); lab.textContent = word;
+      const link = a.matches('a, button');          // a link gets a clean label; plain words stay readable as they are
+      if (link && !a.getAttribute('aria-label')) a.setAttribute('aria-label', word);
+      lab = document.createElement('span'); lab.className = 'nbt'; if (link) lab.setAttribute('aria-hidden', 'true'); lab.textContent = word;
       a.textContent = ''; a.appendChild(lab);
     }
     rotateOnHover(a.closest('[data-rot-hover]') || a, lab);

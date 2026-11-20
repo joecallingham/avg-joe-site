@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "avg-joe-site",
+      "runtimeExecutable": "/Users/joe/.nvm/versions/node/v26.13.0/bin/node",
+      "runtimeArgs": ["serve.mjs"],
+      "port": 4380
+    }
+  ]
+}

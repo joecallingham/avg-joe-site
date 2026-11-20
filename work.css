@@ -210,3 +210,51 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 @media (prefers-reduced-motion:reduce){.fader img,.pal-stage,.pal-logo,.model{transition:none}}
 .cats button:focus-visible{outline:1px solid var(--cream);outline-offset:4px}
 .page .notch .nb{z-index:2}
+
+/* ---------- Information page ---------- */
+.info-hero{padding-top:var(--s2);padding-bottom:var(--s3)}
+.info-hero h1{grid-column:1/span 11;font-weight:500;font-size:4.6rem;line-height:1.04;letter-spacing:-.055em}
+.info-hero .craft{display:inline-block;cursor:default}
+.info-film{padding:0 var(--frame) var(--s4)}
+.info-film .shot{display:block;width:100%;height:min(calc((100vw - 2 * var(--frame)) * .5625),calc(100vh - 4rem));overflow:hidden;background:#d9d4c8}
+.info-film video{width:100%;height:100%;object-fit:cover;display:block}
+/* craft vs AI: two columns of plain lists, then the line that sums it up */
+.split .col{grid-column:span 6}
+.split h3{font-weight:500;font-size:2.1rem;letter-spacing:-.045em;line-height:1.1;padding-bottom:var(--s1);border-bottom:1px solid currentColor;margin-bottom:var(--s1)}
+.split .col li{font-size:1.45rem;line-height:1.35;letter-spacing:-.03em;padding:.35rem 0;border-bottom:1px solid rgba(11,11,11,.14)}
+.split .pull{grid-column:1/span 9;margin-top:var(--s3);font-size:3.2rem;line-height:1.06;letter-spacing:-.05em}
+.split .ticks{grid-column:1/-1;margin-top:var(--s2)}
+/* services and values: a name on the left half, one line on the right, hairlines between */
+.svc li,.vals li{align-items:baseline;padding-top:var(--s1);padding-bottom:var(--s1);border-bottom:1px solid rgba(11,11,11,.18)}
+.svc .n,.vals .n{grid-column:1/span 6;font-size:2.6rem;line-height:1.08;letter-spacing:-.05em}
+.svc .d,.vals .d{grid-column:7/span 5;font-size:1.2rem;line-height:1.35;letter-spacing:-.025em;color:rgba(11,11,11,.7)}
+.vals .n{font-size:3.4rem}
+/* how we work: four steps across */
+.steps{list-style:none;padding-top:var(--gutter)}
+.steps li{grid-column:span 3;border-top:1px solid var(--ink);padding-top:var(--s1)}
+.steps .no{font-size:var(--small);color:rgba(11,11,11,.55);font-variant-numeric:tabular-nums}
+.steps h3{font-weight:500;font-size:2.1rem;letter-spacing:-.045em;line-height:1.1;margin:var(--s3) 0 var(--s1)}
+.steps p{font-size:1.2rem;line-height:1.35;letter-spacing:-.025em;color:rgba(11,11,11,.7);max-width:20rem}
+.clients{padding-top:var(--gutter);row-gap:.2rem}
+.clients li{grid-column:span 3;font-size:1.45rem;line-height:1.4;letter-spacing:-.03em}
+.hello .big-line{grid-column:1/span 8;font-size:4.6rem;line-height:1.02;letter-spacing:-.055em;padding-top:var(--s1)}
+.hello-side{grid-column:9/span 4;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:var(--s2);padding-top:var(--s1)}
+.pill-btn{display:inline-block;height:36px;line-height:36px;padding:0 1.25em;border-radius:99rem;background:var(--ink);color:var(--cream);font-size:var(--small);letter-spacing:-.01em;white-space:nowrap}
+.clock{font-size:var(--small);letter-spacing:-.02em;color:rgba(11,11,11,.6)}
+.clock time{color:var(--ink);font-variant-numeric:tabular-nums}
+@media (max-width:760px){
+  .info-hero h1{grid-column:1/-1;font-size:3.3rem}
+  .info-film .shot{height:auto;aspect-ratio:4/5}
+  .split .col,.split .pull{grid-column:1/-1}
+  .split .col + .col{margin-top:2.2rem}
+  .split .pull{font-size:2.6rem}
+  .svc .n,.vals .n,.svc .d,.vals .d{grid-column:1/-1}
+  .svc .n{font-size:2.4rem}.vals .n{font-size:2.8rem}
+  .svc .d,.vals .d{font-size:1.4rem;margin-top:.3rem}
+  .steps li{grid-column:span 2;margin-bottom:2rem}
+  .steps h3{margin-top:1.6rem}
+  .steps p{font-size:1.35rem}
+  .clients li{grid-column:span 2;font-size:1.5rem}
+  .hello .big-line,.hello-side{grid-column:1/-1}
+  .hello .big-line{font-size:3.3rem}
+}

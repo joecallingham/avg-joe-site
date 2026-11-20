@@ -616,7 +616,7 @@
     rotateOnHover(a, () => navLabel(a));
   });
   document.fonts.ready.then(() => $$('.nb').forEach(a => navLetters(navLabel(a))));
-  const csLinks = [...$$('.fw-link, .more').map(a => [a, a]), ...$$('.work').map(a => [a, a.querySelector('span')])];
+  const csLinks = [...$$('.fw-link, .more, .more-pill').map(a => [a, a]), ...$$('.work').map(a => [a, a.querySelector('span')])];
   csLinks.forEach(([trigger, lab]) => { if (!lab.getAttribute('aria-label') && trigger === lab) lab.setAttribute('aria-label', lab.textContent.trim()); rotateOnHover(trigger, () => lab); });
   document.fonts.ready.then(() => csLinks.forEach(([, lab]) => navLetters(lab)));
   hov($('.nb[data-k="contact"]'), 'soon');
