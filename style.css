@@ -24,7 +24,7 @@
   --s1:.75rem; --s2:1.5rem; --s3:3rem; --s4:6rem;
   --pad:var(--margin);
   /* the type scale: six sizes, each with its own leading. Everything on the site uses one of these */
-  --fs-display:6.25rem; --fs-head:4.6rem; --fs-title:2.75rem; --fs-body:2.1rem; --fs-sm:1.5rem;
+  --fs-display:6.25rem; --fs-head:4.6rem; --fs-title:2.75rem; --fs-body:2.1rem; --fs-sm:1.25rem;
   --small:max(.95rem,12px);   /* the label step: titles over sections, labels, credits, footer, buttons */
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -223,12 +223,11 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
 @media (max-width:760px){
   html{font-size:2.35vw}
   :root{--frame:.8rem;--cols:4;--margin:1.6rem;--gutter:1rem;--ov-wide:none}
-  :root{--fs-display:4.05rem;--fs-head:3.3rem;--fs-title:2.4rem;--fs-body:1.9rem;--fs-sm:1.45rem}
+  :root{--fs-display:4.05rem;--fs-head:3.3rem;--fs-title:2.4rem;--fs-body:1.9rem;--fs-sm:1.35rem}
   /* phones: roomier vertical spacing only; side spacing stays on the margins */
   .grid{row-gap:2.2rem}
   .fw-grid{row-gap:var(--frame)}
   .case{padding-top:5.2rem;padding-bottom:8.5rem;min-height:0;align-content:start}
-  .sec-title{padding-top:2.8rem;padding-bottom:1.4rem}
   .fw-panel h4{margin:2.4rem 0 2rem}
   .fw-link{margin-bottom:5rem}
   .case-boon .more{margin:1.4rem 0 1.2rem}
@@ -250,7 +249,6 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
   .case-620 .txt,.case-620 figure{grid-column:1/-1}
   .fw-card{grid-column:1/-1}
   .fw-panel h4{font-size:3.6rem}
-  .featured .sec-title{padding-top:5.5rem}
   /* phones: "View Case Study" straight under the copy, then the images */
   .case-boon h2{margin-bottom:0}
   .case-boon .more{order:1;margin:calc(var(--s1) - var(--gutter)) 0 calc(var(--s2) - var(--gutter))}
@@ -374,3 +372,30 @@ html.foot-in #nav{transform:translate(-50%,calc(100% + var(--frame) + 5rem))}   
   .foot-tag{margin-top:var(--s3)}
   .foot-c{padding-bottom:calc(var(--frame) + 4rem)}
 }
+
+/* =====================================================================
+   SPACING, LINES AND STYLES: one set of values for the whole site
+   --title-t / --title-b  padding above and below every section title
+   --in                   the gap from a divider line to the first thing under it (and side padding inside columns)
+   --sec                  the space at the foot of a section before the next divider
+   --line                 every divider: 1px, ink
+   ===================================================================== */
+:root{--title-t:var(--s2);--title-b:var(--s1);--in:var(--s2);--sec:var(--s4);--line:1px solid var(--ink)}
+@media (max-width:760px){:root{--title-t:2.8rem;--title-b:1.4rem;--in:2.6rem;--sec:8rem}}   /* phone titles: the tighter About Us gap Joe picked, now on every title */
+
+/* every section title: same padding, same line, and it stays at the top while its section scrolls */
+.sec-title{padding:var(--title-t) var(--margin) var(--title-b);border-bottom:var(--line)}
+.sec-title,#s-cases .sec-title{position:sticky;top:0;z-index:4;background:var(--cream)}
+/* a page's own top title (straight inside main, not in a section) scrolls away normally, so it never stacks on a section's */
+main > .sec-title{position:relative;top:auto}
+@media (max-width:760px){
+  .sec-title,#s-cases .sec-title{top:3.4rem}
+  main > .sec-title{top:auto}
+  .sec-title::before{content:'';position:absolute;left:0;right:0;bottom:100%;height:3.5rem;background:var(--cream)}
+}
+/* pills: one style everywhere, an ink outline (Featured Work fills them on hover) */
+.pills li{background:transparent;box-shadow:inset 0 0 0 1px currentColor;padding:.55em 1.15em;line-height:1.2}
+.fw-panel .pills li{padding:.55em 1.15em}
+/* columns under a divider start the same distance down */
+.fw-panel{padding:var(--in) var(--margin)}
+.fc{padding-top:var(--in)}

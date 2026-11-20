@@ -317,17 +317,15 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 .wd-count{position:absolute;right:var(--margin);top:calc(var(--split) + 1rem);display:flex;gap:1.2rem;font-size:var(--small);letter-spacing:-.02em}
 .wd-cnum{color:rgba(11,11,11,.55)}
 @media (max-width:760px){
-  /* phone: everything starts on the page margin, like the titles. The window is the full width (its lines hidden),
-     so the current name sits on the left and the next one slides in from the right; the line runs under the names,
-     the description sits under the line and the picture runs edge to edge below it */
-  .wd{--wl:var(--margin);--ww:calc(100% - 2 * var(--margin));--split:29%;--wd-bot:calc(var(--frame) + 4.4rem)}
-  .wd-win{border-color:transparent}
+  /* phone: the window layout (light grey guide lines), with the names starting on the window's left line
+     and the description sitting between the two lines, just above the names */
+  .wd{--wl:14%;--ww:72%;--split:42%;--wd-bot:calc(var(--frame) + 4.4rem)}
   .wd-row{font-size:2.9rem}
-  .wd-track span{text-align:left}
-  .wd-sharp{clip-path:none}
-  .wd-desc{top:calc(var(--split) + 1rem);left:var(--margin);right:var(--margin);width:auto;max-width:none;font-size:1.25rem}
-  .wd-pics{left:0;right:0;width:auto;top:calc(var(--split) + 6.6rem)}
-  .wd-count{top:calc(var(--split) - 2.9rem * 1.25 - 1.4rem);left:var(--margin);right:auto;gap:.8rem;font-size:var(--small)}
+  .wd-track span{text-align:left;padding-left:.9rem}
+  .wd-desc{top:auto;bottom:calc(100% - var(--split) + 4.6rem);left:calc(var(--wl) + .9rem);width:calc(var(--ww) - 1.8rem);right:auto;max-width:none}
+  .wd-count{top:calc(var(--split) + .6rem);left:var(--margin);right:auto;flex-direction:column;gap:.2rem;width:calc(var(--wl) - var(--margin) - .4rem);font-size:var(--small)}
+  .wd-cname{display:none}
+  .wd-cnum{white-space:nowrap}
 }
 @media (prefers-reduced-motion:reduce){.wd-desc{transition:none}}
 /* a line along the bottom of the section, where the pictures end */
@@ -433,20 +431,28 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 .lab,.cap,.facts,.ca-lab,.hv-lab,.st-no,.st-txt,.wd-count,.foot-cols,.pill-btn,.clock,.fader-count{font-size:var(--small);line-height:1.35}
 @media (max-width:760px){
   .wd-row{top:calc(var(--split) - 1.25em)}
-  .wd-count{top:calc(var(--split) - var(--fs-head) * 1.25 - 1.4rem)}
 }
 
-/* phone: more breathing room between the dividers */
+
+/* =====================================================================
+   SPACING on the sub-pages, from the same values (see style.css)
+   ===================================================================== */
+.cs-sec>.grid{padding-top:var(--in)}
+.cs-sec:not(.wd-sec):not(.ab-sec){padding-bottom:var(--sec)}
+.cs-brief .lab{margin-bottom:var(--in)}
+@media (min-width:761px){.cs-brief .lab{margin-bottom:0}}
+.hv{margin-top:var(--sec)}
+.hv-copy,.st{padding:var(--in) var(--margin)}
+.hv-lab{margin-bottom:var(--in)}
+.clients{padding-top:var(--in)}
+.wd-desc,.wd-count{top:calc(var(--split) + var(--in))}
+.ca-say{padding-top:var(--sec);padding-bottom:var(--sec)}
+/* What We Do's lines are dividers like every other: 1px ink */
+/* (the What We Do window and split lines stay light grey: they're guides inside the section, not dividers) */
 @media (max-width:760px){
-  .cs-sec>.grid{padding-top:var(--s3)}
-  .cs-brief .lab{margin-bottom:var(--s3)}
-  .cs-sec:not(.wd-sec):not(.ab-sec){padding-bottom:8rem}
-  .sec-title{padding-top:3.4rem;padding-bottom:1.8rem}
-  .hv{margin-top:var(--s4)}
-  .hv-copy{padding:var(--s3) var(--margin)}
-  .hv-lab{margin-bottom:var(--s2)}
-  .st{padding:var(--s3) var(--margin)}
-  .st-word{margin-top:var(--s4)}
-  .ca-say{padding-top:8rem;padding-bottom:8rem}
-  .clients{padding-top:var(--s3)}
+  .st-word{margin-top:var(--sec)}
+  .wd-desc{top:auto}
+  .wd-count{top:calc(var(--split) + .6rem)}
 }
+/* the held titles were set one by one before; the shared rule above now covers them */
+.wd-sec > .sec-title,.ab-sec > .sec-title{z-index:4}
