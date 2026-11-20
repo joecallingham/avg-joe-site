@@ -25,7 +25,7 @@
   --pad:var(--margin);
   /* the type scale: six sizes, each with its own leading. Everything on the site uses one of these */
   --fs-display:6.25rem; --fs-head:4.6rem; --fs-title:2.75rem; --fs-body:2.1rem; --fs-sm:1.25rem;
-  --small:max(.95rem,12px);   /* the label step: titles over sections, labels, credits, footer, buttons */
+  --small:max(.82rem,11px);   /* the label step: titles over sections, labels, credits, footer, buttons */
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{font-size:1vw;background:var(--cream);overscroll-behavior:none;scrollbar-width:none}
