@@ -298,19 +298,3 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .ca-state{font-size:3.6rem}
 }
 }
-
-/* ---------- Information: What We Do as the home page wheel (its words, line and cards use the home page styles) ---------- */
-.wd-run{position:relative}
-.wd-stick{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
-.wd-bg{position:absolute;inset:0;pointer-events:none;
-  background:
-    radial-gradient(55% 75% at -5% 45%,#8fc0dc 0%,rgba(143,192,220,.55) 35%,rgba(143,192,220,0) 72%),
-    radial-gradient(45% 40% at 50% 105%,#f8ebe1 0%,rgba(248,235,225,0) 70%);
-  animation:drift 14s ease-in-out infinite alternate}
-.wd-run #wheel-desc .dw{transition:opacity .5s cubic-bezier(.22,1,.36,1),transform .5s cubic-bezier(.22,1,.36,1)}
-.wd-run #wheel-desc .dw.pre{opacity:0;transform:translateY(.7em);transition:none}
-.wd-run #wheel-desc .dw.out{opacity:0;transform:translateY(-.4em);transition:opacity .18s ease-in,transform .18s ease-in}
-.wd-run .work{visibility:hidden;opacity:0;transform:translateY(24px) scale(.7);transition:opacity .22s ease-in,transform .22s ease-in,visibility 0s .22s}
-.wd-run .work.on{visibility:visible;opacity:1;transform:none;transition:opacity .45s ease-out,transform .6s cubic-bezier(.34,1.7,.64,1),visibility 0s}
-.wd-run #wheel-list li:focus-visible{outline:2px solid var(--ink);outline-offset:6px}
-@media (prefers-reduced-motion:reduce){.wd-bg{animation:none}.wd-run .work,.wd-run #wheel-desc .dw{transition:none}}
