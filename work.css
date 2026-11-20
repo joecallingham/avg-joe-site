@@ -262,6 +262,8 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 }
 
 /* ---------- Information: Craft & AI (spaced like About Us), then the statement ---------- */
+.ca-sec{border-top:1px solid var(--ink)}   /* the rule without a title; the label sits where About Us has its small line */
+.ca-sec .lab{font-weight:400}
 .ca-ai-row{position:relative}
 .ca-ai-row > *{position:relative;z-index:1}
 .ca-ai-row::after{content:'';position:absolute;inset:0;z-index:0;clip-path:inset(0 100% 0 0);transition:clip-path 1.4s cubic-bezier(.65,0,.35,1) .15s;background:
