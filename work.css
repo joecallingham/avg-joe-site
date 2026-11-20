@@ -122,7 +122,7 @@ html.page{overscroll-behavior:auto;--edge:calc(var(--s2) * .5)}
 html.cs-page{--page:var(--cream);--text:var(--ink)}
 .cs-page .sec-title,.cs-page .cs-next{border-color:var(--text);transition:border-color .6s}
 .cs-page .cap,.cs-page .facts dt,.cs-page .sec-title .hint,.cs-page .cs-next .lab,.cs-page .slider output{color:color-mix(in srgb,var(--text) 62%,transparent)}
-.cs-page .pills li,.cs-page .credit,.cs-page .fader-count{color:#0b0b0b}
+.cs-page .pills li,.cs-page .fader-count{color:#0b0b0b}
 .cs-page .pal-stage,.cs-page .tt-stage,.cs-page .model{--bg:var(--panel);--fg:var(--panel-ink);--tt-bg:var(--panel);--tt-fg:var(--panel-ink);transition:background .6s cubic-bezier(.2,.7,.2,1),color .6s}
 .cs-page .chip{background:color-mix(in srgb,var(--text) 10%,transparent);color:var(--text)}
 .cs-page .chip[aria-pressed="true"]{background:var(--text);color:var(--page)}
@@ -362,6 +362,12 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 .hv-half.dim .hv-pat{opacity:1}
 @media (max-width:760px){
   .ab-sec > .sec-title{top:3.4rem}
+  /* the strip above a held title is filled, so nothing scrolls through behind Avg and Joe */
+  .ab-sec > .sec-title::before,.wd-sec > .sec-title::before{content:'';position:absolute;left:0;right:0;bottom:100%;height:3.5rem;background:var(--cream)}
+  /* the panel holds still while you scroll: Craft opens, then AI (hv.js) */
+  .hv-wrap{height:220vh;height:220svh}
+  .hv{position:sticky;margin-top:var(--s3)}
+  .hv-half{cursor:default}
   .hv{grid-template-columns:1fr;grid-template-rows:1fr 1fr}
   .hv-half + .hv-half{border-left:0;border-top:1px solid var(--ink)}
   .hv-txt{font-size:2.1rem}

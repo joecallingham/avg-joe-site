@@ -174,7 +174,8 @@ html.intro-run .nb{transition:none}
 .case{--edge:calc(var(--s2) * .5)}   /* how far the lozenges and the credit sit in from the image edge */
 .shot{position:relative;display:block}
 .shot>img{display:block}
-.credit{position:absolute;right:var(--edge);bottom:var(--edge);font-size:calc(var(--small) * .8);letter-spacing:-.02em;line-height:1;padding:.42em .8em .46em;border-radius:99px;background:rgba(255,255,255,.82);color:var(--ink);pointer-events:none;white-space:nowrap}
+.credit{position:absolute;right:var(--edge);bottom:var(--edge);font-size:var(--small);letter-spacing:-.02em;line-height:1;color:#fff;pointer-events:none;white-space:nowrap}   /* plain text; credits.js turns it black on a light corner */
+.credit.on-light{color:var(--ink)}
 .case figure .pills{position:absolute;left:var(--edge);top:var(--edge);right:var(--edge);z-index:1}
 .sys{transition:color .6s}
 .case-620:hover .sys{color:#3d6b12}
