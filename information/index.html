@@ -33,21 +33,36 @@
     </div>
   </section>
 
-  <section class="cs-sec">
-    <h2 class="sec-title"><span>Craft &amp; AI</span></h2>
-    <div class="grid split">
-      <div class="col rv">
-        <h3>Craft builds your brand</h3>
-        <p class="def">The fun stuff. A brand made from scratch to show who you are.</p>
-        <p class="txt">Craft is understanding a business and building it from scratch with ideas, taste and direction. It's the human eye, the human connection and the final sign-off.</p>
+  <!-- Craft & AI: a pinned scroll run. The statement, then blue slides over (holes onto red) with the craft copy,
+       then the photo slides in under the blue and the blue's text side wipes away to show the AI copy -->
+  <section class="ca-run" id="ca-run" aria-label="Craft and AI">
+    <div class="ca-stick">
+      <p class="ca-state"><span class="ai">AI</span> <img class="ca-cow" src="/img/cow.jpg" alt="" width="440" height="322"> is the fastest assistant we've ever had. It just <span class="ca-blob" aria-hidden="true"></span> <span class="ca-never" data-rot data-rot-auto>never</span> gets the final say.</p>
+      <div class="ca-red" aria-hidden="true"></div>
+      <div class="ca-img">
+        <img class="ca-photo" src="/img/mushroom-wide.jpg" alt="" width="2000" height="1064">
+        <div class="ca-side ca-dark">
+          <p class="ca-lab">What we mean by AI</p>
+          <p class="ca-copy">The busy stuff <span class="ai">AI</span> handles. Automated content, brand rules applied, curated tools, all ticking along in the background. Which leaves you free to run the place.</p>
+        </div>
       </div>
-      <div class="col rv">
-        <h3><span class="ai">AI</span> keeps it running</h3>
-        <p class="def">After the build, it takes the busywork off your hands.</p>
-        <p class="txt">AI is promotion, research and testing that never stop. It's content adapted, guidelines applied and workflows that run themselves.</p>
+      <div class="ca-blue">
+        <div class="ca-side ca-bl">
+          <p class="ca-lab">What we mean by Craft</p>
+          <p class="ca-copy">The good stuff we do by hand. We get to know you, find the idea and <span class="ca-craft" data-rot data-rot-auto>craft</span> a brand that feels like you, checked by people who care.</p>
+        </div>
+        <svg class="ca-holes" viewBox="1000 0 1000 1125" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <defs><mask id="ca-mask" maskUnits="userSpaceOnUse" x="-1000" y="-1000" width="4000" height="3125">
+            <rect x="-1000" y="-1000" width="4000" height="3125" fill="#fff"/>
+            <g class="h"><ellipse cx="1510" cy="265" rx="400" ry="190" transform="rotate(25 1510 265)" fill="#000"/></g>
+            <g class="h"><ellipse cx="1137" cy="450" rx="52" ry="118" transform="rotate(8 1137 450)" fill="#000"/></g>
+            <g class="h"><ellipse cx="1498" cy="752" rx="205" ry="375" transform="rotate(-36 1498 752)" fill="#000"/></g>
+            <g class="h"><ellipse cx="1811" cy="638" rx="120" ry="120" transform="rotate(0 1811 638)" fill="#000"/></g>
+            <g class="h"><ellipse cx="1167" cy="918" rx="153" ry="153" transform="rotate(0 1167 918)" fill="#000"/></g>
+          </mask></defs>
+          <rect x="-1000" y="-1000" width="4000" height="3125" fill="var(--ca-blue)" mask="url(#ca-mask)"/>
+        </svg>
       </div>
-      <p class="pull rv">Craft builds the brand. AI takes the busywork off your hands. You get on with running your business.</p>
-      <ul class="pills ticks rv"><li>We tell you where AI was used</li><li>Your data stays yours</li><li>If it's better by hand, it's done by hand</li></ul>
     </div>
   </section>
 
@@ -120,6 +135,7 @@
 
 <script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
 <script src="/page.js"></script>
+<script src="/information/ca.js"></script>
 <script>
   // the studio clock: UK time, with a mood to match the hour
   (() => {

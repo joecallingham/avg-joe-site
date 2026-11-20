@@ -72,6 +72,7 @@
     const reset = () => $$('.hl', label).forEach(s => { s.style.fontFamily = ''; s.style.fontSize = ''; delete s.dataset.f; });
     trigger.addEventListener('mouseenter', () => { if (RM || TOUCH) return; clearInterval(timer); tick(); timer = setInterval(tick, 90); });
     trigger.addEventListener('mouseleave', () => { clearInterval(timer); reset(); });
+    return { start: () => { if (RM) return; clearInterval(timer); timer = setInterval(tick, 220); }, stop: () => { clearInterval(timer); reset(); } };
   }
   const rotators = $$('[data-rot]').map(a => {
     let lab = a.querySelector('.say, .nbt');
@@ -82,7 +83,9 @@
       lab = document.createElement('span'); lab.className = 'nbt'; if (link) lab.setAttribute('aria-hidden', 'true'); lab.textContent = word;
       a.textContent = ''; a.appendChild(lab);
     }
-    rotateOnHover(a.closest('[data-rot-hover]') || a, lab);
+    const ctl = rotateOnHover(a.closest('[data-rot-hover]') || a, lab);
+    // data-rot-auto: keep cycling the faces while the word is on screen (not just on hover)
+    if (a.hasAttribute('data-rot-auto')) new IntersectionObserver(([e]) => e.isIntersecting ? ctl.start() : ctl.stop()).observe(a);
     return lab;
   });
 
