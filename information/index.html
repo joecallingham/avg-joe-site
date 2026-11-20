@@ -58,16 +58,36 @@
 
   <section class="cs-sec">
     <h2 class="sec-title"><span>What We Do</span></h2>
-    <ul class="svc">
-      <li class="grid rv" data-rot-hover><span class="n" data-rot>Strategy</span><span class="d">We dig into your audience and your market first, so every creative call has a reason behind it.</span></li>
-      <li class="grid rv" data-rot-hover><span class="n" data-rot>Branding</span><span class="d">We find what makes you you, then shape it into a name, a mark and a voice people remember.</span></li>
-      <li class="grid rv" data-rot-hover><span class="n" data-rot>Visual Identity</span><span class="d">Logo, type, colour and imagery pulled into one kit your team can use without us.</span></li>
-      <li class="grid rv" data-rot-hover><span class="n" data-rot>Design</span><span class="d">We curate every typeface, colour and grid around your brand, then build it into a design system that grows with you.</span></li>
-      <li class="grid rv" data-rot-hover><span class="n" data-rot>Art Direction</span><span class="d">We set the look of every shoot, campaign and drop, so each frame feels like it came from the same hand.</span></li>
-      <li class="grid rv" data-rot-hover><span class="n" data-rot>AI Content</span><span class="d">We direct AI like a camera crew, making imagery and film that feels crafted, at the pace you post.</span></li>
-      <li class="grid rv" data-rot-hover><span class="n" data-rot>Packaging</span><span class="d">Packs that earn their spot on the shelf, from structure and print to the moment they're opened.</span></li>
-      <li class="grid rv" data-rot-hover><span class="n" data-rot>Digital</span><span class="d">Websites, apps and the systems behind them that quietly do the admin for you.</span></li>
-    </ul>
+    <!-- after santalarch.com: pinned; the names slide through the window column, each picture wipes in, the line swaps -->
+    <div class="wd" id="wd">
+      <ul class="wd-list sr-only">
+        <li><b>Strategy</b> <span>We dig into your audience and your market first, so every creative call has a reason behind it.</span></li>
+        <li><b>Branding</b> <span>We find what makes you you, then shape it into a name, a mark and a voice people remember.</span></li>
+        <li><b>Visual Identity</b> <span>Logo, type, colour and imagery pulled into one kit your team can use without us.</span></li>
+        <li><b>Design</b> <span>We curate every typeface, colour and grid around your brand, then build it into a design system that grows with you.</span></li>
+        <li><b>Art Direction</b> <span>We set the look of every shoot, campaign and drop, so each frame feels like it came from the same hand.</span></li>
+        <li><b>AI Content</b> <span>We direct AI like a camera crew, making imagery and film that feels crafted, at the pace you post.</span></li>
+        <li><b>Packaging</b> <span>Packs that earn their spot on the shelf, from structure and print to the moment they're opened.</span></li>
+        <li><b>Digital</b> <span>Websites, apps and the systems behind them that quietly do the admin for you.</span></li>
+      </ul>
+      <div class="wd-stick" aria-hidden="true">
+        <div class="wd-win"></div>
+        <div class="wd-row wd-faint"><div class="wd-track"></div></div>
+        <div class="wd-row wd-sharp"><div class="wd-track"></div></div>
+        <div class="wd-pics">
+          <div class="wd-pic"><img src="/img/work/bison/boards/b2.jpg" alt="" loading="lazy"><span class="credit">Bison Coffee</span></div>
+          <div class="wd-pic"><img src="/img/bison.jpg" alt="" loading="lazy"><span class="credit">Bison Coffee</span></div>
+          <div class="wd-pic"><img src="/img/work/bison/gl/p004.jpg" alt="" loading="lazy"><span class="credit">Bison Coffee</span></div>
+          <div class="wd-pic"><img src="/img/boon-sign.jpg" alt="" loading="lazy"><span class="credit">Brewed by Boon</span></div>
+          <div class="wd-pic"><img src="/img/the-hunna-hero.jpg" alt="" loading="lazy"><span class="credit">The Hunna</span></div>
+          <div class="wd-pic"><img src="/img/mushroom.jpg" alt="" loading="lazy"><span class="credit">Out of Office</span></div>
+          <div class="wd-pic"><img src="/img/work/bison/bag.jpg" alt="" loading="lazy"><span class="credit">Bison Coffee</span></div>
+          <div class="wd-pic"><img src="/img/620.jpg" alt="" loading="lazy"><span class="credit">620 Tennis Multicamp</span></div>
+        </div>
+        <p class="wd-desc"></p>
+        <p class="wd-count"><span class="wd-cname"></span><span class="wd-cnum"></span></p>
+      </div>
+    </div>
     </div>
   </section>
 
@@ -138,6 +158,7 @@
 
 <script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
 <script src="/page.js"></script>
+<script src="/information/wd.js"></script>
 <script src="/footer.js"></script>
 <script>
   // the studio clock: UK time, with a mood to match the hour
