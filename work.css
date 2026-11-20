@@ -416,3 +416,22 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 /* What We Stand For uses the same four ruled columns as how we work */
 
 .vals4 .st-word{font-size:clamp(2rem,2.6vw,3.8rem);line-height:1.04}
+
+/* ---------- type scale: sub-pages (same six steps, same leading per step) ---------- */
+/* display */
+.ca-state,.wk-head h1,.hv-word{font-size:var(--fs-display);line-height:1.04;letter-spacing:-.055em}
+/* headline */
+.info-hero h1,.cs-hero h1,.hello .big-line,.cs-next a.big,.cats li button,.wd-row,.hv-txt{font-size:var(--fs-head);line-height:1.04;letter-spacing:-.055em}
+.wd-row{height:1.25em;line-height:1.25}
+/* title */
+.st-word,.vals4 .st-word{font-size:var(--fs-title);line-height:1.06;letter-spacing:-.05em}
+/* body */
+.cs-brief .copy,.clients li{font-size:var(--fs-body);line-height:1.15;letter-spacing:-.045em}
+/* small */
+.wd-desc,.hv-say{font-size:var(--fs-sm);line-height:1.3;letter-spacing:-.03em}
+/* label */
+.lab,.cap,.facts,.ca-lab,.hv-lab,.st-no,.st-txt,.wd-count,.foot-cols,.pill-btn,.clock,.fader-count{font-size:var(--small);line-height:1.35}
+@media (max-width:760px){
+  .wd-row{top:calc(var(--split) - 1.25em)}
+  .wd-count{top:calc(var(--split) - var(--fs-head) * 1.25 - 1.4rem)}
+}

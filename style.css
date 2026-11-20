@@ -23,7 +23,9 @@
   --cols:12; --margin:1.25rem; --gutter:1.25rem;
   --s1:.75rem; --s2:1.5rem; --s3:3rem; --s4:6rem;
   --pad:var(--margin);
-  --small:max(.8rem,11px);
+  /* the type scale: six sizes, each with its own leading. Everything on the site uses one of these */
+  --fs-display:6.25rem; --fs-head:4.6rem; --fs-title:2.75rem; --fs-body:2.1rem; --fs-sm:1.5rem;
+  --small:max(.95rem,12px);   /* the label step: titles over sections, labels, credits, footer, buttons */
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{font-size:1vw;background:var(--cream);overscroll-behavior:none;scrollbar-width:none}
@@ -221,6 +223,7 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
 @media (max-width:760px){
   html{font-size:2.35vw}
   :root{--frame:.8rem;--cols:4;--margin:1.6rem;--gutter:1rem;--ov-wide:none}
+  :root{--fs-display:4.05rem;--fs-head:3.3rem;--fs-title:2.4rem;--fs-body:1.9rem;--fs-sm:1.45rem}
   /* phones: roomier vertical spacing only; side spacing stays on the margins */
   .grid{row-gap:2.2rem}
   .fw-grid{row-gap:var(--frame)}
@@ -349,3 +352,25 @@ html.foot-in #nav{transform:translate(-50%,calc(100% + var(--frame) + 5rem))}   
 #s-cases .sec-title{position:sticky;top:0;z-index:4;background:var(--cream)}
 @media (max-width:760px){#s-cases .sec-title{top:3.4rem}
   #s-cases .sec-title::before{content:'';position:absolute;left:0;right:0;bottom:100%;height:3.5rem;background:var(--cream)}}
+
+/* ---------- type scale: home page and shared parts ---------- */
+.big{font-size:var(--fs-display);line-height:1.04}
+#wheel-list li{font-size:var(--fs-head)}
+.case-boon h2,.case-620 h2,.case h2{font-size:var(--fs-head);line-height:1.04;letter-spacing:-.055em}
+.fw-panel h4{font-size:var(--fs-title);line-height:1.06;letter-spacing:-.05em}
+.line{font-size:var(--fs-sm);line-height:1.3;letter-spacing:-.03em}
+.sec-title{font-size:var(--small);line-height:1.35}
+.credit,.fader-count{font-size:var(--small)}
+.fc h3{font-size:inherit;line-height:inherit}
+/* the home intro line is a headline on phones (it always was), small on desktop */
+@media (max-width:760px){.line{font-size:var(--fs-head);line-height:1.18}}
+/* phone footer: more room between the blocks */
+@media (max-width:760px){
+  .foot-mark{padding-top:var(--s4);padding-bottom:.18em}
+  .foot-cols{row-gap:var(--s3);padding-top:var(--s2)}
+  .fc{padding-top:0}
+  .fc h3{margin-bottom:.7em}
+  .fc-side{padding-top:var(--s2)}
+  .foot-tag{margin-top:var(--s3)}
+  .foot-c{padding-bottom:calc(var(--frame) + 4rem)}
+}
