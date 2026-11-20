@@ -290,10 +290,10 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
 .all-work{font-size:var(--small);letter-spacing:-.02em}
 .all-work:hover{text-decoration:underline;text-underline-offset:.2em}
 /* "Find out more": a big black lozenge on its own layer under the big sentence; main.js places it and moves it at its own pace */
-.more-pill{position:absolute;left:50%;top:0;z-index:6;visibility:hidden;display:inline-block;height:4.2rem;line-height:4.2rem;padding:0 1.9em;border-radius:99rem;
-  background:var(--ink);color:var(--cream);font-size:1.55rem;letter-spacing:-.02em;white-space:nowrap;will-change:transform}
+.more-pill{position:absolute;left:50%;top:0;z-index:6;visibility:hidden;display:inline-block;height:3.5rem;line-height:3.5rem;padding:0 1.7em;border-radius:99rem;
+  background:var(--ink);color:var(--cream);font-size:1.3rem;letter-spacing:-.02em;white-space:nowrap;will-change:transform}
 .more-pill:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
-@media (max-width:760px){.more-pill{height:4.8rem;line-height:4.8rem;font-size:1.75rem}}
+@media (max-width:760px){.more-pill{height:4.1rem;line-height:4.1rem;font-size:1.5rem}}
 /* the services wheel sits over the big sentence while it fades in: only its words and work cards take clicks */
 #s-wheel{pointer-events:none}
 #wheel-list li{pointer-events:auto}

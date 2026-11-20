@@ -394,17 +394,17 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 .hv-half.dim .hv-word,.hv-half[data-k=ai].dim .hv-word{opacity:0;filter:blur(18px)}
 
 /* ---------- Information: how we work, four columns under What We Do ---------- */
-.steps4{display:grid;grid-template-columns:repeat(4,1fr);height:calc(100vh - 3.5rem);height:calc(100svh - 3.5rem);border-bottom:1px solid var(--ink);list-style:none;margin:0;padding:0}
-.st{position:relative;padding:2.4rem var(--margin)}
+.steps4{display:grid;grid-template-columns:repeat(4,1fr);height:calc(50vh - 1.75rem);height:calc(50svh - 1.75rem);border-bottom:1px solid var(--ink);list-style:none;margin:0;padding:0}
+.st{position:relative;display:flex;flex-direction:column;padding:2.4rem var(--margin)}
 .st + .st{border-left:1px solid var(--ink)}
 .st-no{font-size:var(--small);letter-spacing:-.02em;color:rgba(11,11,11,.55)}
-.st-word{position:absolute;inset:0;display:grid;place-items:center;margin:0;font-weight:500;font-size:clamp(2.6rem,3.9vw,5.6rem);letter-spacing:-.05em;line-height:1;pointer-events:none}
-.st-txt{position:absolute;left:var(--margin);right:var(--margin);bottom:calc(var(--frame) + 3.6rem);font-size:var(--small);line-height:1.35;letter-spacing:-.02em;max-width:20rem}
+/* the word sits left, just above its line of text, at the foot of the column */
+.st-word{margin:auto 0 .8rem;font-weight:500;font-size:clamp(2.2rem,3.2vw,4.6rem);letter-spacing:-.05em;line-height:1}
+.st-txt{font-size:var(--small);line-height:1.35;letter-spacing:-.02em;max-width:20rem;min-height:2.7em}   /* two lines kept, so the titles line up across the columns */
 @media (max-width:760px){
   .steps4{grid-template-columns:1fr 1fr;height:auto}
-  .st{min-height:62vw;padding:1.4rem var(--margin)}
+  .st{min-height:31vw;padding:1.4rem var(--margin)}
   .st:nth-child(3){border-left:0}
   .st:nth-child(n+3){border-top:1px solid var(--ink)}
-  .st-word{font-size:2.4rem}
-  .st-txt{bottom:1.2rem}
+  .st-word{font-size:2.2rem;margin-top:1.6rem}
 }
