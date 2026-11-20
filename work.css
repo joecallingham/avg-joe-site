@@ -322,7 +322,8 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .wd{--wl:14%;--ww:72%;--split:42%;--wd-bot:calc(var(--frame) + 4.4rem)}
   .wd-row{font-size:2.9rem}
   .wd-track span{text-align:left;padding-left:.9rem}
-  .wd-desc{top:auto;bottom:calc(100% - var(--split) + 4.6rem);left:calc(var(--wl) + .9rem);width:calc(var(--ww) - 1.8rem);right:auto;max-width:none}
+  /* the description sits at the top of the stage, just under the held What We Do title, between the window lines */
+  .wd-desc{top:calc(3.4rem + var(--title-t) + var(--title-b) + 1.75rem + var(--in));bottom:auto;left:calc(var(--wl) + .9rem);width:calc(var(--ww) - 1.8rem);right:auto;max-width:none}
   .wd-count{top:calc(var(--split) + .6rem);left:var(--margin);right:auto;flex-direction:column;gap:.2rem;width:calc(var(--wl) - var(--margin) - .4rem);font-size:var(--small)}
   .wd-cname{display:none}
   .wd-cnum{white-space:nowrap}
@@ -451,8 +452,9 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 /* (the What We Do window and split lines stay light grey: they're guides inside the section, not dividers) */
 @media (max-width:760px){
   .st-word{margin-top:var(--sec)}
-  .wd-desc{top:auto}
   .wd-count{top:calc(var(--split) + .6rem)}
 }
 /* the held titles were set one by one before; the shared rule above now covers them */
 .wd-sec > .sec-title,.ab-sec > .sec-title{z-index:4}
+/* phone: What We Do's description at the top of the stage, under the held title, between the window lines */
+@media (max-width:760px){.wd .wd-desc{top:calc(3.4rem + var(--title-t) + var(--title-b) + 1.75rem + var(--in));bottom:auto}}
