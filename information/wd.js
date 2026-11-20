@@ -7,12 +7,14 @@
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const items = [...run.querySelectorAll('.wd-list li')].map(li => ({ name: li.querySelector('b').textContent, desc: li.querySelector('span').textContent }));
   const N = items.length, PER = 0.6;          // screens of scrolling per service
-  run.style.height = (100 + (N - 1) * PER * 100 + 40) + 'vh';
+  const INTRO = 0.9;                          // screens of scrolling while everything slides in from the right
+  run.style.height = (100 + (INTRO + (N - 1) * PER) * 100 + 40) + 'vh';
 
   const stick = run.querySelector('.wd-stick');
   const tracks = [...run.querySelectorAll('.wd-track')];
   tracks.forEach(t => t.replaceChildren(...items.map(it => { const s = document.createElement('span'); s.textContent = it.name; return s; })));
   const pics = [...run.querySelectorAll('.wd-pic')];
+  const winEl = run.querySelector('.wd-win'), rule = run.querySelector('.wd-rule'), picsBox = run.querySelector('.wd-pics'), countEl = run.querySelector('.wd-count');
   const desc = run.querySelector('.wd-desc'), cName = run.querySelector('.wd-cname'), cNum = run.querySelector('.wd-cnum');
   const pad = n => String(n).padStart(2, '0');
 
@@ -34,10 +36,20 @@
     requestAnimationFrame(frame);
     const r = run.getBoundingClientRect();
     if (r.bottom < 0 || r.top > innerHeight) return;
-    const p = Math.max(0, Math.min(N - 1, -r.top / (innerHeight * PER)));
-    if (p === last) return;
-    last = p;
-    const x = win - gap / 2 - p * gap;
+    const s = -r.top / innerHeight;                                   // screens scrolled into the section
+    const q = Math.max(0, Math.min(1, (s + 0.35) / (INTRO + 0.35)));   // entry: starts just before it pins
+    const p = Math.max(0, Math.min(N - 1, (s - INTRO) / PER));
+    const key = q * 100 + p;
+    if (key === last) return;
+    last = key;
+    // entry: the names, the window's lines, the picture and the copy all arrive from the right
+    const e = RM ? 1 : 1 - Math.pow(1 - q, 3), off = (1 - e) * innerWidth;
+    const x = win - gap / 2 - p * gap + off;
+    winEl.style.transform = `translate3d(${(off * 0.8).toFixed(1)}px,0,0)`;
+    rule.style.transform = `scaleX(${e.toFixed(4)})`;
+    picsBox.style.clipPath = `inset(0 0 0 ${((1 - e) * 100).toFixed(2)}%)`;
+    picsBox.style.transform = `translate3d(${(off * 0.35).toFixed(1)}px,0,0)`;
+    [desc, countEl].forEach((el, k) => { el.style.translate = `${(off * (0.6 + k * 0.2)).toFixed(1)}px 0`; el.style.opacity = e.toFixed(3); });
     tracks.forEach(t => t.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`);
     // picture i wipes in from the right over picture i-1 as p goes from i-1 to i
     pics.forEach((im, i) => { const f = i === 0 ? 1 : Math.max(0, Math.min(1, p - (i - 1))); im.style.clipPath = `inset(0 0 0 ${((1 - f) * 100).toFixed(2)}%)`; });
