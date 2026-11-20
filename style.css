@@ -16,7 +16,7 @@
 @font-face{font-family:"snell";src:url(fonts/snell-regular.woff2) format("woff2");font-display:swap}
 
 :root{
-  --cream:#f1eee7; --ink:#0b0b0b; --white:#fff;
+  --cream:#f1eee7; --notch-bg:#f7f5f0;   /* the notch and bottom bar: a touch lighter than the page */ --ink:#0b0b0b; --white:#fff;
   --frame:.625rem;
   /* grid: one system for the whole site. Content edges sit on --margin; columns are split by --gutter;
      vertical gaps use the --s steps only. Press G on the page to see the grid. */
@@ -200,11 +200,11 @@ html.intro-run .nb{transition:none}
 /* one soft shape: big rounded shoulders that flare out into the bottom edge */
 .notch{position:relative;width:29rem;height:2.6rem;display:flex;align-items:center;justify-content:center;gap:1.6rem;padding-top:.3rem}
 /* a solid cream bar along the bottom edge, so the notch's curves run into it (over everything, like the notch) */
-#frame-bottom{position:fixed;left:0;right:0;bottom:0;height:var(--frame);background:var(--cream);z-index:49;pointer-events:none}
+#frame-bottom{position:fixed;left:0;right:0;bottom:0;height:var(--frame);background:var(--notch-bg);z-index:49;pointer-events:none}
 html.intro-dark #frame-bottom{background:#0b0b0b}
 /* the notch: a solid cream shape over everything, reaching down to the screen edge */
 .notch-fill{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;z-index:-1}
-.notch-fill path{fill:var(--cream)}
+.notch-fill path{fill:var(--notch-bg)}
 html.intro-dark .notch-fill path{fill:#0b0b0b}
 .notch>.nb{position:relative}
 /* three plain buttons; the middle one changes its words with where you are */
