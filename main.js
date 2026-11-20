@@ -349,7 +349,7 @@
     // settles as the sentence does, then trails and fades as the sentence leaves, so the two never move as one block
     const lastLn = lines[lines.length - 1].getBoundingClientRect();
     // (the lines are parked 0.45em low at this point, so take that back off)
-    more.style.top = (lastLn.bottom - P.bigFs * 0.45 + P.bigFs * (matchMedia('(max-width:760px)').matches ? 1.5 : 1.15)) + 'px';
+    more.style.top = (lastLn.bottom - P.bigFs * 0.45 + P.bigFs * (matchMedia('(max-width:760px)').matches ? 1.2 : 0.9)) + 'px';
     gsap.set(more, { xPercent: -50, y: vh * 0.55, autoAlpha: 0 });
     ft(more, { y: vh * 0.55 }, { y: 0 }, 2.35, { duration: 0.65 });
     ft(more, { autoAlpha: 0 }, { autoAlpha: 1 }, 2.55, { duration: 0.35 });
