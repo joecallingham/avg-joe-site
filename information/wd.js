@@ -7,8 +7,9 @@
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const items = [...run.querySelectorAll('.wd-list li')].map(li => ({ name: li.querySelector('b').textContent, desc: li.querySelector('span').textContent }));
   const N = items.length, PER = 0.6;          // screens of scrolling per service
-  const INTRO = 0.9;                          // screens of scrolling while everything slides in from the right
-  run.style.height = (100 + (INTRO + (N - 1) * PER) * 100 + 40) + 'vh';
+  // everything slides in from the right while the section is still coming up the screen, so once it holds,
+  // every bit of scrolling turns a service, and it lets go as soon as the last one is in (no dead scroll either end)
+  run.style.height = (100 + (N - 1) * PER * 100 + 8) + 'vh';
 
   const stick = run.querySelector('.wd-stick');
   const tracks = [...run.querySelectorAll('.wd-track')];
@@ -37,8 +38,8 @@
     const r = run.getBoundingClientRect();
     if (r.bottom < 0 || r.top > innerHeight) return;
     const s = -r.top / innerHeight;                                   // screens scrolled into the section
-    const q = Math.max(0, Math.min(1, (s + 0.35) / (INTRO + 0.35)));   // entry: starts just before it pins
-    const p = Math.max(0, Math.min(N - 1, (s - INTRO) / PER));
+    const q = Math.max(0, Math.min(1, (s + 0.85) / 0.85));            // entry: from 85% of a screen before it holds
+    const p = Math.max(0, Math.min(N - 1, s / PER));
     const key = q * 100 + p;
     if (key === last) return;
     last = key;
