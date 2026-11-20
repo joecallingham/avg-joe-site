@@ -336,10 +336,8 @@ html.foot-in #nav{transform:translate(-50%,calc(100% + var(--frame) + 5rem))}   
 .fw-grid{padding:0;gap:0;column-gap:0;border-bottom:1px solid var(--ink)}
 .fw-card{background:transparent;color:var(--ink);transition:background-color .45s ease,color .45s ease}
 .fw-card + .fw-card{border-left:1px solid var(--ink)}
-.fw-panel .pills li{background:transparent;box-shadow:inset 0 0 0 1px var(--ink);transition:background-color .45s ease}
 @media (hover:hover){
   .fw-card:hover{background:var(--fw-bg);color:var(--fw-ink)}
-  .fw-card:hover .fw-panel .pills li{background:rgba(255,255,255,.5);box-shadow:none}
 }
 @media (max-width:760px){
   .fw-grid{row-gap:0}
@@ -394,8 +392,12 @@ main > .sec-title{position:relative;top:auto}
   .sec-title::before{content:'';position:absolute;left:0;right:0;bottom:100%;height:3.5rem;background:var(--cream)}
 }
 /* pills: one style everywhere, an ink outline (Featured Work fills them on hover) */
-.pills li{background:transparent;box-shadow:inset 0 0 0 1px currentColor;padding:.55em 1.15em;line-height:1.2}
+.pills li{background:#fbf9f5;color:var(--ink);box-shadow:none;padding:.55em 1.15em;line-height:1.2}   /* solid off-white everywhere */
 .fw-panel .pills li{padding:.55em 1.15em}
 /* columns under a divider start the same distance down */
 .fw-panel{padding:var(--in) var(--margin)}
 .fc{padding-top:var(--in)}
+/* Featured Work: the pills sit over the photo, top left, as on the case studies; View Case Study drops to the foot */
+.fw-img{position:relative;--edge:calc(var(--s2) * .5)}
+.fw-img .pills{position:absolute;left:var(--edge);top:var(--edge);right:var(--edge);margin:0;z-index:1}
+.fw-link{margin-top:auto;margin-bottom:0}

@@ -122,7 +122,7 @@ html.page{overscroll-behavior:auto;--edge:calc(var(--s2) * .5)}
 html.cs-page{--page:var(--cream);--text:var(--ink)}
 .cs-page .sec-title,.cs-page .cs-next{border-color:var(--text);transition:border-color .6s}
 .cs-page .cap,.cs-page .facts dt,.cs-page .sec-title .hint,.cs-page .cs-next .lab,.cs-page .slider output{color:color-mix(in srgb,var(--text) 62%,transparent)}
-.cs-page .pills li,.cs-page .fader-count{color:#0b0b0b}
+.cs-page .fader-count{color:#0b0b0b}
 .cs-page .pal-stage,.cs-page .tt-stage,.cs-page .model{--bg:var(--panel);--fg:var(--panel-ink);--tt-bg:var(--panel);--tt-fg:var(--panel-ink);transition:background .6s cubic-bezier(.2,.7,.2,1),color .6s}
 .cs-page .chip{background:color-mix(in srgb,var(--text) 10%,transparent);color:var(--text)}
 .cs-page .chip[aria-pressed="true"]{background:var(--text);color:var(--page)}
