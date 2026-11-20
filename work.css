@@ -289,12 +289,12 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 [data-lines].in .lw{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){[data-lines] .lw{opacity:1;transform:none;transition:none}.ca-grad{clip-path:none}.ca-grad::before{animation:none}}
 .ca-say{min-height:100vh;min-height:100svh;display:grid;place-items:center;padding:var(--s4) 8vw}
-.ca-state{text-align:center;font-weight:500;font-size:4.6rem;line-height:1.04;letter-spacing:-.055em}   /* same as the hero line */
+.ca-state{text-align:center;font-weight:500;font-size:clamp(2.6rem,6.4vw,8.2rem);line-height:1.08;letter-spacing:-.055em}
 .ca-cow{display:inline-block;height:.86em;width:auto;vertical-align:-.06em;margin:0 .06em}
 .ca-blob{display:inline-block;width:2.1em;height:.92em;vertical-align:-.08em;border-radius:70% 0 70% 0/100% 0 100% 0;
   background:radial-gradient(circle at 42% 18%,#ff4400 0,#f4683a 30%,#8a7c9c 62%,#2f80b8 100%)}
 @media (max-width:760px){
   .ca-say{min-height:80svh;padding:var(--s4) 1.2rem}
-  .ca-state{font-size:3.3rem}
+  .ca-state{font-size:3.6rem}
 }
 }
