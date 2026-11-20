@@ -408,3 +408,6 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .st:nth-child(n+3){border-top:1px solid var(--ink)}
   .st-word{font-size:2.2rem;margin-top:1.6rem}
 }
+/* What We Stand For uses the same four ruled columns as how we work */
+
+.vals4 .st-word{font-size:clamp(2rem,2.6vw,3.8rem);line-height:1.04}
