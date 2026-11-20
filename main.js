@@ -54,11 +54,12 @@
 
   const el = {
     avg: $('#logo-avg'), joe: $('#logo-joe'), line: $('#s-line'), slot1: $('#slot1'), hero: $('#hero'),
-    big: $('#s-big'), slot2: $('#slot2'), wheel: $('#s-wheel'), wbg: $('#wheel-bg'), list: $('#wheel-list'),
+    more: $('#more'), big: $('#s-big'), slot2: $('#slot2'), wheel: $('#s-wheel'), wbg: $('#wheel-bg'), list: $('#wheel-list'),
     works: $('#works'), cases: $('#s-cases'), veil: $('#veil'), say: $('.say'),
     notch: $('.notch'),
   };
 
+  const more = el.more;
   const SPIN = 1 / WS;                // wheel speed: words per screen of scrolling, used everywhere
   const wp = { v: -SPIN };
   const rem = () => parseFloat(getComputedStyle(document.documentElement).fontSize);
@@ -281,7 +282,7 @@
     document.documentElement.style.setProperty('--vhs', vh + 'px');
     const vs = SVH(); document.documentElement.style.setProperty('--vsm', vs + 'px');
     el.slot1.style.removeProperty('--w'); gsap.set(el.slot1, { clearProps: '--w' });
-    gsap.set([el.avg, el.joe, el.line, el.big, ...$$('.big .ln')], { clearProps: 'transform' });
+    gsap.set([el.avg, el.joe, el.line, el.big, ...$$('.big .ln'), more], { clearProps: 'transform' });
     const rect = n => { const b = n.getBoundingClientRect(); return { x: b.left, y: b.top, width: b.width, height: b.height }; };
     el.slot1.style.setProperty('--w', 0); const s0 = rect(el.slot1);
     el.slot1.style.setProperty('--w', 1); const s1 = rect(el.slot1);
@@ -344,9 +345,19 @@
     // the small sentence stays put at the same size and fades out as the frame crops in past it
     ft(el.line, { autoAlpha: 1 }, { autoAlpha: 0 }, 2.3, { duration: 0.38, ease: 'power1.in' });
     lines.forEach((ln, i) => ft(ln, { autoAlpha: 0, y: P.bigFs * 0.45 }, { autoAlpha: 1, y: 0 }, 2.1 + i * 0.18, { duration: 0.55, ease: 'power2.out' }));
+    // "Find out more" sits well clear under the sentence and travels at its own pace: it rises in from further down,
+    // settles as the sentence does, then trails and fades as the sentence leaves, so the two never move as one block
+    const lastLn = lines[lines.length - 1].getBoundingClientRect();
+    // (the lines are parked 0.45em low at this point, so take that back off)
+    more.style.top = (lastLn.bottom - P.bigFs * 0.45 + P.bigFs * (matchMedia('(max-width:760px)').matches ? 1.5 : 1.15)) + 'px';
+    gsap.set(more, { xPercent: -50, y: vh * 0.55, autoAlpha: 0 });
+    ft(more, { y: vh * 0.55 }, { y: 0 }, 2.35, { duration: 0.65 });
+    ft(more, { autoAlpha: 0 }, { autoAlpha: 1 }, 2.55, { duration: 0.35 });
 
     // 3 → 4: everything but the logo and nav moves up, the wheel comes in spinning
     ft(el.big, { y: 0 }, { y: -vh }, 3);
+    ft(more, { y: 0 }, { y: -vh * 0.55 }, 3);                         // trails behind the sentence on the way out (the gap opens up)...
+    ft(more, { autoAlpha: 1 }, { autoAlpha: 0 }, 3.12, { duration: 0.3 });   // ...and fades before the wheel settles in
     ft(el.hero, P.hero[3], P.hero[4], 3);
     ft(el.wheel, { autoAlpha: 0 }, { autoAlpha: 1 }, 3, { duration: 0.3 });   // the wheel doesn't slide in: it's in place and just rotates in
     ft(wp, { v: -SPIN }, { v: 0 }, 3);                               // spins in at the same speed
