@@ -221,6 +221,7 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 /* craft vs AI: two columns of plain lists, then the line that sums it up */
 .split .col{grid-column:span 6}
 .split h3{font-weight:500;font-size:2.1rem;letter-spacing:-.045em;line-height:1.1;padding-bottom:var(--s1);border-bottom:1px solid currentColor;margin-bottom:var(--s1)}
+.split .def{font-size:1.45rem;line-height:1.35;letter-spacing:-.03em;opacity:.6;margin-bottom:var(--s1)}
 .split .col li{font-size:1.45rem;line-height:1.35;letter-spacing:-.03em;padding:.35rem 0;border-bottom:1px solid rgba(11,11,11,.14)}
 .split .pull{grid-column:1/span 9;margin-top:var(--s3);font-size:3.2rem;line-height:1.06;letter-spacing:-.05em}
 .split .ticks{grid-column:1/-1;margin-top:var(--s2)}
