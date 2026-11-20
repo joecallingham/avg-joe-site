@@ -457,4 +457,5 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 /* the held titles were set one by one before; the shared rule above now covers them */
 .wd-sec > .sec-title,.ab-sec > .sec-title{z-index:4}
 /* phone: What We Do's description at the top of the stage, under the held title, between the window lines */
-@media (max-width:760px){.wd .wd-desc{top:calc(3.4rem + var(--title-t) + var(--title-b) + 1.75rem + var(--in));bottom:auto}}
+@media (max-width:760px){.wd .wd-desc,.wd .wd-count{top:calc(3.4rem + var(--title-t) + var(--title-b) + 1.75rem + var(--in));bottom:auto}
+  .wd .wd-count{line-height:inherit;margin:0;padding-top:.15em}}   /* the counter lines up with the top of the description */
