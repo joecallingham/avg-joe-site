@@ -42,4 +42,14 @@
     h.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); set(open === h ? null : h); } if (e.key === 'Escape') set(null); });
   });
   if (HOVER) hv.addEventListener('mouseleave', () => set(null));
+  // phones: the sides switch on their own as you scroll past (Craft as the panel comes up, AI as its half reaches the middle); a tap still works
+  let auto;
+  const onScroll = () => {
+    if (!MOB.matches) return;
+    const H = innerHeight, p = hv.getBoundingClientRect();
+    const want = p.top > H * 0.6 || p.bottom < H * 0.25 ? null : halves[1].getBoundingClientRect().top < H * 0.35 ? halves[1] : halves[0];
+    if (want !== auto) { auto = want; set(want); }
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 })();
