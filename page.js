@@ -93,7 +93,7 @@
   /* ---------- nav: Studio brings up the drum machine and says so ---------- */
   const say = $('.say'), studio = $('.nb[data-k="studio"]');
   let beatOpen = false, beatLoading = false, hovering = false;
-  const setSay = () => { const t = beatOpen ? 'Put it away' : hovering ? 'Make a beat?' : studio.dataset.say || 'Studio'; if (say.textContent !== t) { say.textContent = t; letters(say); } };
+  const setSay = () => { const t = hovering ? 'Pick a time' : 'Book call'; if (say.textContent !== t) { say.textContent = t; letters(say); } };
   function loadBeat(cb) {
     if (window.AvgBeat) return cb();
     addEventListener('avgbeat-ready', cb, { once: true });
@@ -102,7 +102,8 @@
     const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = '/beat/beat.css'; document.head.appendChild(l);
     const s = document.createElement('script'); s.src = '/beat/beat.js'; s.async = true; document.body.appendChild(s);
   }
-  studio.addEventListener('click', e => { e.preventDefault(); loadBeat(() => window.AvgBeat.toggle()); });
+  studio.addEventListener('click', e => { e.preventDefault(); window.AvgBook && AvgBook.open(studio); });   // the middle button books a call
+  addEventListener('avgbook', e => { if (e.detail) lenis.stop(); else lenis.start(); });
   studio.addEventListener('mouseenter', () => { hovering = true; setSay(); });
   studio.addEventListener('mouseleave', () => { hovering = false; setSay(); });
   addEventListener('avgbeat', e => { beatOpen = !!e.detail; if (beatOpen) lenis.stop(); else lenis.start(); studio.setAttribute('aria-expanded', String(beatOpen)); setSay(); });

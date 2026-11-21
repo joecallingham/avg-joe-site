@@ -192,7 +192,8 @@
 
   /* ---------- nav: stays on Studio ---------- */
   // The middle button talks: its words change with where you are (and with what you hover).
-  const SAYS = { top: 'Studio', big: "That's us", wheel: 'Pick one?', pick: 'Good choice', work: 'Have a nose', end: 'Say hello?', soon: "Let's chat", play: 'Make a beat?', beat: 'Put it away', info: 'All about us' };
+  // the middle of the notch always books a call now (hovering it says "Pick a time")
+  const SAYS = { top: 'Book call', big: 'Book call', wheel: 'Book call', pick: 'Book call', work: 'Book call', end: 'Book call', soon: 'Book call', play: 'Pick a time', beat: 'Book call', info: 'Book call' };
   let saying = 'Studio', sayTl = null, hoverSay = null;
   function say(text) {
     if (text === saying) return;
@@ -579,10 +580,11 @@
     if (next !== undefined) goTo(next);
   });
 
+  addEventListener('avgbook', e => { if (e.detail) lenis.stop(); else lenis.start(); });
   $$('.nb').forEach(a => a.addEventListener('click', e => {
     if (a.dataset.k === 'info' || a.dataset.k === 'work') return;   // Work and Info go to their pages
     e.preventDefault();
-    if (a.dataset.k === 'studio') loadBeat(() => window.AvgBeat.toggle());   // Studio brings up the drum machine
+    if (a.dataset.k === 'studio' && window.AvgBook) AvgBook.open(a);   // the middle button books a call
   }));
   const hov = (n, key) => { n.addEventListener('mouseenter', () => { hoverSay = key; navState(); }); n.addEventListener('mouseleave', () => { hoverSay = null; navState(); }); };
   /* nav buttons: on hover their letters run through the rotation faces. Each letter keeps the box of its Nuckle width,
