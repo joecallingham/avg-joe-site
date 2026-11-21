@@ -448,10 +448,12 @@ html.intro-dark .nb-ic{color:rgba(241,238,231,.5)}
 @media (min-width:761px){.bk{left:auto;width:min(60rem,100vw);right:0;top:0;max-height:none;border-top:0;border-left:var(--line);transform:translateX(102%)}}
 @media (max-width:760px){.bk-days,.bk-times{grid-template-columns:repeat(3,1fr)}}
 
-/* ---------- moving between pages: the old page blurs out and the new one blurs in (cross-document view transitions) ---------- */
-@view-transition{navigation:auto}
-::view-transition-old(root){animation:vt-out .3s cubic-bezier(.4,0,1,1) both}
-::view-transition-new(root){animation:vt-in .45s cubic-bezier(.22,1,.36,1) both}
-@keyframes vt-out{to{opacity:0;filter:blur(16px)}}
-@keyframes vt-in{from{opacity:0;filter:blur(16px)}}
-@media (prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation:none}}
+/* ---------- moving between pages: everything blurs out, the next page blurs back into focus (transition.js) ----------
+   A full-screen layer blurs what's under it; its blur strength animates, so the page itself goes soft and sharp again. */
+.pt{position:fixed;inset:0;z-index:1000;pointer-events:none;-webkit-backdrop-filter:blur(0px);backdrop-filter:blur(0px);background:rgba(241,238,231,0);
+  animation:pt-in .55s cubic-bezier(.22,1,.36,1) both}
+.pt.in{animation:pt-in .55s cubic-bezier(.22,1,.36,1) both}
+.pt.leave{animation:pt-out .26s cubic-bezier(.4,0,1,1) both}
+@keyframes pt-in{from{-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);background:rgba(241,238,231,.3)}to{-webkit-backdrop-filter:blur(0px);backdrop-filter:blur(0px);background:rgba(241,238,231,0)}}
+@keyframes pt-out{from{-webkit-backdrop-filter:blur(0px);backdrop-filter:blur(0px);background:rgba(241,238,231,0)}to{-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);background:rgba(241,238,231,.3)}}
+@media (prefers-reduced-motion:reduce){.pt{display:none}}
