@@ -447,3 +447,11 @@ html.intro-dark .nb-ic{color:rgba(241,238,231,.5)}
 .bk-day:focus-visible,.bk-time:focus-visible,.bk-go:focus-visible,.bk-x:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
 @media (min-width:761px){.bk{left:auto;width:min(60rem,100vw);right:0;top:0;max-height:none;border-top:0;border-left:var(--line);transform:translateX(102%)}}
 @media (max-width:760px){.bk-days,.bk-times{grid-template-columns:repeat(3,1fr)}}
+
+/* ---------- moving between pages: the old page blurs out and the new one blurs in (cross-document view transitions) ---------- */
+@view-transition{navigation:auto}
+::view-transition-old(root){animation:vt-out .3s cubic-bezier(.4,0,1,1) both}
+::view-transition-new(root){animation:vt-in .45s cubic-bezier(.22,1,.36,1) both}
+@keyframes vt-out{to{opacity:0;filter:blur(16px)}}
+@keyframes vt-in{from{opacity:0;filter:blur(16px)}}
+@media (prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation:none}}
