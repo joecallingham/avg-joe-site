@@ -449,11 +449,14 @@ html.intro-dark .nb-ic{color:rgba(241,238,231,.5)}
 @media (max-width:760px){.bk-days,.bk-times{grid-template-columns:repeat(3,1fr)}}
 
 /* ---------- moving between pages: everything blurs out, the next page blurs back into focus (transition.js) ----------
-   A full-screen layer blurs what's under it; its blur strength animates, so the page itself goes soft and sharp again. */
-.pt{position:fixed;inset:0;z-index:1000;pointer-events:none;-webkit-backdrop-filter:blur(0px);backdrop-filter:blur(0px);background:rgba(241,238,231,0);
-  animation:pt-in .55s cubic-bezier(.22,1,.36,1) both}
-.pt.in{animation:pt-in .55s cubic-bezier(.22,1,.36,1) both}
-.pt.leave{animation:pt-out .26s cubic-bezier(.4,0,1,1) both}
-@keyframes pt-in{from{-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);background:rgba(241,238,231,.3)}to{-webkit-backdrop-filter:blur(0px);backdrop-filter:blur(0px);background:rgba(241,238,231,0)}}
-@keyframes pt-out{from{-webkit-backdrop-filter:blur(0px);backdrop-filter:blur(0px);background:rgba(241,238,231,0)}to{-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);background:rgba(241,238,231,.3)}}
+   A full-screen layer carries a real blur of what's under it. Its strength shows by fading the layer in and out
+   (the version iPhone browsers handle reliably), and when it has cleared it is hidden outright, so it can never stick.
+   It's oversized top and bottom so the browser's moving toolbar never leaves a sharp strip. */
+.pt{position:fixed;left:0;right:0;top:-15vh;height:130vh;height:130lvh;z-index:1000;pointer-events:none;
+  -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);background:rgba(241,238,231,.28);
+  opacity:0;visibility:hidden;animation:pt-in .55s cubic-bezier(.22,1,.36,1)}
+.pt.in{animation:pt-in .55s cubic-bezier(.22,1,.36,1)}
+.pt.leave{visibility:visible;animation:pt-out .26s cubic-bezier(.4,0,1,1) forwards}
+@keyframes pt-in{0%{opacity:1;visibility:visible}99%{opacity:0;visibility:visible}100%{opacity:0;visibility:hidden}}
+@keyframes pt-out{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.pt{display:none}}

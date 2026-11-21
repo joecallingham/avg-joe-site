@@ -13,8 +13,9 @@
     if (url.origin !== location.origin) return;                                   // other sites, mailto:, tel:
     if (url.pathname === location.pathname && url.search === location.search) return;   // links within this page
     e.preventDefault();
-    pt.classList.remove('in'); pt.classList.add('leave');
+    pt.classList.remove('in'); void pt.offsetWidth; pt.classList.add('leave');
     setTimeout(() => { location.href = url.href; }, OUT);
+    setTimeout(() => { if (document.visibilityState === 'visible') { pt.classList.remove('leave'); void pt.offsetWidth; pt.classList.add('in'); } }, 4000);   // never leave the page fogged if the next one doesn't come
   });
   // coming back with the back button (the page is restored, not reloaded): clear the blur again
   addEventListener('pageshow', e => { if (e.persisted) { pt.classList.remove('leave'); pt.classList.remove('in'); void pt.offsetWidth; pt.classList.add('in'); } });
