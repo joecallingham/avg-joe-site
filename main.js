@@ -580,10 +580,9 @@
   });
 
   $$('.nb').forEach(a => a.addEventListener('click', e => {
-    if (a.dataset.k === 'info') return;             // Info goes to the Information page
+    if (a.dataset.k === 'info' || a.dataset.k === 'work') return;   // Work and Info go to their pages
     e.preventDefault();
     if (a.dataset.k === 'studio') loadBeat(() => window.AvgBeat.toggle());   // Studio brings up the drum machine
-    if (a.dataset.k === 'work') goTo(END);
   }));
   const hov = (n, key) => { n.addEventListener('mouseenter', () => { hoverSay = key; navState(); }); n.addEventListener('mouseleave', () => { hoverSay = null; navState(); }); };
   /* nav buttons: on hover their letters run through the rotation faces. Each letter keeps the box of its Nuckle width,
