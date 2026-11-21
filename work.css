@@ -522,3 +522,15 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .cs-page .chip{font-size:var(--fs-body)}
   .cs-page .cs-did .steps4{height:auto}
 }
+/* phones: the picked side's pattern covers its own title, then "What we mean by…" and the copy sit over the pattern in white;
+   the other side is left alone so it can still be tapped */
+.hv-mine{display:none}
+@media (max-width:760px){
+  .hv-copy{display:none}
+  .hv-half .hv-say{display:none}
+  .hv-mine{display:block;position:absolute;left:0;right:0;top:0;padding:var(--in) var(--margin);color:#fff;pointer-events:none}
+  .hv-mine-say{font-size:var(--small);line-height:1.35;letter-spacing:-.02em;margin:0 0 var(--in);opacity:0;transition:opacity .3s ease}
+  .hv-mine .hv-txt{font-size:var(--fs-body);line-height:1.08}
+  .hv-half.dim .hv-mine-say{opacity:1;transition:opacity .5s ease .3s}
+  .hv-half.dim .hv-mine .hv-txt .lw{opacity:1;transform:none;transition:opacity .55s cubic-bezier(.33,1,.68,1),transform .55s cubic-bezier(.33,1,.68,1)}
+}
