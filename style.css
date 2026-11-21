@@ -401,8 +401,13 @@ main > .sec-title{position:relative;top:auto}
 .fw-img{position:relative;--edge:calc(var(--s2) * .5)}
 .fw-img .pills{position:absolute;left:var(--edge);top:var(--edge);right:var(--edge);margin:0;z-index:1}
 .fw-link{margin-top:auto;margin-bottom:0}
-/* phone, home: the footer fills the screen as a layer, so its content sits at the bottom (no gap under the ©) */
-@media (max-width:760px){.foot.layer{justify-content:flex-end}.foot.layer .foot-cols{flex:none}}
+/* phone: the footer is a full screen again (its top where it was); the spare room sits above the robot line,
+   so the line and the © stay at the foot of the screen with no gap under them */
+@media (max-width:760px){
+  .foot:not(.layer){min-height:100vh;min-height:100svh}
+  .foot-cols{flex:1;grid-template-rows:auto auto auto 1fr auto}
+  .foot-tag{align-self:end}
+}
 /* the notch's two icons: WhatsApp (phone) on the left, Instagram on the right */
 .nb-ic{position:relative;display:grid;place-items:center;width:1.9rem;height:1.9rem;color:#8e8b86;transition:color .35s}
 .nb-ic svg{width:1.05rem;height:1.05rem;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
