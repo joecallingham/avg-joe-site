@@ -489,7 +489,7 @@
 
   /* ---------- smooth scroll: Lenis (same settings as sumojoestudio.com) ---------- */
   const lenis = new Lenis({
-    lerp: 0.055, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.14, touchInertiaExponent: 1.6, touchMultiplier: 1.5,   // touch: follows the finger more closely and throws further than before (it felt slow)
+    lerp: 0.055, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.11, touchInertiaExponent: 1.45, touchMultiplier: 1.15,   // touch: between the original (felt slow) and 1.5x (felt too fast)
     autoRaf: false,
   });
   gsap.ticker.add(t => lenis.raf(t * 1000));
