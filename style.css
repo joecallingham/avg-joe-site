@@ -255,7 +255,7 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
   .boon-grid figure,.boon-grid .van{order:2}
   .case-620{padding-bottom:9rem}
   .case-620 h2{font-size:3.6rem}
-  .notch{width:44rem;height:3.6rem;gap:1.6rem}
+  .notch{width:44rem;height:4.9rem;gap:1.6rem;padding-top:.5rem}   /* taller on phones: an easier tap */
   .nb[data-k="studio"]{min-width:9.5rem}
 }
 
