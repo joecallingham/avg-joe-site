@@ -459,3 +459,66 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 /* phone: What We Do's description at the top of the stage, under the held title, between the window lines */
 @media (max-width:760px){.wd .wd-desc,.wd .wd-count{top:calc(3.4rem + var(--title-t) + var(--title-b) + 1.75rem + var(--in));bottom:auto}
   .wd .wd-count{line-height:inherit;margin:0;padding-top:.15em}}   /* the counter lines up with the top of the description */
+
+/* =====================================================================
+   WORK PAGE, in the Information page's language: edge-to-edge cells with black dividers,
+   the image full-bleed at the top of each, the text under it, and what was involved as small lozenges
+   ===================================================================== */
+.wk-list{column-gap:0;row-gap:0;padding:0;overflow:hidden;border-bottom:var(--line);align-items:stretch}
+.wk{box-shadow:1px 0 0 var(--ink),0 1px 0 var(--ink)}
+.wk a,.wk>div{display:flex;flex-direction:column;height:100%}
+.wk-img,.wk.wk-big .wk-img{aspect-ratio:auto;height:32vw;background:#e4e0d6}
+.wk-name{margin:0;padding:var(--in) var(--margin) 0;font-size:var(--fs-title);line-height:1.06;letter-spacing:-.05em}
+.wk-line{padding:.5em var(--margin) 0;font-size:var(--fs-sm);line-height:1.3;letter-spacing:-.03em;color:rgba(11,11,11,.55)}
+.wk-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:auto;padding:var(--in) var(--margin)}
+.wk-tags li{font-size:var(--small);line-height:1.2;letter-spacing:-.01em;padding:.45em .95em;border-radius:99rem;box-shadow:inset 0 0 0 1px rgba(11,11,11,.3);transition:background-color .25s,color .25s,box-shadow .25s}
+.wk-tags li.on{background:var(--ink);color:var(--cream);box-shadow:none}
+@media (max-width:760px){
+  .wk{grid-column:1/-1}
+  .wk-img,.wk.wk-big .wk-img{height:62vw}
+}
+
+/* project names wrap inside their cell (the hover rotation keeps each word together) */
+.wk-name .nbt{white-space:normal;display:inline}
+
+/* =====================================================================
+   CASE STUDY LAYOUT, in the Information page's language: every piece runs edge to edge in ruled cells,
+   media fills its cell, words sit in the cell beside it with the standard inset. (Bison is the template.)
+   ===================================================================== */
+/* hero: headline cell | photo cell, split by a line; the facts as ruled rows under the headline */
+.cs-page .cs-hero{padding:0;column-gap:0;height:var(--hero-h,calc(100svh - 3.6rem));border-bottom:var(--line)}
+.cs-page .cs-hero .txt{padding:var(--in) var(--margin) calc(var(--frame) + 4rem)}
+.cs-page .cs-hero figure{border-left:var(--line)}
+.cs-page .facts{grid-template-columns:1fr;gap:0}
+.cs-page .facts > div{display:grid;grid-template-columns:8rem 1fr;gap:var(--gutter);padding:.7em 0;border-top:var(--line)}
+/* media sections: no inset, no gaps; the controls/caption cell carries the line and the inset */
+.cs-page .cs-sec:has(.pal-stage),.cs-page .cs-sec:has(.tt),.cs-page .cs-sec:has(.model),.cs-page .cs-sec:has(.strip),.cs-page .cs-sec:has(.fader){padding-bottom:0}
+.cs-page .cs-sec > .grid:not(.cs-brief),.cs-page .tt{padding:0;column-gap:0;row-gap:0}
+.cs-page .cs-sec > .grid:not(.cs-brief){border-bottom:var(--line)}
+.cs-page .pal-ctl,.cs-page .tt-ctl,.cs-page .model-side,.cs-page .routes .cap{border-left:var(--line);padding:var(--in) var(--margin);max-width:none;align-self:stretch}
+.cs-page .model-side{padding:0;gap:0}
+.cs-page .model-side .cap{padding:var(--in) var(--margin);border-top:var(--line);max-width:none}
+.cs-page .routes .cap{grid-column:9/span 4!important}
+/* logo versions: a plain list you pick from, not lozenges */
+.cs-page .chips{flex-direction:column;gap:.2rem}
+.cs-page .chip{height:auto;padding:0;background:none;border-radius:0;font-size:var(--fs-title);line-height:1.1;letter-spacing:-.05em;color:rgba(11,11,11,.3);text-align:left}
+.cs-page .chip[aria-pressed="true"],.cs-page .chip:hover{background:none;color:var(--ink)}
+/* guidelines strip: edge to edge, pages divided by lines */
+.cs-page .strip{gap:0;padding:0;border-bottom:var(--line)}
+.cs-page .strip img{border-right:var(--line)}
+/* the counter on the routes reads as a label, not a lozenge */
+.cs-page .fader-count{background:none;color:#fff;padding:0;border-radius:0;font-size:var(--small)}
+/* what we did and the closing statement */
+.cs-page .cs-did{padding-bottom:0}
+.cs-page .cs-did .steps4{height:calc(42vh - 1.75rem)}
+.cs-page .cs-say{border-top:0}
+/* next project: one ruled row */
+.cs-page .cs-next{padding:var(--in) var(--margin) var(--sec);border-top:var(--line)}
+@media (max-width:760px){
+  .cs-page .cs-hero{height:auto}
+  .cs-page .cs-hero figure{border-left:0;border-top:var(--line)}
+  .cs-page .pal-ctl,.cs-page .tt-ctl,.cs-page .model-side,.cs-page .routes .cap{border-left:0;border-top:var(--line)}
+  .cs-page .routes .cap{grid-column:1/-1!important}
+  .cs-page .chip{font-size:var(--fs-body)}
+  .cs-page .cs-did .steps4{height:auto}
+}

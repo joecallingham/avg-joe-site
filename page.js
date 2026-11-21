@@ -261,6 +261,12 @@
       b.addEventListener('click', () => pick(name));
       li.appendChild(b); list.appendChild(li);
     });
+    // each project lists what was involved; these are the only lozenges on the site, and they light up for the picked filter
+    wks.forEach(w => {
+      const ul = document.createElement('ul'); ul.className = 'wk-tags';
+      w.dataset.cats.split('|').forEach(c => { const li = document.createElement('li'); li.textContent = c; li.dataset.cat = c; ul.appendChild(li); });
+      (w.querySelector('a, div') || w).appendChild(ul);
+    });
     let byKey = false;
     const open = on => {
       panel.classList.toggle('open', on); veil.classList.toggle('open', on);
@@ -271,6 +277,7 @@
       $$('button', list).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === name)));
       wks.forEach(w => { w.hidden = name !== 'All' && !w.dataset.cats.split('|').includes(name); });
       $('.cats-label').textContent = name; $('.wk-count').textContent = wks.filter(w => !w.hidden).length;
+      $$('.wk-tags li').forEach(li => li.classList.toggle('on', li.dataset.cat === name));
       layout(); open(false);
       wks.filter(w => !w.hidden).forEach((w, i) => { const im = $('img', w); im.classList.remove('in'); setTimeout(() => im.classList.add('in'), 60 + i * 70); });
       lenis.scrollTo(0, { duration: 0.8 });
