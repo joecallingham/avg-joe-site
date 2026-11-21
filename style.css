@@ -368,7 +368,7 @@ html.foot-in #nav{transform:translate(-50%,calc(100% + var(--frame) + 5rem))}   
   .fc h3{margin-bottom:.7em}
   .fc-side{padding-top:var(--s2)}
   .foot-tag{margin-top:var(--s3)}
-  .foot-c{padding-bottom:calc(var(--frame) + 4rem)}
+  .foot-c{padding-bottom:calc(var(--frame) + 1.6rem)}
 }
 
 /* =====================================================================
@@ -401,3 +401,5 @@ main > .sec-title{position:relative;top:auto}
 .fw-img{position:relative;--edge:calc(var(--s2) * .5)}
 .fw-img .pills{position:absolute;left:var(--edge);top:var(--edge);right:var(--edge);margin:0;z-index:1}
 .fw-link{margin-top:auto;margin-bottom:0}
+/* phone, home: the footer fills the screen as a layer, so its content sits at the bottom (no gap under the ©) */
+@media (max-width:760px){.foot.layer{justify-content:flex-end}.foot.layer .foot-cols{flex:none}}
