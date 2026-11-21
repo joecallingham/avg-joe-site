@@ -192,7 +192,7 @@
 
   /* ---------- nav: stays on Studio ---------- */
   // The middle button talks: its words change with where you are (and with what you hover).
-  const SAYS = { top: 'Studio', big: "That's us", wheel: 'Pick one?', pick: 'Good choice', work: 'Have a nose', end: 'Say hello?', soon: "Let's chat", play: 'Make a beat?', beat: 'Put it away' };
+  const SAYS = { top: 'Studio', big: "That's us", wheel: 'Pick one?', pick: 'Good choice', work: 'Have a nose', end: 'Say hello?', soon: "Let's chat", play: 'Make a beat?', beat: 'Put it away', info: 'All about us' };
   let saying = 'Studio', sayTl = null, hoverSay = null;
   function say(text) {
     if (text === saying) return;
@@ -580,7 +580,7 @@
   });
 
   $$('.nb').forEach(a => a.addEventListener('click', e => {
-    if (a.dataset.k === 'contact') return;          // Contact opens WhatsApp in a new tab
+    if (a.dataset.k === 'info') return;             // Info goes to the Information page
     e.preventDefault();
     if (a.dataset.k === 'studio') loadBeat(() => window.AvgBeat.toggle());   // Studio brings up the drum machine
     if (a.dataset.k === 'work') goTo(END);
@@ -633,7 +633,7 @@
   const csLinks = [...$$('.fw-link, .more, .more-pill').map(a => [a, a]), ...$$('.work').map(a => [a, a.querySelector('span')])];
   csLinks.forEach(([trigger, lab]) => { if (!lab.getAttribute('aria-label') && trigger === lab) lab.setAttribute('aria-label', lab.textContent.trim()); rotateOnHover(trigger, () => lab); });
   document.fonts.ready.then(() => csLinks.forEach(([, lab]) => navLetters(lab)));
-  hov($('.nb[data-k="contact"]'), 'soon');
+  hov($('.nb[data-k="info"]'), 'info');
   hov($('.nb[data-k="studio"]'), 'play');
   $$('.work').forEach(n => hov(n, 'pick'));
   $$('.logo').forEach(a => a.addEventListener('click', e => { e.preventDefault(); jumpTo(0); }));
