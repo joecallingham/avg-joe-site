@@ -528,7 +528,7 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 @media (max-width:760px){
   .hv-copy{display:none}
   .hv-half .hv-say{display:none}
-  .hv-mine{display:block;position:absolute;left:0;right:0;top:0;padding:var(--in) var(--margin);color:#fff;pointer-events:none}
+  .hv-mine{display:block;position:absolute;left:0;right:0;top:0;padding:var(--in) var(--margin);color:var(--ink);pointer-events:none}
   .hv-mine-say{font-size:var(--small);line-height:1.35;letter-spacing:-.02em;margin:0 0 var(--in);opacity:0;transition:opacity .3s ease}
   .hv-mine .hv-txt{font-size:var(--fs-body);line-height:1.08}
   .hv-half.dim .hv-mine-say{opacity:1;transition:opacity .5s ease .3s}
