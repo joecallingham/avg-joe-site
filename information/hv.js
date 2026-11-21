@@ -47,7 +47,7 @@
   const onScroll = () => {
     if (!MOB.matches) return;
     const H = innerHeight, p = hv.getBoundingClientRect();
-    const want = p.top > H * 0.6 || p.bottom < H * 0.25 ? null : halves[1].getBoundingClientRect().top < H * 0.35 ? halves[1] : halves[0];
+    const want = p.top > H * 0.6 || p.bottom < H * 0.25 ? null : halves[1].getBoundingClientRect().top < H * 0.6 ? halves[1] : halves[0];
     if (want !== auto) { auto = want; set(want); }
   };
   addEventListener('scroll', onScroll, { passive: true });
