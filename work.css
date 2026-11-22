@@ -543,3 +543,9 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .lab,.cap,.facts,.ca-lab,.hv-lab,.hv-mine-say,.st-no,.st-txt,.wd-count,.foot-cols,.clock,.wk-name,.wk-line,.steps p,.svc .d,.vals .d{line-height:1.45}
   .wk-name{line-height:1.14}
 }
+
+/* phones, Information: About Us and the Craft/AI copy match the intro; What We Do descriptions drop to the nav size */
+@media (max-width:760px){
+  .ab-sec .cs-brief .copy,.hv-mine .hv-txt{font-weight:500;font-size:var(--fs-head);line-height:1.2;letter-spacing:-.055em}
+  .wd .wd-desc{font-size:var(--small);line-height:1.45;letter-spacing:-.02em}
+}
