@@ -452,14 +452,16 @@ html.intro-dark .nb-ic{color:rgba(241,238,231,.5)}
    A full-screen layer carries a real blur of what's under it. Its strength shows by fading the layer in and out
    (the version iPhone browsers handle reliably), and when it has cleared it is hidden outright, so it can never stick.
    It's oversized top and bottom so the browser's moving toolbar never leaves a sharp strip. */
-/* page change (over the notch, 49-50, under Avg Joe, 60): a black panel swipes down over the page, the next page loads under it, then it carries on down and off (after malvah.co) */
-.pt{position:fixed;left:0;right:0;top:-15vh;height:130vh;height:130lvh;z-index:55;pointer-events:none;background:var(--ink);
-  clip-path:inset(100% 0 0 0);animation:pt-in .75s cubic-bezier(.76,0,.24,1) .06s backwards}
+/* page change (over the notch, 49-50, under Avg Joe, 60): a black sheet the size of the screen slides down over the page,
+   the next page loads under it, then it slides on down and off. Moved with transform only (the cheapest thing a phone can animate)
+   and never taller than the screen, so the phone's toolbars aren't disturbed */
+.pt{position:fixed;left:0;top:0;width:100%;height:100vh;height:100lvh;z-index:55;pointer-events:none;background:var(--ink);
+  transform:translate3d(0,100%,0);visibility:hidden;animation:pt-in .75s cubic-bezier(.76,0,.24,1) .06s backwards}
 .pt.in{animation-name:pt-in2}
-.pt.leave{animation:pt-out .5s cubic-bezier(.76,0,.24,1) forwards}
-@keyframes pt-in{from{clip-path:inset(0 0 0 0)}to{clip-path:inset(100% 0 0 0)}}
-@keyframes pt-in2{from{clip-path:inset(0 0 0 0)}to{clip-path:inset(100% 0 0 0)}}
-@keyframes pt-out{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
-/* while the panel is up, Avg Joe is plain cream (phones don't reliably flip its colour against a moving panel) */
+.pt.leave{visibility:visible;transform:none;animation:pt-out .5s cubic-bezier(.76,0,.24,1)}
+@keyframes pt-in{from{transform:translate3d(0,0,0);visibility:visible}to{transform:translate3d(0,100%,0);visibility:visible}}
+@keyframes pt-in2{from{transform:translate3d(0,0,0);visibility:visible}to{transform:translate3d(0,100%,0);visibility:visible}}
+@keyframes pt-out{from{transform:translate3d(0,-100%,0)}to{transform:translate3d(0,0,0)}}
+/* while the sheet is fully down, Avg Joe is plain cream (phones don't reliably flip its colour against it) */
 .pt:not(.off) ~ .logo{mix-blend-mode:normal!important;color:var(--cream)!important}
 @media (prefers-reduced-motion:reduce){.pt{display:none}}
