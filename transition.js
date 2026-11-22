@@ -20,7 +20,12 @@
     e.preventDefault();
     pt.classList.remove('in'); void pt.offsetWidth; pt.classList.add('leave');
     setTimeout(() => pt.classList.remove('off'), 160);   // Avg Joe turns cream once the panel is reaching it
-    setTimeout(() => { location.href = url.href; }, OUT * 0.6);   // start loading while the panel is still coming down (this page keeps drawing until the next one is ready)
+    // go only once the panel has fully covered the page: iPhones stop drawing this page the moment the next one starts loading,
+    // so leaving earlier freezes the panel part-way down
+    let gone = false;
+    const go = () => { if (gone) return; gone = true; location.href = url.href; };
+    pt.addEventListener('animationend', function f(ev) { if (ev.animationName === 'pt-out') { pt.removeEventListener('animationend', f); requestAnimationFrame(() => requestAnimationFrame(go)); } });
+    setTimeout(go, OUT + 250);
     setTimeout(() => { if (document.visibilityState === 'visible') { pt.classList.remove('leave'); void pt.offsetWidth; pt.classList.add('in'); setTimeout(off, 900); } }, 4000);   // never leave the page covered if the next one doesn't come
   });
   // fetch a page as soon as a finger or pointer lands on its link, so it's usually ready by the time the panel is down
