@@ -376,7 +376,7 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .hv-lab{margin-bottom:1rem}
 }
 @media (prefers-reduced-motion:reduce){.hv-word,.hv-pat,.hv-txt .lw,.hv-lab{transition:none}}
-.wd-sec{padding-bottom:0}
+.wd-sec{padding-bottom:var(--sec)}
 /* What We Do ends at its bottom line: the strip under the line is pulled up under the next section, so there's no gap */
 .wd{margin-bottom:calc(-1 * var(--wd-bot))}
 .wd-win{bottom:var(--wd-bot)}
@@ -414,7 +414,6 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 }
 /* What We Stand For uses the same four ruled columns as how we work */
 
-.vals4 .st-word{font-size:clamp(2rem,2.6vw,3.8rem);line-height:1.04}
 
 /* ---------- type scale: sub-pages (same six steps, same leading per step) ---------- */
 /* display */
@@ -423,7 +422,7 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 .info-hero h1,.cs-hero h1,.hello .big-line,.cs-next a.big,.cats li button,.wd-row,.hv-txt{font-size:var(--fs-head);line-height:1.04;letter-spacing:-.055em}
 .wd-row{height:1.25em;line-height:1.25}
 /* title */
-.st-word,.vals4 .st-word{font-size:var(--fs-title);line-height:1.06;letter-spacing:-.05em}
+.st-word{font-size:var(--fs-title);line-height:1.06;letter-spacing:-.05em}
 /* body */
 .cs-brief .copy,.clients li{font-size:var(--fs-body);line-height:1.15;letter-spacing:-.045em}
 /* small */
