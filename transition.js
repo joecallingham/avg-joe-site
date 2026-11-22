@@ -1,10 +1,10 @@
-/* Moving between pages: a blur layer over the page clears as a page opens (CSS, so it works even before this runs),
-   and fogs back in when you follow a link to another page here, then the browser goes on to it. Same in every browser. */
+/* Moving between pages: a black panel swipes down over the page when you follow a link here, the next page opens
+   under it and the panel carries on down and off (CSS, so it works even before this runs). Same in every browser. */
 (() => {
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const pt = document.querySelector('.pt');
   if (!pt || RM) return;
-  const OUT = 260;   // ms the blur takes to fog in before the next page loads
+  const OUT = 500;   // ms the panel takes to swipe down over the page before the next one loads
   document.addEventListener('click', e => {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     const a = e.target.closest && e.target.closest('a[href]');
@@ -15,8 +15,8 @@
     e.preventDefault();
     pt.classList.remove('in'); void pt.offsetWidth; pt.classList.add('leave');
     setTimeout(() => { location.href = url.href; }, OUT);
-    setTimeout(() => { if (document.visibilityState === 'visible') { pt.classList.remove('leave'); void pt.offsetWidth; pt.classList.add('in'); } }, 4000);   // never leave the page fogged if the next one doesn't come
+    setTimeout(() => { if (document.visibilityState === 'visible') { pt.classList.remove('leave'); void pt.offsetWidth; pt.classList.add('in'); } }, 4000);   // never leave the page covered if the next one doesn't come
   });
-  // coming back with the back button (the page is restored, not reloaded): clear the blur again
+  // coming back with the back button (the page is restored, not reloaded): swipe the panel off again
   addEventListener('pageshow', e => { if (e.persisted) { pt.classList.remove('leave'); pt.classList.remove('in'); void pt.offsetWidth; pt.classList.add('in'); } });
 })();
