@@ -223,7 +223,7 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
 @media (max-width:760px){
   html{font-size:2.35vw}
   :root{--frame:.8rem;--cols:4;--margin:1.6rem;--gutter:1rem;--ov-wide:none}
-  :root{--fs-display:4.05rem;--fs-head:3.3rem;--fs-title:2.4rem;--fs-body:1.9rem;--fs-sm:1.35rem}
+  :root{--fs-display:4.05rem;--fs-head:3rem;--fs-title:2.4rem;--fs-body:1.9rem;--fs-sm:1.35rem}
   /* phones: roomier vertical spacing only; side spacing stays on the margins */
   .grid{row-gap:2.2rem}
   .fw-grid{row-gap:var(--frame)}
