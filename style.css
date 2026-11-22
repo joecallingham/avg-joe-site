@@ -465,3 +465,11 @@ html.intro-dark .nb-ic{color:rgba(241,238,231,.5)}
 /* while the sheet is fully down, Avg Joe is plain cream (phones don't reliably flip its colour against it) */
 .pt:not(.off) ~ .logo{mix-blend-mode:normal!important;color:var(--cream)!important}
 @media (prefers-reduced-motion:reduce){.pt{display:none}}
+
+/* phones: a touch more leading on every step of the scale */
+@media (max-width:760px){
+  .big,.case-boon h2,.case-620 h2,.case h2,#wheel-list li,.bk-big{line-height:1.12}
+  .fw-panel h4{line-height:1.14}
+  .line{line-height:1.24}
+  .sec-title,.credit,#wheel-desc,.nb{line-height:1.45}
+}

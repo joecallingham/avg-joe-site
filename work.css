@@ -533,3 +533,13 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .hv-half.dim .hv-mine-say{opacity:1;transition:opacity .5s ease .3s}
   .hv-half.dim .hv-mine .hv-txt .lw{opacity:1;transform:none;transition:opacity .55s cubic-bezier(.33,1,.68,1),transform .55s cubic-bezier(.33,1,.68,1)}
 }
+
+/* phones: a touch more leading on every step of the scale (single-line rows like .wd-row and .hv-word keep theirs) */
+@media (max-width:760px){
+  .ca-state,.wk-head h1,.info-hero h1,.cs-hero h1,.hello .big-line,.cs-next a.big,.cats li button,.hv-txt{line-height:1.12}
+  .st-word,.wk-name,.cs-page .chip{line-height:1.14}
+  .cs-brief .copy,.clients li,.hv-mine .hv-txt,.split .pull{line-height:1.25}
+  .wd-desc,.hv-say,.wk-line,.split .txt,.split .def,.split .col li{line-height:1.42}
+  .lab,.cap,.facts,.ca-lab,.hv-lab,.hv-mine-say,.st-no,.st-txt,.wd-count,.foot-cols,.clock,.wk-name,.wk-line,.steps p,.svc .d,.vals .d{line-height:1.45}
+  .wk-name{line-height:1.14}
+}
