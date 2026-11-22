@@ -453,13 +453,17 @@ html.intro-dark .nb-ic{color:rgba(241,238,231,.5)}
    (the version iPhone browsers handle reliably), and when it has cleared it is hidden outright, so it can never stick.
    It's oversized top and bottom so the browser's moving toolbar never leaves a sharp strip. */
 /* page change (under the notch, 49-50, and Avg Joe, 60): a black panel swipes down over the page, the next page loads under it, then it carries on down and off (after malvah.co) */
-.pt{position:fixed;left:0;right:0;top:-15vh;bottom:0;z-index:48;pointer-events:none;background:var(--ink);
+.pt{position:fixed;left:0;right:0;top:-15vh;height:130vh;height:130lvh;z-index:48;pointer-events:none;background:var(--ink);
   clip-path:inset(100% 0 0 0);animation:pt-in .75s cubic-bezier(.76,0,.24,1) .06s backwards}
 .pt.in{animation-name:pt-in2}
 .pt.leave{animation:pt-out .5s cubic-bezier(.76,0,.24,1) forwards}
 @keyframes pt-in{from{clip-path:inset(0 0 0 0)}to{clip-path:inset(100% 0 0 0)}}
 @keyframes pt-in2{from{clip-path:inset(0 0 0 0)}to{clip-path:inset(100% 0 0 0)}}
 @keyframes pt-out{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
+/* once the panel covers the page the notch drops away before the next page loads: phone browsers resize the screen as loading
+   starts, which would make anything pinned to the bottom jump */
+html.pt-go #nav{transform:translate(-50%,calc(100% + var(--frame) + 5rem));transition:transform .22s cubic-bezier(.4,0,1,1)}
+html.pt-go #frame-bottom{translate:0 100%;transition:translate .22s cubic-bezier(.4,0,1,1)}
 /* while the panel is up, Avg Joe is plain cream (phones don't reliably flip its colour against a moving panel) */
 .pt:not(.off) ~ .logo{mix-blend-mode:normal!important;color:var(--cream)!important}
 @media (prefers-reduced-motion:reduce){.pt{display:none}}

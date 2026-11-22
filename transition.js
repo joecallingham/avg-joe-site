@@ -24,9 +24,9 @@
     // so leaving earlier freezes the panel part-way down
     let gone = false;
     const go = () => { if (gone) return; gone = true; location.href = url.href; };
-    pt.addEventListener('animationend', function f(ev) { if (ev.animationName === 'pt-out') { pt.removeEventListener('animationend', f); requestAnimationFrame(() => requestAnimationFrame(go)); } });
-    setTimeout(go, OUT + 250);
-    setTimeout(() => { if (document.visibilityState === 'visible') { pt.classList.remove('leave'); void pt.offsetWidth; pt.classList.add('in'); setTimeout(off, 900); } }, 4000);   // never leave the page covered if the next one doesn't come
+    pt.addEventListener('animationend', function f(ev) { if (ev.animationName === 'pt-out') { pt.removeEventListener('animationend', f); document.documentElement.classList.add('pt-go'); setTimeout(go, 240); } });
+    setTimeout(() => { document.documentElement.classList.add('pt-go'); setTimeout(go, 240); }, OUT + 250);
+    setTimeout(() => { if (document.visibilityState === 'visible') { document.documentElement.classList.remove('pt-go'); pt.classList.remove('leave'); void pt.offsetWidth; pt.classList.add('in'); setTimeout(off, 900); } }, 4000);   // never leave the page covered if the next one doesn't come
   });
   // fetch a page as soon as a finger or pointer lands on its link, so it's usually ready by the time the panel is down
   const got = new Set();
@@ -40,5 +40,5 @@
   addEventListener('pointerdown', warm, { passive: true });
   addEventListener('mouseover', warm, { passive: true });
   // coming back with the back button (the page is restored, not reloaded): swipe the panel off again
-  addEventListener('pageshow', e => { if (e.persisted) { pt.classList.remove('leave'); pt.classList.remove('in'); void pt.offsetWidth; pt.classList.add('in'); setTimeout(off, 900); } });
+  addEventListener('pageshow', e => { if (e.persisted) { document.documentElement.classList.remove('pt-go'); pt.classList.remove('leave'); pt.classList.remove('in'); void pt.offsetWidth; pt.classList.add('in'); setTimeout(off, 900); } });
 })();
