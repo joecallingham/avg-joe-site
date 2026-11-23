@@ -570,3 +570,11 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 @media (min-width:761px){.cs-hero h1{font-size:var(--fs-title);line-height:1.14;letter-spacing:-.05em}}
 /* desktop: What We Do descriptions at the nav size, in a narrow box (about 8-10 words a line) */
 @media (min-width:761px){.wd .wd-desc{font-size:var(--small);line-height:1.45;letter-spacing:-.02em;max-width:22em;text-wrap:pretty}}
+/* desktop, Information: how we work uses the phone hierarchy: "01 Listen" small label, then the step in large type (About Us size) */
+@media (min-width:761px){
+  .wd-sec .steps4{height:auto}
+  .wd-sec .st{display:block;padding:var(--in) var(--margin) calc(var(--in) * 1.5)}
+  .wd-sec .st-no,.wd-sec .st-word{display:inline;margin:0;font-weight:500;font-size:var(--small);line-height:1.45;letter-spacing:-.02em}
+  .wd-sec .st-word{margin-left:.6em;color:var(--ink)}
+  .wd-sec .st-txt{display:block;margin:var(--in) 0 0;max-width:none;min-height:0;font-weight:500;font-size:var(--fs-body);line-height:1.22;letter-spacing:-.045em;color:var(--ink)}
+}
