@@ -274,12 +274,12 @@
     });
     // the Work title and the intro hold at the top while the panels stack beneath; when Selected Work arrives, they all move up together
     const intro = $('.wk-intro'), wlist = $('.wk-list'), wtitle = $('.wk-title'), selSec = $('.wk-sel');
-    if (intro && wlist) {
+    if (wlist) {
       let ih = 0, base = 0, th = 0, raf = 0;
       const measure = () => {
         base = matchMedia('(max-width: 760px)').matches ? 3.4 * parseFloat(getComputedStyle(document.documentElement).fontSize) : 0;
         th = wtitle ? wtitle.getBoundingClientRect().height : 0;
-        ih = intro.getBoundingClientRect().height;
+        ih = intro ? intro.getBoundingClientRect().height : 0;
         wlist.style.setProperty('--wk-ih', (th + ih) + 'px'); wlist.style.setProperty('--wk-base', base + 'px');
         // each panel pins one bar lower than the last, so the rows stack under each other
         const nm = feats[0] && feats[0].querySelector('.wk-name');
@@ -290,7 +290,7 @@
         raf = 0;
         const H = innerHeight, ref = selSec ? selSec.getBoundingClientRect().top : wlist.getBoundingClientRect().bottom;
         const off = Math.min(0, ref - H);
-        intro.style.top = (base + th + off).toFixed(1) + 'px';
+        if (intro) intro.style.top = (base + th + off).toFixed(1) + 'px';
         if (wtitle) wtitle.style.top = (base + off).toFixed(1) + 'px';
         wlist.style.setProperty('--wk-off', off.toFixed(1) + 'px');
       };

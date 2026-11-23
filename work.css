@@ -990,3 +990,9 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 /* featured: rows stack under each other (each pins one bar lower and is that much shorter); the intro's rule is the line above them */
 .wk.wk-feat{top:calc(var(--wk-base,0px) + var(--wk-ih,0px) + var(--i,0) * var(--wk-bar,36px) + var(--wk-off,0px))!important;height:calc(100vh - var(--wk-base,0px) - var(--wk-ih,0px) - var(--i,0) * var(--wk-bar,36px))!important;height:calc(100svh - var(--wk-base,0px) - var(--wk-ih,0px) - var(--i,0) * var(--wk-bar,36px))!important}
 .wk.wk-feat:first-child{border-top-color:transparent}
+/* Work: opens on a full-screen reel inside the frame, like the home page film */
+.wk-reel{padding:var(--frame) var(--frame) 0}
+.wk-reel .shot{display:block;height:calc(100vh - 2 * var(--frame));height:calc(100svh - 2 * var(--frame));overflow:hidden;border-radius:.25rem;background:#d9d4c8}
+.wk-reel video{width:100%;height:100%;object-fit:cover;display:block;max-width:none}
+.wk-reel + .wk-list{margin-top:var(--frame)}
+.wk-list .wk.wk-feat:first-child{border-top-color:var(--ink)}   /* no intro above now, so the first row keeps its own rule */
