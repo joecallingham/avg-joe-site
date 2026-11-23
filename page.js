@@ -257,7 +257,14 @@
       w.classList.add('wk-feat');
       w.querySelector('.wk-name').dataset.no = String(i + 1).padStart(2, '0');
     });
-    sel.forEach(w => w.classList.add('wk-thumb'));
+    sel.forEach((w, i) => {
+      w.classList.add('wk-thumb');
+      // for the list view: a number and the grey "what we did", laid out like the featured rows
+      w.querySelector('.wk-name').dataset.no = String(i + 1).padStart(2, '0');
+      const c = document.createElement('span'); c.className = 'wk-lcats';
+      c.textContent = w.dataset.cats.split('|').join(' · ');
+      (w.querySelector('a, div') || w).appendChild(c);
+    });
     // every project ends its row with a boxed "View more" (or "Coming soon" where the case study isn't up yet)
     [...feats, ...sel].forEach(w => {
       const box = w.querySelector('a, div') || w, m = document.createElement('span');
