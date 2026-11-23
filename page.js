@@ -281,6 +281,10 @@
         th = wtitle ? wtitle.getBoundingClientRect().height : 0;
         ih = intro.getBoundingClientRect().height;
         wlist.style.setProperty('--wk-ih', (th + ih) + 'px'); wlist.style.setProperty('--wk-base', base + 'px');
+        // each panel pins one bar lower than the last, so the rows stack under each other
+        const nm = feats[0] && feats[0].querySelector('.wk-name');
+        wlist.style.setProperty('--wk-bar', (nm ? nm.getBoundingClientRect().height : 36) + 'px');
+        feats.forEach((w, i) => w.style.setProperty('--i', i));
       };
       const tick = () => {
         raf = 0;

@@ -987,3 +987,6 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
   .wk-grid3.is-list .wk-more{grid-column:9/span 4!important}
 }
 .wk-grid3.is-list .wk.soon .wk-name::after{content:none!important}
+/* featured: rows stack under each other (each pins one bar lower and is that much shorter); the intro's rule is the line above them */
+.wk.wk-feat{top:calc(var(--wk-base,0px) + var(--wk-ih,0px) + var(--i,0) * var(--wk-bar,36px) + var(--wk-off,0px))!important;height:calc(100vh - var(--wk-base,0px) - var(--wk-ih,0px) - var(--i,0) * var(--wk-bar,36px))!important;height:calc(100svh - var(--wk-base,0px) - var(--wk-ih,0px) - var(--i,0) * var(--wk-bar,36px))!important}
+.wk.wk-feat:first-child{border-top-color:transparent}
