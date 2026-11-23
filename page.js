@@ -258,6 +258,13 @@
       w.querySelector('.wk-name').dataset.no = String(i + 1).padStart(2, '0');
     });
     sel.forEach(w => w.classList.add('wk-thumb'));
+    // every project ends its row with a boxed "View more" (or "Coming soon" where the case study isn't up yet)
+    [...feats, ...sel].forEach(w => {
+      const box = w.querySelector('a, div') || w, m = document.createElement('span');
+      const live = box.tagName === 'A';
+      m.className = 'wk-more' + (live ? '' : ' soon'); m.textContent = live ? 'View more ↘' : 'Coming soon';
+      box.appendChild(m);
+    });
     // the Work title and the intro hold at the top while the panels stack beneath; when Selected Work arrives, they all move up together
     const intro = $('.wk-intro'), wlist = $('.wk-list'), wtitle = $('.wk-title'), selSec = $('.wk-sel');
     if (intro && wlist) {

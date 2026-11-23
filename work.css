@@ -826,3 +826,26 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .wk-filters{flex-direction:row;flex-wrap:wrap;gap:.2rem 1rem}
   .wk-grid3{grid-template-columns:1fr}
 }
+
+/* ---- every project ends its row with a boxed "View more", set off by a divider ---- */
+.wk-more{font-size:var(--small);line-height:1.35;letter-spacing:-.02em;font-weight:500;color:var(--ink);white-space:nowrap}
+.wk-more.soon{color:#8e8b86}
+.wk a:hover .wk-more:not(.soon){text-decoration:underline;text-underline-offset:.2em}
+/* featured panels: the last cell of the bar */
+.wk.wk-feat .wk-line{grid-column:8/span 3!important}
+.wk.wk-feat .wk-more{grid-column:11/span 2;grid-row:1;align-self:stretch;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--ink);padding:0 var(--margin)}
+/* grid cards: the end of the label row */
+.wk.wk-thumb > a,.wk.wk-thumb > div{display:grid!important;grid-template-columns:minmax(0,1fr) auto;align-content:start}
+.wk.wk-thumb .wk-img{grid-column:1/-1}
+.wk.wk-thumb .wk-name{grid-column:1;grid-row:2}
+.wk.wk-thumb .wk-more{grid-column:2;grid-row:2;display:flex;align-items:center;border-left:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:0 var(--margin);margin-top:-1px}
+.wk.wk-thumb .wk-line{grid-column:1/-1;grid-row:3}
+@media (max-width:760px){
+  .wk.wk-feat .wk-name{grid-column:1/span 8!important}
+  .wk.wk-feat .wk-line{display:none!important}
+  .wk.wk-feat .wk-more{grid-column:9/span 4}
+}
+/* grid cards: the label and the View more box share one row and line up */
+.wk.wk-thumb .wk-name{padding:.8rem var(--margin)!important;align-self:center}
+.wk.wk-thumb .wk-more{align-self:stretch;padding:.8rem var(--margin)}
+.wk.wk-thumb .wk-line{padding-top:var(--in)!important}
