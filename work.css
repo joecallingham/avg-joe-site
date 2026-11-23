@@ -719,3 +719,32 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 /* the closing image sits tight under the client list */
 .cs-sec.cs-sec:not(.wd-sec):not(.ab-sec):has(.cl){padding-bottom:0}
 .info-end{padding-top:0}
+/* clients: names at the About Us copy size (one step down) */
+.cl-name{font-size:var(--fs-body);line-height:1.22;letter-spacing:-.045em}
+@media (max-width:760px){.cl-name{font-size:var(--fs-body);line-height:1.25}}
+
+/* ---- Work page, in the Information page's language (26 Nov): no lozenges on the cards (only the filters keep them);
+   the client is a small label and the line is the headline, as on the home page's Featured Work ---- */
+.wk-tags{display:none!important}
+.wk-name{font-size:var(--small)!important;line-height:1.45!important;letter-spacing:-.02em!important;padding:var(--in) var(--margin) 0!important;font-weight:500}
+.wk-line{font-size:var(--fs-title)!important;line-height:1.14!important;letter-spacing:-.05em!important;color:var(--ink)!important;padding:var(--in) var(--margin) calc(var(--in) * 1.5)!important;margin:0}
+@media (max-width:760px){.wk-line{font-size:var(--fs-head)!important;line-height:1.2!important}}
+@media (min-width:761px){.wk-line{font-size:var(--fs-body)!important;line-height:1.22!important;letter-spacing:-.045em!important}}
+/* "on its way" is a status, so it sits in the label, not the headline */
+.wk.soon .wk-line::after{content:none!important}
+.wk.soon .wk-name::after{content:" · on its way";color:#8e8b86}
+
+/* ---- Bison (case studies), in the Information page's language (26 Nov): What We Did as rows like the Brief —
+   "01 Identity" as the label on the left, the description large on the right, a full-bleed line between rows ---- */
+.cs-did .steps4{display:block!important;height:auto!important;border-bottom:1px solid var(--ink)}
+.cs-did .st{display:grid!important;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter);min-height:0!important;padding:var(--in) var(--margin) calc(var(--in) * 1.5)!important;border:0!important}
+.cs-did .st + .st{border-top:1px solid var(--ink)!important}
+.cs-did .st-no,.cs-did .st-word{grid-column:1/span 3;grid-row:1;margin:0!important;font-weight:500;font-size:var(--small)!important;line-height:1.45!important;letter-spacing:-.02em!important}
+.cs-did .st-word{padding-left:2.1em;color:var(--ink)}
+.cs-did .st-txt{grid-column:7/span 6;grid-row:1;margin:0!important;max-width:none!important;min-height:0!important;font-weight:500;font-size:var(--fs-body)!important;line-height:1.22!important;letter-spacing:-.045em!important;color:var(--ink)!important}
+@media (max-width:760px){
+  .cs-did .st{display:block!important}
+  .cs-did .st-no,.cs-did .st-word{display:inline}
+  .cs-did .st-word{padding-left:0;margin-left:.6em!important}
+  .cs-did .st-txt{display:block;margin-top:var(--in)!important;font-size:var(--fs-head)!important;line-height:1.2!important;letter-spacing:-.055em!important}
+}

@@ -253,7 +253,7 @@
     d += `H${n(g.vw + far - ox)}V${n(bottom)}Z`;
     return d;
   }
-  const caseImgs = () => $$('.boon-grid img, .case-620 figure img, .fw-card');
+  const caseImgs = () => $$('.case figure img, .fw-img');
   let cutNodes = [];
   function cutImages() {
     if (!cutGeo || !tl) return;
