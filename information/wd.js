@@ -76,10 +76,14 @@
   fly.className = 'wd-fly'; fly.setAttribute('aria-hidden', 'true');
   fly.innerHTML = pics[pics.length - 1].innerHTML;
   document.body.appendChild(fly);
+  let vy = 0, vH = 1000, unit = 1;
+  const K = 0.3;   // desktop: the drawing rises at 30% of the frame line's speed
+  const vbUp = px => `0 ${(vy + px * unit).toFixed(1)} 1000 ${vH.toFixed(1)}`;   // the same crop, with the drawing moved up px
   // every graphic here is drawn to the same crop, sized by width and anchored to its box's bottom edge
   const fit = () => {
     const w = box.offsetWidth || 1, h = Math.min(box.offsetHeight || w, dest.clientHeight || w), vh = 1000 * h / w;
-    const vb = `0 ${((1000 - vh) / 2).toFixed(1)} 1000 ${vh.toFixed(1)}`;
+    vy = (1000 - vh) / 2; vH = vh; unit = 1000 / w;                 // the crop, and drawing units per screen pixel
+    const vb = `0 ${vy.toFixed(1)} 1000 ${vH.toFixed(1)}`;
     // desktop: the drawing is pinned to the shared bottom edge, so it stays put while the frame's top line moves;
     // phones: pinned to the top edge, so the image scrolls with the page
     const anchor = phone() ? 'xMidYMin meet' : 'xMidYMax meet';
@@ -93,11 +97,15 @@
     if (st.top >= 0) y0 = b.top;                                            // where the image sits while the section holds
     const going = st.top < 0 && d.top > pin + 0.5 && d.top < H;              // What We Do is leaving and Listen hasn't pinned yet
     stage.classList.toggle('flying', going);
+    const rise = phone() ? 0 : K * Math.max(0, box.offsetTop - pin);   // Listen's graphic sits where the drawing ends up after its rise
+    dest.setAttribute('viewBox', vbUp(rise));
     if (!going) { fly.style.visibility = 'hidden'; box.style.visibility = ''; dest.style.visibility = ''; return; }
     fly.style.visibility = 'visible';
-    fly.style.left = d.left + 'px'; fly.style.width = dest.clientWidth + 'px';     // stops short of the divider line
+    fly.style.left = d.left + 'px'; fly.style.width = (dest.clientWidth - (phone() ? 0 : 1)) + 'px';     // stops short of the divider line, so it draws up in view
     // the frame's top line moves up with the section's grey grid line as the page scrolls, until it meets the title
-    fly.style.top = Math.max(b.top, pin) + 'px';
+    const top = Math.max(b.top, pin);
+    fly.style.top = top + 'px';
+    if (!phone()) fly.firstElementChild.setAttribute('viewBox', vbUp(K * Math.max(0, box.offsetTop - top)));   // the drawing rises, but slower than the frame line
     fly.style.bottom = Math.max(0, H - d.bottom) + 'px';
     box.style.visibility = 'hidden'; dest.style.visibility = 'hidden';
     firstStep.classList.add('in');

@@ -628,3 +628,11 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 @media (max-width:760px){.wd-sec .st{grid-template-rows:1fr 1fr}}
 /* desktop: the step panels end exactly at the bottom of the screen (so the image lands on the same bottom edge it dropped from) */
 @media (min-width:761px){.wd-sec .st{height:calc(100vh - var(--st-js,3.5rem));height:calc(100svh - var(--st-js,3.5rem))}}
+/* desktop: the black line between each step's graphic and its text draws up from the bottom as the panel arrives (instead of just appearing) */
+@media (min-width:761px){
+  .wd-sec .st .st-pat{border-right:0}
+  .st-copy{position:relative}
+  .st-copy::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;margin-left:-1px;background:var(--ink);transform:scaleY(0);transform-origin:bottom;transition:transform .9s cubic-bezier(.65,0,.35,1)}
+  .st.in .st-copy::before{transform:scaleY(1)}
+}
+@media (min-width:761px) and (prefers-reduced-motion:reduce){.st-copy::before{transform:none;transition:none}}
