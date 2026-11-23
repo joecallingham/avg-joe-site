@@ -950,3 +950,5 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 .clp-line{grid-column:9/span 4;padding-right:var(--margin)}
 @media (max-width:760px){.clp-name{grid-column:1/-1}}
 
+/* clients: the line sits left-aligned in the column straight after the name */
+@media (min-width:761px){.clp-name{grid-column:1/span 4}.clp-line{grid-column:5/span 8;text-align:left}}
