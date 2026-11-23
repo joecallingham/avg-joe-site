@@ -71,6 +71,7 @@
   const box = document.querySelector('.wd-pics'), pics = document.querySelectorAll('.wd-pic'), dest = document.querySelector('.wd-sec .st .st-pat');
   if (!box || !pics.length || !dest) return;
   const stage = box.closest('.wd'), list = document.querySelector('.wd-sec .steps4'), firstStep = dest.closest('.st');
+  const phone = () => matchMedia('(max-width: 760px)').matches;
   const fly = document.createElement('div');
   fly.className = 'wd-fly'; fly.setAttribute('aria-hidden', 'true');
   fly.innerHTML = pics[pics.length - 1].innerHTML;
@@ -79,7 +80,8 @@
   const fit = () => {
     const w = box.offsetWidth || 1, h = Math.min(box.offsetHeight || w, dest.clientHeight || w), vh = 1000 * h / w;
     const vb = `0 ${((1000 - vh) / 2).toFixed(1)} 1000 ${vh.toFixed(1)}`;
-    [...document.querySelectorAll('.wd-pic svg, .wd-fly svg'), dest].forEach(v => { v.setAttribute('viewBox', vb); v.setAttribute('preserveAspectRatio', 'xMidYMax meet'); });
+    const anchor = phone() ? 'xMidYMin meet' : 'xMidYMax meet';   // desktop: pinned to the shared bottom edge; phones: to the top edge
+    [...document.querySelectorAll('.wd-pic svg, .wd-fly svg'), dest].forEach(v => { v.setAttribute('viewBox', vb); v.setAttribute('preserveAspectRatio', anchor); });
   };
   let raf = 0, y0 = 0;
   const tick = () => {
@@ -92,7 +94,9 @@
     if (!going) { fly.style.visibility = 'hidden'; box.style.visibility = ''; dest.style.visibility = ''; return; }
     fly.style.visibility = 'visible';
     fly.style.left = d.left + 'px'; fly.style.width = dest.clientWidth + 'px';     // stops short of the divider line
-    fly.style.top = Math.min(y0, d.top) + 'px';
+    // desktop: the top edge holds where the image was, then rides up with Listen.
+    // phones: the image just scrolls up with the page (and the divider) until it meets the title, then the Listen copy comes up underneath it
+    fly.style.top = (phone() ? Math.max(b.top, pin) : Math.min(y0, d.top)) + 'px';
     fly.style.bottom = Math.max(0, H - d.bottom) + 'px';
     box.style.visibility = 'hidden'; dest.style.visibility = 'hidden';
     firstStep.classList.add('in');
@@ -100,6 +104,7 @@
   const ask = () => { if (!raf) raf = requestAnimationFrame(tick); };
   addEventListener('scroll', ask, { passive: true });
   addEventListener('resize', () => { fit(); ask(); });
+  matchMedia('(max-width: 760px)').addEventListener('change', () => { fit(); ask(); });
   document.fonts && document.fonts.ready.then(() => { fit(); ask(); });
   fit(); tick();
 })();
