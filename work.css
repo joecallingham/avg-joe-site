@@ -710,3 +710,7 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 .wd-fly-line{display:none!important}
 .wd-sec .st:first-child .st-copy{border-top:0!important}
 @media (max-width:760px){.wd-sec .st:first-child .st-pat{border-bottom:0}}
+/* the closing image: same frame as the main image at the top of the page, a quarter of the screen tall */
+.info-end{padding:var(--sec) var(--frame) var(--frame)}
+.info-end .shot,.info-film.info-end .shot{position:relative;height:25vh;height:25svh;aspect-ratio:auto}
+.info-end img{width:100%;height:100%;object-fit:cover;display:block}
