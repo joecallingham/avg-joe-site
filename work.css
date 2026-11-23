@@ -581,3 +581,7 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .st-copy{padding:var(--in) var(--margin) calc(var(--in) * 2)}
   .wd-sec .st-txt{font-size:var(--fs-head);line-height:1.2;letter-spacing:-.055em}
 }
+/* desktop: the step panels stack: each holds under the What We Do title while the next slides up over it */
+@media (min-width:761px){
+  .wd-sec .st{position:sticky;top:3.5rem;background:var(--cream)}
+}
