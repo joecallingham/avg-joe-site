@@ -551,12 +551,12 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 }
 /* phones: label to copy is one step (--in) everywhere, as in the Craft/AI panel; the grid's row gap no longer stacks on top */
 @media (max-width:760px){.cs-brief{row-gap:0}}
-/* phones, Information: how we work is one column, each step one run of intro-size type ("Listen. We learn how…") */
+/* phones, Information: how we work is one column; "01 Listen" as a small label, then the step as intro-size type */
 @media (max-width:760px){
   .wd-sec .steps4{grid-template-columns:1fr}
   .wd-sec .st{display:block;min-height:0;padding:var(--in) var(--margin)}
   .wd-sec .st + .st{border-left:0;border-top:1px solid var(--ink)}
-  .wd-sec .st-no{display:block;margin-bottom:var(--in)}
-  .wd-sec .st-word,.wd-sec .st-txt{display:inline;margin:0;max-width:none;min-height:0;font-weight:500;font-size:var(--fs-head);line-height:1.2;letter-spacing:-.055em;color:var(--ink)}
-  .wd-sec .st-word::after{content:'. '}
+  .wd-sec .st-no,.wd-sec .st-word{display:inline;margin:0;font-weight:500;font-size:var(--small);line-height:1.45;letter-spacing:-.02em}
+  .wd-sec .st-word{margin-left:.6em;color:var(--ink)}
+  .wd-sec .st-txt{display:block;margin:var(--in) 0 0;max-width:none;min-height:0;font-weight:500;font-size:var(--fs-head);line-height:1.2;letter-spacing:-.055em;color:var(--ink)}
 }
