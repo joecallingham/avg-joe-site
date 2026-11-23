@@ -952,3 +952,8 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 
 /* clients: the line sits left-aligned in the column straight after the name */
 @media (min-width:761px){.clp-name{grid-column:1/span 4}.clp-line{grid-column:5/span 8;text-align:left}}
+/* clients: a boxed View case study at the end of each row (greyed until the case study exists) */
+.clp-bar > .clp-more{grid-column:11/span 2;align-self:stretch}
+.clp-more.soon{cursor:default}
+@media (min-width:761px){.clp-line{grid-column:5/span 6}}
+@media (max-width:760px){.clp-name{grid-column:1/span 8}.clp-bar > .clp-more{grid-column:9/span 4}}
