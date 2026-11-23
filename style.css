@@ -481,3 +481,12 @@ html.intro-dark .nb-ic{color:rgba(241,238,231,.5)}
 @media (min-width:761px){.case-boon h2,.case-620 h2,.case h2{font-size:var(--fs-title);line-height:1.14;letter-spacing:-.05em}}
 /* phones: featured work titles match the case study headlines */
 @media (max-width:760px){.fw-panel h4{font-size:var(--fs-head);line-height:1.2;letter-spacing:-.055em}}
+/* inner pages: the footer's contents slide up from under its top edge (footer.js sets --fy) */
+.foot.foot-under{overflow:hidden}
+.foot.foot-under > *{transform:translate3d(0,var(--fy,0px),0)}
+/* desktop: each case study fits on one screen (no forced full-screen height; the side image is cut to fit under the title bar) */
+@media (min-width:761px){
+  .case-boon,.case-620{min-height:0}
+  .case{padding-bottom:var(--s3)}
+  .case-620 figure img{aspect-ratio:auto;height:calc(100vh - 15rem);height:calc(100svh - 15rem)}
+}

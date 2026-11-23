@@ -551,15 +551,6 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 }
 /* phones: label to copy is one step (--in) everywhere, as in the Craft/AI panel; the grid's row gap no longer stacks on top */
 @media (max-width:760px){.cs-brief{row-gap:0}}
-/* phones, Information: how we work is one column; "01 Listen" as a small label, then the step as intro-size type */
-@media (max-width:760px){
-  .wd-sec .steps4{grid-template-columns:1fr}
-  .wd-sec .st{display:block;min-height:0;padding:var(--in) var(--margin)}
-  .wd-sec .st + .st{border-left:0;border-top:1px solid var(--ink)}
-  .wd-sec .st-no,.wd-sec .st-word{display:inline;margin:0;font-weight:500;font-size:var(--small);line-height:1.45;letter-spacing:-.02em}
-  .wd-sec .st-word{margin-left:.6em;color:var(--ink)}
-  .wd-sec .st-txt{display:block;margin:var(--in) 0 0;max-width:none;min-height:0;font-weight:500;font-size:var(--fs-head);line-height:1.2;letter-spacing:-.055em;color:var(--ink)}
-}
 /* desktop: more leading on the headlines too (single-line rows like .wd-row and .hv-word keep theirs) */
 @media (min-width:761px){
   .ca-state,.wk-head h1,.info-hero h1,.cs-hero h1,.hello .big-line,.cs-next a.big,.hv-txt,.ca-copy,.split .pull{line-height:1.14}
@@ -570,11 +561,17 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 @media (min-width:761px){.cs-hero h1{font-size:var(--fs-title);line-height:1.14;letter-spacing:-.05em}}
 /* desktop: What We Do descriptions at the nav size, in a narrow box (about 8-10 words a line) */
 @media (min-width:761px){.wd .wd-desc{font-size:var(--small);line-height:1.45;letter-spacing:-.02em;max-width:22em;text-wrap:pretty}}
-/* desktop, Information: how we work uses the phone hierarchy: "01 Listen" small label, then the step in large type (About Us size) */
-@media (min-width:761px){
-  .wd-sec .steps4{height:auto}
-  .wd-sec .st{display:block;padding:var(--in) var(--margin) calc(var(--in) * 1.5)}
-  .wd-sec .st-no,.wd-sec .st-word{display:inline;margin:0;font-weight:500;font-size:var(--small);line-height:1.45;letter-spacing:-.02em}
-  .wd-sec .st-word{margin-left:.6em;color:var(--ink)}
-  .wd-sec .st-txt{display:block;margin:var(--in) 0 0;max-width:none;min-height:0;font-weight:500;font-size:var(--fs-body);line-height:1.22;letter-spacing:-.045em;color:var(--ink)}
+/* Information: how we work is laid out like About Us: "01 Listen" as the label on the left, the step as large copy on the right (stacked on phones) */
+.wd-sec .steps4{display:block;height:auto;border-bottom:0;padding-bottom:var(--in)}
+.wd-sec .st{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter);min-height:0;padding:var(--in) var(--margin) 0;border:0!important}
+.wd-sec .st-no,.wd-sec .st-word{margin:0;font-weight:500;font-size:var(--small);line-height:1.45;letter-spacing:-.02em;grid-row:1}
+.wd-sec .st-no{grid-column:1/span 3;white-space:nowrap}
+.wd-sec .st-word{grid-column:1/span 3;padding-left:2.1em;color:var(--ink)}
+.wd-sec .st-txt{grid-column:7/span 6;grid-row:1;margin:0;max-width:none;min-height:0;font-weight:500;font-size:var(--fs-body);line-height:1.22;letter-spacing:-.045em;color:var(--ink)}
+/* phones: the same, stacked like About Us: label, then the step at the About Us phone size */
+@media (max-width:760px){
+  .wd-sec .st{display:block}
+  .wd-sec .st-no,.wd-sec .st-word{display:inline}
+  .wd-sec .st-word{margin-left:.6em;padding-left:0}
+  .wd-sec .st-txt{display:block;margin-top:var(--in);font-size:var(--fs-head);line-height:1.2;letter-spacing:-.055em}
 }
