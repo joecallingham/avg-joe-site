@@ -912,3 +912,5 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .wk-filt{padding-left:0}
   .wk-grid3:not(.is-list){row-gap:var(--in)}
 }
+/* no "View:" / "Filter by:" labels: the controls start flush */
+.wk-view > button:first-child,.wk-filt > button{margin-left:0}
