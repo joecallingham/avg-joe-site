@@ -53,3 +53,10 @@
   addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 })();
+/* how we work: each step's shapes grow in as its panel comes into view */
+(() => {
+  const steps = document.querySelectorAll('.wd-sec .st');
+  if (!steps.length) return;
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .3 });
+  steps.forEach(s => io.observe(s));
+})();

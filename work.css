@@ -561,21 +561,23 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 @media (min-width:761px){.cs-hero h1{font-size:var(--fs-title);line-height:1.14;letter-spacing:-.05em}}
 /* desktop: What We Do descriptions at the nav size, in a narrow box (about 8-10 words a line) */
 @media (min-width:761px){.wd .wd-desc{font-size:var(--small);line-height:1.45;letter-spacing:-.02em;max-width:22em;text-wrap:pretty}}
-/* Information: how we work is laid out like About Us: "01 Listen" as the label on the left, the step as large copy on the right (stacked on phones) */
+/* Information: how we work, one panel per step built like the Craft | AI panel: a flat-shape graphic on the left half, label and copy on the right */
 .wd-sec .steps4{display:block;height:auto;border-bottom:1px solid var(--ink);padding-bottom:0}
-.wd-sec .st{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter);min-height:0;padding:var(--in) var(--margin) calc(var(--in) * 2);border:0!important}
-.wd-sec .st + .st{border-top:1px solid var(--ink)!important}   /* each step its own ruled section */
-.wd-sec .st-no,.wd-sec .st-word{margin:0;font-weight:500;font-size:var(--small);line-height:1.45;letter-spacing:-.02em;grid-row:1}
-.wd-sec .st-no{grid-column:7/span 6;white-space:nowrap}
-.wd-sec .st-word{grid-column:7/span 6;padding-left:2.1em;color:var(--ink)}
-/* desktop: label over the step, in the right half, at the Craft/AI copy size (as in that panel) */
-.wd-sec .st-txt{grid-column:7/span 6;grid-row:2;margin:var(--in) 0 0;max-width:none;min-height:0;font-weight:500;font-size:var(--fs-head);line-height:1.14;letter-spacing:-.055em;color:var(--ink)}
-/* phones: the same, stacked like About Us: label, then the step at the About Us phone size */
+.wd-sec .st{display:grid;grid-template-columns:1fr 1fr;height:calc(100vh - 3.5rem);height:calc(100svh - 3.5rem);min-height:0;padding:0;border:0!important;overflow:hidden}
+.wd-sec .st + .st{border-top:1px solid var(--ink)!important}
+.st-pat{grid-column:1;width:100%;height:100%;display:block;border-right:1px solid var(--ink)}
+.st-pat .s{transform-box:fill-box;transform-origin:center;scale:.2;transition:scale .9s cubic-bezier(.34,1.3,.64,1)}
+.st.in .st-pat .s{scale:1}
+.st.in .st-pat .s:nth-of-type(2){transition-delay:.06s}.st.in .st-pat .s:nth-of-type(3){transition-delay:.12s}.st.in .st-pat .s:nth-of-type(4){transition-delay:.18s}
+@media (prefers-reduced-motion:reduce){.st-pat .s{scale:1;transition:none}}
+.st-copy{grid-column:2;padding:2.4rem var(--margin)}
+.wd-sec .st-no,.wd-sec .st-word{display:inline;margin:0;font-weight:500;font-size:var(--small);line-height:1.45;letter-spacing:-.02em}
+.wd-sec .st-word{margin-left:.6em;color:var(--ink)}
+.wd-sec .st-txt{display:block;margin:var(--in) 0 0;max-width:none;min-height:0;font-weight:500;font-size:var(--fs-head);line-height:1.14;letter-spacing:-.055em;color:var(--ink)}
+/* phones: no graphic; label, then the step at the About Us phone size, each its own ruled section */
 @media (max-width:760px){
-  .wd-sec .st{display:block}
-  .wd-sec .st-no,.wd-sec .st-word{display:inline}
-  .wd-sec .st-word{margin-left:.6em;padding-left:0}
-  .wd-sec .st-txt{display:block;margin-top:var(--in);font-size:var(--fs-head);line-height:1.2;letter-spacing:-.055em}
+  .wd-sec .st{display:block;height:auto}
+  .st-pat{display:none}
+  .st-copy{padding:var(--in) var(--margin) calc(var(--in) * 2)}
+  .wd-sec .st-txt{font-size:var(--fs-head);line-height:1.2;letter-spacing:-.055em}
 }
-/* phones: What We Do's pictures run from the left edge to the window's right line */
-@media (max-width:760px){.wd .wd-pics{left:0;width:calc(var(--wl) + var(--ww))}}
