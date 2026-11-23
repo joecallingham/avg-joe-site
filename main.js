@@ -524,7 +524,12 @@
     const st = Math.min(past, room);
     if (Math.abs(lastSt - st) > 0.5) { el.cases.scrollTop = st; lastSt = st; }
     if (cur >= endPx) put(el.cases, 'transform', `translate3d(0,${(-(past - st)).toFixed(1)}px,0)`);      // after the last case study, the whole section slides up off screen
-    if (foot) foot.style.visibility = past > room + 1 ? 'visible' : 'hidden';   // ...uncovering the footer behind it
+    if (foot) {
+      const up = Math.max(0, past - room), p = Math.min(1, up / VH());
+      foot.style.visibility = up > 1 ? 'visible' : 'hidden';   // ...uncovering the footer behind it
+      foot.style.setProperty('--fy', (0.75 * (1 - p) * VH()).toFixed(1) + 'px');   // its contents rise into place a little behind the work (as on Malvah)
+      document.documentElement.classList.toggle('cases-off', up > 0);   // the work is solid while it slides off, so the footer never shows through it
+    }
     document.documentElement.classList.toggle('foot-in', past > room + VH() * 0.35);   // and the notch drops away
     cutImages();
     navState();
