@@ -942,19 +942,11 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 .clp{height:auto!important;top:calc(var(--cl-top,3rem) + var(--i,0) * var(--cl-bar,36px) + var(--cl-off,0px))!important}
 .clp-img{height:33.333vh;height:33.333svh}
 
-/* clients: names back at the size of the old list; no categories or View more */
+/* clients: no categories or View more; name left, line right */
 .clp-bar{align-items:center}
-.clp-name{grid-column:1/span 8;font-size:var(--fs-body);line-height:1.22;letter-spacing:-.045em}
+.clp-name{grid-column:1/span 8}
 .clp-name a{color:inherit}
 .clp-name a:hover{text-decoration:underline;text-underline-offset:.15em;text-decoration-thickness:1px}
-.clp-no{font-size:var(--small);letter-spacing:-.02em;vertical-align:.35em}
 .clp-line{grid-column:9/span 4;padding-right:var(--margin)}
-@media (max-width:760px){.clp-name{grid-column:1/-1;line-height:1.25}}
+@media (max-width:760px){.clp-name{grid-column:1/-1}}
 
-/* clients: number (and line) in the left half, the name starts exactly at the middle of the screen */
-.clp-bar{grid-template-columns:1fr 1fr;column-gap:0}
-.clp-left{grid-column:1;display:flex;align-items:baseline;gap:.8em;padding-left:var(--margin);padding-right:var(--gutter);font-size:var(--small);letter-spacing:-.02em;font-weight:500;min-width:0}
-.clp-left .clp-no{margin:0;vertical-align:0}
-.clp-left .clp-line{grid-column:auto;padding:0;text-align:left;color:#8e8b86;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.clp-name{grid-column:2;padding-left:0;padding-right:var(--margin)}
-@media (max-width:760px){.clp-name{grid-column:2}.clp-left .clp-line{display:none}}
