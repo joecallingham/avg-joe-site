@@ -609,3 +609,7 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 /* the Digital graphic on its way down into the Listen panel (wd.js) */
 .wd-fly{position:fixed;z-index:2;visibility:hidden;pointer-events:none;overflow:hidden}
 .wd-fly svg{display:block;width:100%;height:100%}
+.wd-fly{background:transparent}
+.wd-fly .wd-fly-next{position:absolute;inset:0}
+.wd-fly-next .s{scale:1}
+.wd-pic svg,.wd-fly svg,.st-pat{overflow:hidden}
