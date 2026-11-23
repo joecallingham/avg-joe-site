@@ -63,50 +63,43 @@
   show(0);
   requestAnimationFrame(frame);
 })();
-/* After the last service (Digital), its graphic drops down and grows into the first step's graphic space (Listen),
-   its bottom edge moving down to show more of the drawing (which keeps its size), and lands as Listen's graphic, the same image. Scrolling back reverses it. */
+/* After the last service, its image carries straight on as Listen's image (the same picture).
+   Both boxes reach the bottom of the screen, and the drawing is anchored to that bottom edge in both, so it never moves or scales.
+   As What We Do scrolls away, a copy holds the image's place: its top edge stays where it was, then rides up with the Listen panel
+   until it lands, uncovering more of the picture as it goes. */
 (() => {
   const box = document.querySelector('.wd-pics'), pics = document.querySelectorAll('.wd-pic'), dest = document.querySelector('.wd-sec .st .st-pat');
-  if (!box || !pics.length || !dest || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  // desktop: the graphics are sized by the box's width (not its height), so a taller box shows more of the drawing below
-  // rather than a bigger drawing. The Digital box and the Listen panel are the same width, so the image keeps its size and place.
-  const svgs = () => [...document.querySelectorAll('.wd-pic svg, .wd-fly svg'), dest];   // the services, the travelling copy and Listen only (not the other steps)
-  const fit = () => {
-    // the crop matches the picture box's own shape on this screen, so the drawing is always sized by width (never by height)
-    // (on phones too: the box and the Listen panel are both full width there, so the image keeps its size and place)
-    const bw = box.offsetWidth || 1, bh = box.offsetHeight || 1, vh = 1000 * bh / bw, vb = `0 ${((1000 - vh) / 2).toFixed(1)} 1000 ${vh.toFixed(1)}`;
-    svgs().forEach(v => {
-      if (!v.dataset.vb) v.dataset.vb = v.getAttribute('viewBox');
-      v.setAttribute('viewBox', vb);
-      v.setAttribute('preserveAspectRatio', 'xMidYMin meet');
-    });
-  };
+  if (!box || !pics.length || !dest) return;
+  const stage = box.closest('.wd'), list = document.querySelector('.wd-sec .steps4'), firstStep = dest.closest('.st');
   const fly = document.createElement('div');
   fly.className = 'wd-fly'; fly.setAttribute('aria-hidden', 'true');
   fly.innerHTML = pics[pics.length - 1].innerHTML;
-  const firstStep = dest.closest('.st');
   document.body.appendChild(fly);
-  fit(); addEventListener('resize', fit);
-  const list = document.querySelector('.wd-sec .steps4'), stage = box.closest('.wd');
-  let raf = 0, y0 = null, h0 = 0;
+  // every graphic here is drawn to the same crop, sized by width and anchored to its box's bottom edge
+  const fit = () => {
+    const w = box.offsetWidth || 1, h = Math.min(box.offsetHeight || w, dest.clientHeight || w), vh = 1000 * h / w;
+    const vb = `0 ${((1000 - vh) / 2).toFixed(1)} 1000 ${vh.toFixed(1)}`;
+    [...document.querySelectorAll('.wd-pic svg, .wd-fly svg'), dest].forEach(v => { v.setAttribute('viewBox', vb); v.setAttribute('preserveAspectRatio', 'xMidYMax meet'); });
+  };
+  let raf = 0, y0 = 0;
   const tick = () => {
     raf = 0;
-    const H = innerHeight, d = dest.getBoundingClientRect();
+    const H = innerHeight, d = dest.getBoundingClientRect(), b = box.getBoundingClientRect(), st = stage.querySelector('.wd-stick').getBoundingClientRect();
     const pin = parseFloat(getComputedStyle(list).getPropertyValue('--st-js')) || 50;
-    const t = Math.max(0, Math.min(1, (H - d.top) / Math.max(1, H - pin)));      // 0 as Listen arrives at the bottom, 1 once it has pinned
-    const b = box.getBoundingClientRect();
-    if (t <= 0 || t >= 1 || b.width === 0) { stage.classList.remove('flying'); fly.style.visibility = 'hidden'; box.style.visibility = ''; dest.style.visibility = ''; if (t <= 0) { y0 = null; h0 = b.height; } return; }
-    // a simple drop: the image holds where it was (at the split) while the page moves on, so it drops down into the next section;
-    // once Listen's graphic space reaches it, it rides up with that panel and settles in. The drawing never scales:
-    // only the frame's bottom edge moves down, uncovering more of the image.
-    if (y0 === null) y0 = b.top - box.closest('.wd-stick').getBoundingClientRect().top;   // where the image sat while the section held (fast scrolls can't shift it)
-    const top = Math.min(y0, d.top), L = (a, z) => a + (z - a) * t;
+    if (st.top >= 0) y0 = b.top;                                            // where the image sits while the section holds
+    const going = st.top < 0 && d.top > pin + 0.5 && d.top < H;              // What We Do is leaving and Listen hasn't pinned yet
+    stage.classList.toggle('flying', going);
+    if (!going) { fly.style.visibility = 'hidden'; box.style.visibility = ''; dest.style.visibility = ''; return; }
     fly.style.visibility = 'visible';
-    fly.style.left = L(b.left, d.left) + 'px'; fly.style.top = top + 'px';
-    fly.style.width = L(b.width - 1, dest.clientWidth) + 'px';             // stops short of the divider lines, so they stay on top fly.style.height = L(h0 || b.height, d.height) + 'px';
-    stage.classList.add('flying');                                         // the section's bottom divider doesn't cut across the image as it drops
-    box.style.visibility = 'hidden'; dest.style.visibility = 'hidden';     // the original and Listen's own graphic stay out of sight while the copy travels (one image on screen)
+    fly.style.left = d.left + 'px'; fly.style.width = dest.clientWidth + 'px';     // stops short of the divider line
+    fly.style.top = Math.min(y0, d.top) + 'px';
+    fly.style.bottom = Math.max(0, H - d.bottom) + 'px';
+    box.style.visibility = 'hidden'; dest.style.visibility = 'hidden';
+    firstStep.classList.add('in');
   };
   const ask = () => { if (!raf) raf = requestAnimationFrame(tick); };
-  addEventListener('scroll', ask, { passive: true }); addEventListener('resize', ask); tick();
+  addEventListener('scroll', ask, { passive: true });
+  addEventListener('resize', () => { fit(); ask(); });
+  document.fonts && document.fonts.ready.then(() => { fit(); ask(); });
+  fit(); tick();
 })();

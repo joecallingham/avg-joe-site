@@ -607,7 +607,7 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 /* What We Do: each service shows a flat-shape graphic (as the step panels do) instead of a photo */
 .wd-pic svg{display:block;width:100%;height:100%}
 /* the Digital graphic on its way down into the Listen panel (wd.js) */
-.wd-fly{position:fixed;z-index:2;visibility:hidden;pointer-events:none;overflow:hidden}
+.wd-fly{position:fixed;z-index:2;visibility:hidden;pointer-events:none;overflow:hidden;height:auto}
 .wd-fly svg{display:block;width:100%;height:100%}
 .wd-fly{background:transparent}
 .wd-fly .wd-fly-next{position:absolute;inset:0}
@@ -624,3 +624,7 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 /* the section's lines and text sit above the travelling image while it drops */
 .wd-stick{z-index:3}
 .wd.flying .wd-rule-b{opacity:0}
+/* phones: each step panel is half graphic, half text */
+@media (max-width:760px){.wd-sec .st{grid-template-rows:1fr 1fr}}
+/* desktop: the step panels end exactly at the bottom of the screen (so the image lands on the same bottom edge it dropped from) */
+@media (min-width:761px){.wd-sec .st{height:calc(100vh - var(--st-js,3.5rem));height:calc(100svh - var(--st-js,3.5rem))}}
