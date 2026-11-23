@@ -477,3 +477,5 @@ html.intro-dark .nb-ic{color:rgba(241,238,231,.5)}
 @media (min-width:761px){
   .big,.case-boon h2,.case-620 h2,.case h2,.bk-big{line-height:1.14}
 }
+/* desktop: the home project headlines use the About Us copy size */
+@media (min-width:761px){.case-boon h2,.case-620 h2,.case h2{font-size:var(--fs-body);line-height:1.22;letter-spacing:-.045em}}

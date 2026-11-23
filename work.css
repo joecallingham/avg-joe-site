@@ -566,3 +566,5 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 }
 /* desktop: About Us and the case-study briefs get a little more leading */
 @media (min-width:761px){.cs-brief .copy{line-height:1.22}}
+/* desktop: case-study hero lines use the About Us copy size */
+@media (min-width:761px){.cs-hero h1{font-size:var(--fs-body);line-height:1.22;letter-spacing:-.045em}}
