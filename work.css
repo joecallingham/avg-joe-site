@@ -914,3 +914,27 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 }
 /* no "View:" / "Filter by:" labels: the controls start flush */
 .wk-view > button:first-child,.wk-filt > button{margin-left:0}
+
+/* ---- Information: Clients as the Work page's featured panels (26 Nov). The title holds; each client is a full-screen
+   panel (a thin bar: number and name, what we did, the line, a boxed View more; then the picture in the cream frame)
+   that stacks over the one before; the whole stack moves off with the section ---- */
+.cl-sec{padding-bottom:0!important}
+.cl-stack{position:relative}
+.clp{position:sticky;top:var(--cl-top,3rem);height:calc(100vh - var(--cl-top,3rem));height:calc(100svh - var(--cl-top,3rem));background:var(--cream);border-top:1px solid var(--ink);display:grid;grid-template-rows:auto minmax(0,1fr)}
+.clp-bar{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter);font-size:var(--small);line-height:1.35;letter-spacing:-.02em;font-weight:500}
+.clp-bar > *{padding:.9rem 0 .8rem}
+.clp-name{grid-column:1/span 4;padding-left:var(--margin)}
+.clp-no{color:#8e8b86;margin-right:.8em}
+.clp-cats{grid-column:5/span 3;color:#8e8b86}
+.clp-line{grid-column:8/span 3;text-align:right}
+.clp-more{grid-column:11/span 2;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--ink);padding:0 var(--margin);white-space:nowrap;color:var(--ink)}
+a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
+.clp-more.soon{color:#8e8b86}
+.clp-img{margin:0 var(--frame) var(--frame);position:relative;overflow:hidden;background:#e4e0d6}
+.clp-img img,.clp-img svg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+@media (max-width:760px){
+  .clp-name{grid-column:1/span 8}
+  .clp-cats,.clp-line{display:none}
+  .clp-more{grid-column:9/span 4}
+}
+.clp{top:calc(var(--cl-top,3rem) + var(--cl-off,0px))}

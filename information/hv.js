@@ -79,3 +79,23 @@
   });
   list.addEventListener('pointerleave', () => pic.classList.remove('on'));
 })();
+
+/* Clients: the panels pin exactly under the held Clients title (measured, so its line and theirs are one) */
+(() => {
+  const title = document.querySelector('.cl-title'), stack = document.querySelector('.cl-stack');
+  if (!title || !stack) return;
+  // once the last client has landed, the title and the stack move up together (as on the Work page)
+  let base = 0, th = 0, raf = 0;
+  const pin = () => {
+    title.style.top = ''; base = parseFloat(getComputedStyle(title).top) || 0; th = title.getBoundingClientRect().height;
+    stack.style.setProperty('--cl-top', (base + th - 1).toFixed(2) + 'px'); tick();
+  };
+  const tick = () => {
+    raf = 0;
+    const off = Math.min(0, stack.getBoundingClientRect().bottom - innerHeight);
+    title.style.top = (base + off).toFixed(1) + 'px';
+    stack.style.setProperty('--cl-off', off.toFixed(1) + 'px');
+  };
+  addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(tick); }, { passive: true });
+  pin(); addEventListener('resize', pin); document.fonts && document.fonts.ready.then(pin);
+})();
