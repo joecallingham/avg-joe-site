@@ -47,10 +47,9 @@
     last = run_;
     const e = RM ? 1 : q, off = (1 - e) * innerWidth;                 // linear, so it moves with the scroll, not ahead of it
     const x = win - gap / 2 - run_ * gap;
-    winEl.style.transform = `translate3d(${(off * 0.8).toFixed(1)}px,0,0)`;
-    picsBox.style.clipPath = `inset(0 0 0 ${((1 - e) * 100).toFixed(2)}%)`;
-    picsBox.style.transform = `translate3d(${(off * 0.35).toFixed(1)}px,0,0)`;
-    countEl.style.translate = `${(off * 0.8).toFixed(1)}px 0`; countEl.style.opacity = e.toFixed(3);
+    winEl.style.clipPath = `inset(${((1 - e) * 100).toFixed(2)}% 0 0 0)`;          // the window's two lines draw up from their base as the section arrives
+    picsBox.style.clipPath = `inset(${((1 - e) * 100).toFixed(2)}% 0 0 0)`;          // the pictures rise in place with the lines (they no longer slide across the text)
+    countEl.style.opacity = e.toFixed(3);                                              // the counter fades in where it sits (no slide across the description)
     tracks.forEach(t => t.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`);
     // picture i wipes in from the right over picture i-1 as p goes from i-1 to i
     pics.forEach((im, i) => { const f = i === 0 ? 1 : Math.max(0, Math.min(1, p - (i - 1))); im.style.clipPath = `inset(0 0 0 ${((1 - f) * 100).toFixed(2)}%)`; });
