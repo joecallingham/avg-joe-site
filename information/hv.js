@@ -64,3 +64,18 @@
   const pin = () => { if (!list || !title) return; const top = parseFloat(getComputedStyle(title).top) || 0; list.style.setProperty('--st-js', (top + title.getBoundingClientRect().height - 1).toFixed(2) + 'px'); };
   pin(); addEventListener('resize', pin); document.fonts && document.fonts.ready.then(pin);
 })();
+/* Clients: hovering a row shows that client's picture on the left (desktop); rows without a picture clear it */
+(() => {
+  const list = document.querySelector('.cl-list'), pic = document.querySelector('.cl-pic');
+  if (!list || !pic) return;
+  const img = pic.querySelector('img');
+  list.querySelectorAll('.cl-row[data-img]').forEach(r => { const i = new Image(); i.src = r.dataset.img; });   // ready before the first hover
+  list.addEventListener('pointerover', e => {
+    const row = e.target.closest('.cl-row'); if (!row) return;
+    const src = row.dataset.img;
+    if (!src) { pic.classList.remove('on'); return; }
+    if (img.getAttribute('src') !== src) { pic.classList.remove('on'); img.src = src; void pic.offsetWidth; }
+    pic.classList.add('on');
+  });
+  list.addEventListener('pointerleave', () => pic.classList.remove('on'));
+})();

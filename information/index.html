@@ -6,8 +6,8 @@
 <title>Information — Avg Joe</title>
 <meta name="description" content="Avg Joe is a small studio blending proper craft with smart AI, so businesses can get back to what they do best.">
 <meta name="theme-color" content="#f1eee7">
-<link rel="stylesheet" href="/style.css?v=20261125j">
-<link rel="stylesheet" href="/work.css?v=20261125j">
+<link rel="stylesheet" href="/style.css?v=20261125m">
+<link rel="stylesheet" href="/work.css?v=20261125m">
 </head>
 <body>
 <div class="pt" aria-hidden="true"></div>
@@ -146,23 +146,24 @@
 
   <section class="cs-sec">
     <h2 class="sec-title"><span>Clients</span></h2>
-    <ul class="grid clients rv">
-      <li>620 Tennis Multicamp</li><li>Brewed by Boon</li><li>Bison Coffee</li><li>The Hunna</li>
-      <li>Download Festival</li><li>Mary Wyatt</li><li>Royal Enfield</li><li>Papa Salt</li>
-      <li>Lower Than Atlantis</li><li>Figtree</li>
-    </ul>
-  </section>
-
-  <section class="cs-sec hello">
-    <h2 class="sec-title"><span>Say Hello</span></h2>
-    <div class="grid">
-      <p class="big-line rv">Got something ordinary? Let's put the extra in.</p>
-      <div class="hello-side rv">
-        <a class="pill-btn" href="https://wa.me/447542068942" target="_blank" rel="noopener" data-rot>Message us on WhatsApp ↗</a>
-        <p class="clock" aria-live="off">It's <time id="uk-time">--:--</time> in the UK. <span id="uk-mood">We're probably making something.</span></p>
-      </div>
+    <!-- clients: a ruled list; on desktop the client's picture shows on the left while you hover their row -->
+    <div class="cl rv">
+      <div class="cl-pic" aria-hidden="true"><img alt="" loading="lazy"></div>
+      <ul class="cl-list">
+        <li class="cl-row" data-img="/img/620.jpg"><span class="cl-name">620 Tennis Multicamp</span></li>
+        <li class="cl-row" data-img="/img/boon-sign.jpg"><span class="cl-name">Brewed by Boon</span></li>
+        <li class="cl-row" data-img="/img/bison.jpg"><span class="cl-name">Bison Coffee</span></li>
+        <li class="cl-row" data-img="/img/the-hunna-hero.jpg"><span class="cl-name">The Hunna</span></li>
+        <li class="cl-row" data-img="/img/download-hero.jpg"><span class="cl-name">Download Festival</span></li>
+        <li class="cl-row" data-img="/img/download-hero.jpg"><span class="cl-name">Mary Wyatt</span></li>
+        <li class="cl-row"><span class="cl-name">Royal Enfield</span></li>
+        <li class="cl-row"><span class="cl-name">Papa Salt</span></li>
+        <li class="cl-row"><span class="cl-name">Lower Than Atlantis</span></li>
+        <li class="cl-row"><span class="cl-name">Figtree</span></li>
+      </ul>
     </div>
   </section>
+
   <!-- a full-width image a third of the screen tall; as the footer comes up it shrinks into the box between Extra and Ordinary (footer.js) -->
   <section class="end-img" aria-hidden="true"><div class="ei-frame"><img src="/img/mushroom-wide.jpg" alt="" loading="lazy"></div></section>
 </main>
@@ -190,25 +191,12 @@
 </nav>
 
 <script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
-<script src="/page.js?v=20261125j"></script>
-<script src="/information/hv.js?v=20261125j"></script>
-<script src="/information/wd.js?v=20261125j"></script>
-<script src="/booking.js?v=20261125j"></script>
-<script src="/transition.js?v=20261125j"></script>
-<script src="/footer.js?v=20261125j"></script>
-<script src="/credits.js?v=20261125j"></script>
-<script>
-  // the studio clock: UK time, with a mood to match the hour
-  (() => {
-    const t = document.getElementById('uk-time'), m = document.getElementById('uk-mood');
-    const moods = h => h < 6 ? "We're asleep. Message anyway." : h < 9 ? 'Kettle on.' : h < 12 ? "We're probably making something." : h < 14 ? 'Lunch. Back shortly.' : h < 18 ? "We're probably making something." : h < 22 ? 'Winding down, still reading messages.' : "We're asleep. Message anyway.";
-    const tick = () => {
-      const p = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(new Date());
-      const h = +p.find(x => x.type === 'hour').value, mi = p.find(x => x.type === 'minute').value;
-      t.textContent = String(h).padStart(2, '0') + ':' + mi; t.dateTime = t.textContent; m.textContent = moods(h);
-    };
-    tick(); setInterval(tick, 20000);
-  })();
-</script>
+<script src="/page.js?v=20261125m"></script>
+<script src="/information/hv.js?v=20261125m"></script>
+<script src="/information/wd.js?v=20261125m"></script>
+<script src="/booking.js?v=20261125m"></script>
+<script src="/transition.js?v=20261125m"></script>
+<script src="/footer.js?v=20261125m"></script>
+<script src="/credits.js?v=20261125m"></script>
 </body>
 </html>

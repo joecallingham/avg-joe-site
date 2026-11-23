@@ -508,3 +508,5 @@ html.cases-off #s-cases{background:var(--cream)}
 .ei-fly img{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
 .fm-slot{border-radius:.1em}   /* the same rounding the image arrives with (16% of the box's short side) */
 .ei-fly img{max-width:none;max-height:none}   /* the moving picture keeps its full-frame size; the global image cap would squeeze it */
+/* footer: "Good to know" and the clock line sit in the light grey of the inactive nav links */
+.fc-side p,.fc p:has(.foot-time){color:#8e8b86}
