@@ -53,7 +53,7 @@
       const anchor = phone() ? 'xMidYMin meet' : 'xMidYMax meet';   // desktop: pinned to the shared bottom edge; phones: to the top
       pics.forEach(p => { const v = p.querySelector('svg'); v.setAttribute('viewBox', vb(0)); v.setAttribute('preserveAspectRatio', anchor); });
       for (const v of [dest, flySvg]) { v.setAttribute('viewBox', vb(rise)); v.setAttribute('preserveAspectRatio', anchor); }
-      flyH = Math.max(box.offsetHeight, dh);
+      flyH = Math.max(box.offsetHeight, dh) + rise;                    // desktop: taller by the drift, so the picture always reaches the frame's top line
       fly.style.width = (dest.clientWidth - (phone() ? 0 : 1)) + 'px';   // stops short of the divider line, which draws up beside it
       flySvg.style.height = flyH + 'px';
     }
