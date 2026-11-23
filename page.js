@@ -289,9 +289,28 @@
       document.fonts && document.fonts.ready.then(() => { measure(); ask(); });
       measure(); tick();
     }
-    // Selected Work filters: plain words in the label column; picking one filters the grid in place
-    const fl = $('.wk-filters');
-    if (fl && sel.length) {
+    // Selected Work: small, small, big / big, small, small over whatever is showing (so a filter keeps the rhythm)
+    const grid = $('.wk-grid3');
+    const rhythm = () => {
+      const vis = sel.filter(w => !w.hidden);
+      vis.forEach((w, i) => { w.classList.toggle('wk-big', [0, 0, 1, 1, 0, 0][i % 6] === 1); w.style.removeProperty('--span'); });
+      // a short last row widens its cards to fill the 12 columns, so no gap is left
+      let row = [], used = 0;
+      vis.forEach(w => { const sp = w.classList.contains('wk-big') ? 6 : 3; if (used + sp > 12) { row = []; used = 0; } row.push([w, sp]); used += sp; if (used === 12) { row = []; used = 0; } });
+      if (row.length && used < 12) {                                      // scale the row up in proportion, in whole columns
+        let left = 12;
+        row.forEach(([w, sp], k) => { const n = k === row.length - 1 ? left : Math.round(sp * 12 / used); left -= n; w.style.setProperty('--span', 'span ' + n); });
+      }
+    };
+    rhythm();
+    // view: images or a ruled list
+    $$('.wk-view button').forEach(b => b.addEventListener('click', () => {
+      $$('.wk-view button').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+      grid && grid.classList.toggle('is-list', b.dataset.view === 'list');
+    }));
+    // filter: "Categories (n)" opens the list of categories just below; picking one filters the grid live
+    const fl = $('.wk-filters'), fo = $('.wk-filt-open');
+    if (fl && fo && sel.length) {
       const counts = new Map();
       sel.forEach(w => w.dataset.cats.split('|').forEach(c => counts.set(c, (counts.get(c) || 0) + 1)));
       const cats = [['All', sel.length], ...[...counts].sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]))];
@@ -302,9 +321,14 @@
         b.addEventListener('click', () => pick(name));
         fl.appendChild(b);
       });
+      const openF = on => { fl.hidden = !on; fo.setAttribute('aria-expanded', String(on)); };
+      fo.addEventListener('click', () => openF(fl.hidden));
       const pick = name => {
         $$('button', fl).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === name)));
         sel.forEach(w => { w.hidden = name !== 'All' && !w.dataset.cats.split('|').includes(name); });
+        $('.wk-filt-label').textContent = name === 'All' ? 'Categories' : name;
+        $('.wk-filt-n').textContent = sel.filter(w => !w.hidden).length;
+        rhythm(); openF(false);
         sel.filter(w => !w.hidden).forEach((w, i) => { const im = $('img', w); im.classList.remove('in'); setTimeout(() => im.classList.add('in'), 60 + i * 70); });
       };
     }
