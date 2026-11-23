@@ -574,14 +574,19 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 .wd-sec .st-no,.wd-sec .st-word{display:inline;margin:0;font-weight:500;font-size:var(--small);line-height:1.45;letter-spacing:-.02em}
 .wd-sec .st-word{margin-left:.6em;color:var(--ink)}
 .wd-sec .st-txt{display:block;margin:var(--in) 0 0;max-width:none;min-height:0;font-weight:500;font-size:var(--fs-head);line-height:1.14;letter-spacing:-.055em;color:var(--ink)}
-/* phones: no graphic; label, then the step at the About Us phone size, each its own ruled section */
+/* phones: the same panels, graphic on top and label + copy under it; they stack under the held title as you scroll */
 @media (max-width:760px){
-  .wd-sec .st{display:block;height:auto}
-  .st-pat{display:none}
-  .st-copy{padding:var(--in) var(--margin) calc(var(--in) * 2)}
+  .wd-sec .st{--st-top:calc(3.4rem + var(--title-t) + var(--title-b) + 1.45 * var(--small) + 1px);
+    position:sticky;top:var(--st-top);background:var(--cream);
+    grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;
+    height:calc(100vh - var(--st-top) - var(--frame) - 4.4rem);height:calc(100svh - var(--st-top) - var(--frame) - 4.4rem)}
+  .st-pat{grid-column:1;grid-row:1;border-right:0;border-bottom:1px solid var(--ink)}
+  .st-copy{grid-column:1;grid-row:2;padding:var(--in) var(--margin) calc(var(--in) * 1.5)}
   .wd-sec .st-txt{font-size:var(--fs-head);line-height:1.2;letter-spacing:-.055em}
 }
 /* desktop: the step panels stack: each holds under the What We Do title while the next slides up over it */
 @media (min-width:761px){
   .wd-sec .st{position:sticky;top:3.5rem;background:var(--cream)}
 }
+/* phones: What We Do's pictures run from the left edge to the window's right line */
+@media (max-width:760px){.wd .wd-pics{left:0;width:calc(var(--wl) + var(--ww))}}
