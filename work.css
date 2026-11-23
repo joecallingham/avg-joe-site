@@ -962,3 +962,6 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 /* clients: the title's own rule is the line under "Clients"; the first panel's top rule sat on it and doubled it */
 .clp:first-child{border-top-color:transparent}
 @media (min-width:761px){.clp-line{grid-column:6/span 5}}   /* descriptions one column further along */
+/* clients: no pictures, but each row still slides up on its own: an empty, see-through run of scroll after every row but the last */
+.clp:not(:last-child){padding-bottom:33.333vh;padding-bottom:33.333svh;background:transparent}
+.clp-bar{background:var(--cream)}
