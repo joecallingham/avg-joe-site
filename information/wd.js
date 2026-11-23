@@ -109,7 +109,8 @@
     // the frame's top line moves up with the section's grey grid line as the page scrolls, until it meets the title
     const top = Math.max(b.top, pin);
     fly.style.top = top + 'px';
-    if (!phone()) fly.firstElementChild.setAttribute('viewBox', vbUp(K * Math.max(0, box.offsetTop - top)));   // the drawing rises, but slower than the frame line
+    // the drawing rises more slowly than the frame line, and finishes as Listen settles into place
+    if (!phone()) fly.firstElementChild.setAttribute('viewBox', vbUp(rise * Math.max(0, Math.min(1, (H - d.top) / Math.max(1, H - pin)))));
     fly.style.bottom = Math.max(0, H - d.bottom) + 'px';
     box.style.visibility = 'hidden'; dest.style.visibility = 'hidden';
     firstStep.classList.add('in');
