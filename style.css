@@ -530,3 +530,9 @@ html.cases-off #s-cases{background:var(--cream)}
   .case.cp .more{margin-top:var(--in)}
 }
 .case.cp .cp-img{display:block!important}   /* an older phone rule flattened case figures; these keep their own box */
+/* desktop: a subtle shadow lifts the notch and the bottom bar off the page (the notch's follows its curves) */
+@media (min-width:761px){
+  #frame-bottom{box-shadow:0 -1px 14px rgba(11,11,11,.09)}
+  .notch-fill{filter:drop-shadow(0 -2px 8px rgba(11,11,11,.09))}
+}
+@media (min-width:761px){.notch-fill{clip-path:inset(-40px -40px calc(100% - 2.6rem + 1px) -40px)}}   /* the notch's shadow stops at the bar's top edge, so it doesn't fall on the bar */
