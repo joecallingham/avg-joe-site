@@ -616,3 +616,11 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 /* What We Do: the pictures run full bleed to the bottom of the screen, with the bottom divider and the window's left line down there too */
 .wd{--wd-bot:0px}
 @media (max-width:760px){.wd{--wd-bot:0px}}
+/* phones: What We Do's image runs the full width and to the bottom of the screen, behind the vertical grid lines */
+@media (max-width:760px){
+  .wd .wd-pics{left:0;width:100%;z-index:1}
+  .wd .wd-win{z-index:2}
+}
+/* the section's lines and text sit above the travelling image while it drops */
+.wd-stick{z-index:3}
+.wd.flying .wd-rule-b{opacity:0}

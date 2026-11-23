@@ -72,13 +72,13 @@
   // rather than a bigger drawing. The Digital box and the Listen panel are the same width, so the image keeps its size and place.
   const svgs = () => [...document.querySelectorAll('.wd-pic svg, .wd-fly svg'), dest];   // the services, the travelling copy and Listen only (not the other steps)
   const fit = () => {
-    const wide = matchMedia('(min-width: 761px)').matches;
     // the crop matches the picture box's own shape on this screen, so the drawing is always sized by width (never by height)
-    const bw = box.offsetWidth || 1, bh = box.offsetHeight || 1, vh = Math.min(1000, 1000 * bh / bw), vb = `0 ${((1000 - vh) / 2).toFixed(1)} 1000 ${vh.toFixed(1)}`;
+    // (on phones too: the box and the Listen panel are both full width there, so the image keeps its size and place)
+    const bw = box.offsetWidth || 1, bh = box.offsetHeight || 1, vh = 1000 * bh / bw, vb = `0 ${((1000 - vh) / 2).toFixed(1)} 1000 ${vh.toFixed(1)}`;
     svgs().forEach(v => {
       if (!v.dataset.vb) v.dataset.vb = v.getAttribute('viewBox');
-      v.setAttribute('viewBox', wide ? vb : v.dataset.vb);
-      v.setAttribute('preserveAspectRatio', wide ? 'xMidYMin meet' : 'xMidYMid meet');
+      v.setAttribute('viewBox', vb);
+      v.setAttribute('preserveAspectRatio', 'xMidYMin meet');
     });
   };
   const fly = document.createElement('div');
@@ -87,7 +87,7 @@
   const firstStep = dest.closest('.st');
   document.body.appendChild(fly);
   fit(); addEventListener('resize', fit);
-  const list = document.querySelector('.wd-sec .steps4');
+  const list = document.querySelector('.wd-sec .steps4'), stage = box.closest('.wd');
   let raf = 0, y0 = null, h0 = 0;
   const tick = () => {
     raf = 0;
@@ -95,7 +95,7 @@
     const pin = parseFloat(getComputedStyle(list).getPropertyValue('--st-js')) || 50;
     const t = Math.max(0, Math.min(1, (H - d.top) / Math.max(1, H - pin)));      // 0 as Listen arrives at the bottom, 1 once it has pinned
     const b = box.getBoundingClientRect();
-    if (t <= 0 || t >= 1 || b.width === 0) { fly.style.visibility = 'hidden'; box.style.visibility = ''; dest.style.visibility = ''; if (t <= 0) { y0 = null; h0 = b.height; } return; }
+    if (t <= 0 || t >= 1 || b.width === 0) { stage.classList.remove('flying'); fly.style.visibility = 'hidden'; box.style.visibility = ''; dest.style.visibility = ''; if (t <= 0) { y0 = null; h0 = b.height; } return; }
     // a simple drop: the image holds where it was (at the split) while the page moves on, so it drops down into the next section;
     // once Listen's graphic space reaches it, it rides up with that panel and settles in. The drawing never scales:
     // only the frame's bottom edge moves down, uncovering more of the image.
@@ -104,6 +104,7 @@
     fly.style.visibility = 'visible';
     fly.style.left = L(b.left, d.left) + 'px'; fly.style.top = top + 'px';
     fly.style.width = L(b.width - 1, dest.clientWidth) + 'px';             // stops short of the divider lines, so they stay on top fly.style.height = L(h0 || b.height, d.height) + 'px';
+    stage.classList.add('flying');                                         // the section's bottom divider doesn't cut across the image as it drops
     box.style.visibility = 'hidden'; dest.style.visibility = 'hidden';     // the original and Listen's own graphic stay out of sight while the copy travels (one image on screen)
   };
   const ask = () => { if (!raf) raf = requestAnimationFrame(tick); };
