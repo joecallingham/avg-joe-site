@@ -303,6 +303,15 @@
       }
     };
     rhythm();
+    // each thumbnail lists what was involved as lozenges, under its grey line (taken from data-cats, so they always match the filters)
+    sel.forEach(w => {
+      const line = $('.wk-line', w);
+      if (!line || $('.wk-pills', w)) return;
+      const ul = document.createElement('ul');
+      ul.className = 'pills wk-pills';
+      w.dataset.cats.split('|').forEach(c => { const li = document.createElement('li'); li.textContent = c; ul.appendChild(li); });
+      line.after(ul);
+    });
     // view: images or a ruled list
     $$('.wk-view button').forEach(b => b.addEventListener('click', () => {
       $$('.wk-view button').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
