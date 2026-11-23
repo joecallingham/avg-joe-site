@@ -82,7 +82,7 @@
 
 /* Clients: the panels pin exactly under the held Clients title (measured, so its line and theirs are one) */
 (() => {
-  const title = document.querySelector('.cl-title'), stack = document.querySelector('.cl-stack');
+  const title = document.querySelector('.cl-title'), stack = document.querySelector('.cl-stack'), sec = document.querySelector('.cl-sec');
   if (!title || !stack) return;
   // once the last client has landed, the title and the stack move up together (as on the Work page)
   let base = 0, th = 0, raf = 0;
@@ -107,6 +107,8 @@
     const off = Math.min(0, stack.getBoundingClientRect().bottom - innerHeight);
     title.style.top = (base + off).toFixed(1) + 'px';
     stack.style.setProperty('--cl-off', off.toFixed(1) + 'px');
+    // phones: the title's cream cover only once it is held at the top, so the rule above Clients shows until then
+    title.classList.toggle('stuck', sec.getBoundingClientRect().top < base - 0.5);
   };
   addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(tick); }, { passive: true });
   pin(); addEventListener('resize', pin); document.fonts && document.fonts.ready.then(pin);
