@@ -479,3 +479,5 @@ html.intro-dark .nb-ic{color:rgba(241,238,231,.5)}
 }
 /* desktop: the home project headlines use the featured work title size */
 @media (min-width:761px){.case-boon h2,.case-620 h2,.case h2{font-size:var(--fs-title);line-height:1.14;letter-spacing:-.05em}}
+/* phones: featured work titles match the case study headlines */
+@media (max-width:760px){.fw-panel h4{font-size:var(--fs-head);line-height:1.2;letter-spacing:-.055em}}
