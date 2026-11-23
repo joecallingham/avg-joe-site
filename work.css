@@ -889,3 +889,26 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 /* the big card's picture fills whatever height the small cards beside it set (it never sets the row height itself) */
 @media (min-width:761px){.wk-grid3 .wk.wk-thumb.wk-big .wk-img img{position:absolute;inset:0;width:100%;height:100%}}
 @media (min-width:761px){.wk-grid3:not(.is-list) .wk.wk-thumb[style*="--span"]{grid-column:var(--span)!important}}
+
+/* ---- Selected Work, copied from the reference (26 Nov): no dividers or boxes, clean gaps; small cards a quarter wide,
+   big ones half; under each image the name in black and the line in grey, one modest size; controls above ---- */
+.wk-ctl{padding:var(--in) var(--margin) calc(var(--in) * 1.2)}
+.wk-view{grid-column:1/span 3}
+.wk-filt{grid-column:4/span 4;padding-left:calc(var(--gutter) * .5)}
+.wk-ctl > div{color:var(--ink)}
+.wk-grid3:not(.is-list){border-top:0!important;column-gap:var(--gutter);row-gap:calc(var(--in) * 2.2);padding:0 var(--margin) var(--sec);overflow:visible}
+.wk-grid3:not(.is-list) .wk.wk-thumb{box-shadow:none!important;border:0!important;background:none}
+.wk-grid3:not(.is-list) .wk.wk-thumb > a,.wk-grid3:not(.is-list) .wk.wk-thumb > div{display:block!important;height:auto}
+.wk-grid3:not(.is-list) .wk.wk-thumb .wk-img{aspect-ratio:4/3!important;height:auto!important;position:relative}
+.wk-grid3:not(.is-list) .wk.wk-thumb.wk-big .wk-img img{position:absolute;inset:0}
+.wk-grid3:not(.is-list) .wk-more{display:none!important}
+.wk-grid3:not(.is-list) .wk.wk-thumb .wk-name{padding:.9rem 0 0!important;font-size:var(--fs-sm)!important;line-height:1.3!important;letter-spacing:-.03em!important;font-weight:500;color:var(--ink)}
+.wk-grid3:not(.is-list) .wk.soon .wk-name::after{content:none}
+.wk-grid3:not(.is-list) .wk.wk-thumb .wk-line{padding:.15rem 0 0!important;font-size:var(--fs-sm)!important;line-height:1.3!important;letter-spacing:-.03em!important;font-weight:400;color:#8e8b86!important;max-width:30em}
+/* list view: tidy rows, light grey lines only */
+.wk-grid3.is-list{border-top:1px solid rgba(11,11,11,.15)!important;margin:0 var(--margin);padding-bottom:var(--sec)}
+.wk-grid3.is-list .wk-more{border:0!important}
+@media (max-width:760px){
+  .wk-filt{padding-left:0}
+  .wk-grid3:not(.is-list){row-gap:var(--in)}
+}
