@@ -88,7 +88,19 @@
   let base = 0, th = 0, raf = 0;
   const pin = () => {
     title.style.top = ''; base = parseFloat(getComputedStyle(title).top) || 0; th = title.getBoundingClientRect().height;
-    stack.style.setProperty('--cl-top', (base + th - 1).toFixed(2) + 'px'); tick();
+    stack.style.setProperty('--cl-top', (base + th - 1).toFixed(2) + 'px');
+    // each panel pins one bar lower than the last, so the bars collect one under another as the panels come up
+    const bar = stack.querySelector('.clp-bar');
+    stack.style.setProperty('--cl-bar', (bar ? bar.getBoundingClientRect().height : 36).toFixed(2) + 'px');
+    const ps = stack.querySelectorAll('.clp');
+    ps.forEach((p, i) => p.style.setProperty('--i', i));
+    // the last client's picture runs down to the bottom of the screen, so the stack lets go exactly as it lands (no early lift, no gap)
+    const last = ps[ps.length - 1], barH = bar ? bar.getBoundingClientRect().height : 36;
+    if (last) {
+      const img = last.querySelector('.clp-img'), frame = parseFloat(getComputedStyle(img).marginBottom) || 0;
+      img.style.height = Math.max(innerHeight / 3, innerHeight - (base + th - 1) - (ps.length - 1) * barH - barH - frame - 1) + 'px';
+    }
+    tick();
   };
   const tick = () => {
     raf = 0;
