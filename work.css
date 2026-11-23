@@ -562,8 +562,9 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 /* desktop: What We Do descriptions at the nav size, in a narrow box (about 8-10 words a line) */
 @media (min-width:761px){.wd .wd-desc{font-size:var(--small);line-height:1.45;letter-spacing:-.02em;max-width:22em;text-wrap:pretty}}
 /* Information: how we work is laid out like About Us: "01 Listen" as the label on the left, the step as large copy on the right (stacked on phones) */
-.wd-sec .steps4{display:block;height:auto;border-bottom:0;padding-bottom:var(--in)}
-.wd-sec .st{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter);min-height:0;padding:var(--in) var(--margin) 0;border:0!important}
+.wd-sec .steps4{display:block;height:auto;border-bottom:1px solid var(--ink);padding-bottom:0}
+.wd-sec .st{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter);min-height:0;padding:var(--in) var(--margin) calc(var(--in) * 2);border:0!important}
+.wd-sec .st + .st{border-top:1px solid var(--ink)!important}   /* each step its own ruled section */
 .wd-sec .st-no,.wd-sec .st-word{margin:0;font-weight:500;font-size:var(--small);line-height:1.45;letter-spacing:-.02em;grid-row:1}
 .wd-sec .st-no{grid-column:1/span 3;white-space:nowrap}
 .wd-sec .st-word{grid-column:1/span 3;padding-left:2.1em;color:var(--ink)}
