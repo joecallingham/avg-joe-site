@@ -63,3 +63,32 @@
   show(0);
   requestAnimationFrame(frame);
 })();
+/* After the last service (Digital), its graphic drops down and grows into the first step's graphic space (Listen),
+   showing more of the drawing as it goes, then fades into Listen's own graphic. Scrolling back reverses it. */
+(() => {
+  const box = document.querySelector('.wd-pics'), pics = document.querySelectorAll('.wd-pic'), dest = document.querySelector('.wd-sec .st .st-pat');
+  if (!box || !pics.length || !dest || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const fly = document.createElement('div');
+  fly.className = 'wd-fly'; fly.setAttribute('aria-hidden', 'true');
+  fly.innerHTML = pics[pics.length - 1].innerHTML;
+  document.body.appendChild(fly);
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const list = document.querySelector('.wd-sec .steps4');
+  let raf = 0;
+  const tick = () => {
+    raf = 0;
+    const H = innerHeight, d = dest.getBoundingClientRect();
+    const pin = parseFloat(getComputedStyle(list).getPropertyValue('--st-js')) || 50;
+    const t = Math.max(0, Math.min(1, (H - d.top) / Math.max(1, H - pin)));      // 0 as Listen arrives at the bottom, 1 once it has pinned
+    const b = box.getBoundingClientRect();
+    if (t <= 0 || t >= 1 || b.width === 0) { fly.style.visibility = 'hidden'; box.style.visibility = ''; return; }
+    const e = ease(t), L = (a, z) => a + (z - a) * e;
+    fly.style.visibility = 'visible';
+    fly.style.left = L(b.left, d.left) + 'px'; fly.style.top = L(b.top, d.top) + 'px';
+    fly.style.width = L(b.width, d.width) + 'px'; fly.style.height = L(b.height, d.height) + 'px';
+    fly.style.opacity = t > .82 ? (1 - (t - .82) / .18).toFixed(3) : 1;   // hands over to Listen's own graphic as it lands
+    box.style.visibility = 'hidden';                                       // the original stays out of sight while its copy travels
+  };
+  const ask = () => { if (!raf) raf = requestAnimationFrame(tick); };
+  addEventListener('scroll', ask, { passive: true }); addEventListener('resize', ask); tick();
+})();
