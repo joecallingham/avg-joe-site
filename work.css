@@ -637,3 +637,6 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 }
 @media (min-width:761px) and (prefers-reduced-motion:reduce){.st-copy::before{transform:none;transition:none}}
 .wd.gone .wd-stick{visibility:hidden}
+/* a divider above "01 Listen" the whole way in: on phones the travelling image carries it on its bottom edge; on desktop the Listen text has its own top line */
+@media (max-width:760px){.wd-fly{border-bottom:1px solid var(--ink)}}
+@media (min-width:761px){.wd-sec .st:first-child .st-copy{border-top:1px solid var(--ink)}}
