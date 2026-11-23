@@ -38,38 +38,3 @@
   };
   tick(); setInterval(tick, 20000);
 })();
-/* The closing image (Information page): it lives underneath the page, on the footer's level. The content scrolls up off it,
-   uncovering it full screen; its frame starts shrinking as soon as the content starts to leave, and ends in the box
-   between Extra and Ordinary once the footer is in.
-   As on the home page, the picture partly scales with its frame and is partly cropped by it mid-move, and the corners
-   round off as it leaves full screen. Driven straight off the scroll, so it never runs ahead of it. */
-(() => {
-  const sec = document.querySelector('.end-img'), foot = document.getElementById('foot'), slot = foot && foot.querySelector('.fm-slot');
-  if (!sec || !slot) return;
-  const src = sec.dataset.src;
-  const still = new Image(); still.src = src; still.alt = ''; slot.appendChild(still);
-  const fly = document.createElement('div'), img = new Image();
-  img.src = src; img.alt = ''; fly.className = 'ei-fly'; fly.setAttribute('aria-hidden', 'true'); fly.appendChild(img); document.body.appendChild(fly);
-  const CROP = 0.5, ease = t => t * t * (3 - 2 * t);
-  let raf = 0, state = '';
-  const tick = () => {
-    raf = 0;
-    const W = innerWidth, H = innerHeight, s = sec.getBoundingClientRect(), f = foot.getBoundingClientRect();
-    const t = Math.max(0, Math.min(1, (H - s.top) / (s.height + H)));    // 0 as the page content starts to scroll off, 1 once the footer is in
-    const mode = s.top >= H ? 'rest' : t >= 0.995 ? 'in' : 'out';
-    if (mode !== state) { state = mode; slot.classList.toggle('full', mode === 'in'); fly.classList.toggle('on', mode === 'out'); }
-    if (mode !== 'out') return;
-    const b = slot.getBoundingClientRect(), e = ease(t), L = (p, q) => p + (q - p) * e;
-    const by = Math.min(b.top, (H - b.height) / 2);                     // aim for the middle of the screen until the box rises past it, so it never drifts off
-    const x = L(0, b.left), y = L(0, by), w = L(W, b.width), h = L(H, b.height);
-    fly.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;
-    fly.style.width = w.toFixed(1) + 'px'; fly.style.height = h.toFixed(1) + 'px';
-    fly.style.borderRadius = (0.16 * Math.min(w, h) * e).toFixed(1) + 'px';
-    // the picture: sized for the full screen, scaled part of the way with the frame and cropped the rest
-    const crop = CROP * Math.sin(Math.PI * e), iw = w + (W - w) * crop, ih = h + (H - h) * crop, k = Math.max(iw / W, ih / H);
-    img.style.width = W + 'px'; img.style.height = H + 'px';
-    img.style.transform = `translate3d(${((w - W * k) / 2).toFixed(1)}px,${((h - H * k) / 2).toFixed(1)}px,0) scale(${k.toFixed(4)})`;
-  };
-  const ask = () => { if (!raf) raf = requestAnimationFrame(tick); };
-  addEventListener('scroll', ask, { passive: true }); addEventListener('resize', ask); tick();
-})();
