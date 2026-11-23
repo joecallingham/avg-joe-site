@@ -1,125 +1,122 @@
-/* Information page: What We Do, after santalarch.com's services.
+/* Information page: What We Do, then its hand-off into the first step (Listen).
    The section pins; as you scroll, the row of service names slides left through a window column (sharp inside it,
-   faint outside), each service's picture wipes in from the right in that same column, and the line beside it swaps. */
+   soft outside), each service's pattern wipes in, and the line beside it swaps. After the last service its pattern
+   carries straight on as Listen's (the same image, never scaled):
+   - desktop: the frame's top line rises with the grey grid line while the pattern drifts up at 30% of that speed,
+     finishing as Listen settles;
+   - phones: the pattern scrolls up with the page to the title, and Listen's text rises in underneath on the same scroll.
+   Built to stay smooth on phones: one update, run only when you scroll; only moving parts are written each frame
+   (transforms and clips, never layout); everything else is measured once and on resize. */
 (() => {
   const run = document.getElementById('wd');
   if (!run) return;
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const MQ = matchMedia('(max-width: 760px)'), phone = () => MQ.matches;
   const items = [...run.querySelectorAll('.wd-list li')].map(li => ({ name: li.querySelector('b').textContent, desc: li.querySelector('span').textContent }));
   const N = items.length, PER = 0.6;          // screens of scrolling per service
-  // everything slides in from the right while the section is still coming up the screen, so once it holds,
-  // every bit of scrolling turns a service, and it lets go as soon as the last one is in (no dead scroll either end)
-  run.style.height = (100 + (N - 0.75) * PER * 100) + 'vh';   // lets go as Digital starts sliding out of the window into the blur, so its image starts to drop then
+  run.style.height = (100 + (N - 0.75) * PER * 100) + 'vh';   // lets go as Digital starts sliding into the blur, so its image starts to drop then
 
   const stick = run.querySelector('.wd-stick');
   const tracks = [...run.querySelectorAll('.wd-track')];
   tracks.forEach(t => t.replaceChildren(...items.map(it => { const s = document.createElement('span'); s.textContent = it.name; return s; })));
   const pics = [...run.querySelectorAll('.wd-pic')];
-  const winEl = run.querySelector('.wd-win'), rule = run.querySelector('.wd-rule'), picsBox = run.querySelector('.wd-pics'), countEl = run.querySelector('.wd-count');
-  // desktop: the window's left line runs the full height (from the bottom line up); the pictures open out of it
-  const vline = document.createElement('div'); vline.className = 'wd-vline'; stick.appendChild(vline);
+  const winEl = run.querySelector('.wd-win'), box = run.querySelector('.wd-pics'), countEl = run.querySelector('.wd-count');
+  const vline = document.createElement('div'); vline.className = 'wd-vline'; stick.appendChild(vline);   // desktop: the window's full-height left line
   const desc = run.querySelector('.wd-desc'), cName = run.querySelector('.wd-cname'), cNum = run.querySelector('.wd-cnum');
   const pad = n => String(n).padStart(2, '0');
 
-  // names sit one window-width apart; the track moves so the current name is centred in the window
-  let gap = 0, win = 0, last = null;
-  const measure = () => { const w = run.querySelector('.wd-win'); gap = w.offsetWidth; win = w.offsetLeft + w.offsetWidth / 2; tracks.forEach(t => [...t.children].forEach((s, i) => { s.style.left = (i * gap) + 'px'; s.style.width = gap + 'px'; })); last = null; };
-  addEventListener('resize', measure); document.fonts && document.fonts.ready.then(measure); measure();
+  // the hand-off into Listen: a screen-high copy of the last pattern, revealed by a clip
+  const dest = document.querySelector('.wd-sec .st .st-pat');
+  const list = document.querySelector('.wd-sec .steps4'), firstStep = dest && dest.closest('.st');
+  const fly = document.createElement('div'), flySvg = pics[N - 1].querySelector('svg').cloneNode(true), flyLine = document.createElement('i');
+  fly.className = 'wd-fly'; fly.setAttribute('aria-hidden', 'true'); flyLine.className = 'wd-fly-line';
+  fly.append(flySvg, flyLine); document.body.appendChild(fly);
+
+  // write a style only when it changes, so each frame touches only what actually moves
+  const put = (el, k, v) => { const c = el._c || (el._c = {}); if (c[k] !== v) { c[k] = v; el.style[k] = v; } };
+  const flag = (el, c, on) => { if (el.classList.contains(c) !== on) el.classList.toggle(c, on); };
+
+  // ---- measured once, and again on resize / when fonts land
+  let gap = 0, win = 0, pin = 50, unit = 1, vy = 0, vH = 1000, rise = 0, flyH = 0, boxTop = 0, last = null, raf = 0;
+  const measure = () => {
+    gap = winEl.offsetWidth; win = winEl.offsetLeft + gap / 2;
+    tracks.forEach(t => [...t.children].forEach((s, i) => { s.style.left = (i * gap) + 'px'; s.style.width = gap + 'px'; }));
+    if (dest) {
+      pin = parseFloat(getComputedStyle(list).getPropertyValue('--st-js')) || 50;
+      // phones: Steps is pulled up by Listen's graphic height, so Listen's text rises on the same scroll as the image
+      run.style.marginBottom = phone() ? -dest.getBoundingClientRect().height + 'px' : '';
+      // one crop for every pattern here: sized by width, so a taller frame shows more of it rather than a bigger one
+      const w = box.offsetWidth || 1, dh = dest.getBoundingClientRect().height, h = Math.min(box.offsetHeight || w, dh || w);
+      unit = 1000 / w; vH = 1000 * h / w; vy = (1000 - vH) / 2; boxTop = box.offsetTop;
+      rise = phone() ? 0 : 0.3 * Math.max(0, boxTop - pin);         // desktop: how far the pattern drifts up on the way
+      const vb = up => `0 ${(vy + up * unit).toFixed(1)} 1000 ${vH.toFixed(1)}`;
+      const anchor = phone() ? 'xMidYMin meet' : 'xMidYMax meet';   // desktop: pinned to the shared bottom edge; phones: to the top
+      pics.forEach(p => { const v = p.querySelector('svg'); v.setAttribute('viewBox', vb(0)); v.setAttribute('preserveAspectRatio', anchor); });
+      for (const v of [dest, flySvg]) { v.setAttribute('viewBox', vb(rise)); v.setAttribute('preserveAspectRatio', anchor); }
+      flyH = Math.max(box.offsetHeight, dh);
+      fly.style.width = (dest.clientWidth - (phone() ? 0 : 1)) + 'px';   // stops short of the divider line, which draws up beside it
+      flySvg.style.height = flyH + 'px';
+    }
+    for (const el of [...pics, ...tracks, winEl, vline, box, countEl, fly, flySvg, flyLine]) el._c = {};
+    last = null; queue();
+  };
 
   let shown = -1, swapT = 0;
   const show = i => {
     shown = i;
-    pics.forEach((im, k) => im.classList.toggle('on', k <= i));   // each service's shapes grow in as it comes up (as the step panels' do) and stay grown under the next
+    pics.forEach((im, k) => flag(im, 'on', k <= i));                 // each pattern ripples in as its service comes up, and stays under the next
     cName.textContent = items[i].name; cNum.textContent = pad(i + 1) + ' | ' + pad(N);
     clearTimeout(swapT);
     desc.classList.add('out');
     swapT = setTimeout(() => { desc.textContent = items[i].desc; desc.classList.remove('out'); }, RM ? 0 : 220);
   };
 
-  const frame = () => {
-    requestAnimationFrame(frame);
-    const r = run.getBoundingClientRect();
-    if (r.bottom < -innerHeight || r.top > innerHeight * 1.5) return;
-    const s = -r.top / innerHeight;                                   // screens scrolled into the section
-    // the names run straight off the scroll at one pace the whole way: in from the right as the section arrives,
-    // through the window while it holds, and on off to the left as it leaves (no easing, no hold, no clamp)
-    const run_ = s / PER;
-    const p = Math.max(0, Math.min(N - 1, run_));                    // which service is in: pictures, line, counter
-    const q = Math.max(0, Math.min(1, (s + 0.85) / 0.85));            // how far the window, picture and counter have arrived
-    if (run_ === last) return;
-    last = run_;
-    const e = RM ? 1 : q, off = (1 - e) * innerWidth;                 // linear, so it moves with the scroll, not ahead of it
-    const x = win - gap / 2 - run_ * gap;
-    const eL = Math.min(1, e * 1.8), eP = Math.max(0, Math.min(1, (e - 0.45) / 0.55));   // lines first, then the picture
-    winEl.style.clipPath = `inset(${((1 - eL) * 100).toFixed(2)}% 0 0 0)`;          // the window's lines draw up from their base as the section arrives
-    vline.style.clipPath = `inset(${((1 - eL) * 100).toFixed(2)}% 0 0 0)`;
-    picsBox.style.clipPath = `inset(0 0 0 ${((1 - eP) * 100).toFixed(2)}%)`;         // then the picture opens out of the left line, right to left
-    countEl.style.opacity = e.toFixed(3);                                              // the counter fades in where it sits (no slide across the description)
-    tracks.forEach(t => t.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`);
-    // picture i wipes in from the right over picture i-1 as p goes from i-1 to i
-    pics.forEach((im, i) => { const f = i === 0 ? 1 : Math.max(0, Math.min(1, p - (i - 1))); im.style.clipPath = `inset(0 0 0 ${((1 - f) * 100).toFixed(2)}%)`; });
-    const i = Math.round(p);
-    if (i !== shown) show(i);
-  };
-  show(0);
-  requestAnimationFrame(frame);
-})();
-/* After the last service, its image carries straight on as Listen's image (the same picture).
-   The drawing never scales. As What We Do scrolls away, the frame's top line moves up with the grey grid line until it meets the title.
-   On desktop the drawing stays still while the frame line moves (both frames end at the bottom of the screen);
-   on phones the image scrolls up with the page and the Listen copy comes in underneath. */
-(() => {
-  const box = document.querySelector('.wd-pics'), pics = document.querySelectorAll('.wd-pic'), dest = document.querySelector('.wd-sec .st .st-pat');
-  if (!box || !pics.length || !dest) return;
-  const stage = box.closest('.wd'), list = document.querySelector('.wd-sec .steps4'), firstStep = dest.closest('.st');
-  const phone = () => matchMedia('(max-width: 760px)').matches;
-  const fly = document.createElement('div');
-  fly.className = 'wd-fly'; fly.setAttribute('aria-hidden', 'true');
-  fly.innerHTML = pics[pics.length - 1].innerHTML;
-  document.body.appendChild(fly);
-  let vy = 0, vH = 1000, unit = 1;
-  const K = 0.3;   // desktop: the drawing rises at 30% of the frame line's speed
-  const vbUp = px => `0 ${(vy + px * unit).toFixed(1)} 1000 ${vH.toFixed(1)}`;   // the same crop, with the drawing moved up px
-  // every graphic here is drawn to the same crop, sized by width and anchored to its box's bottom edge
-  const fit = () => {
-    const w = box.offsetWidth || 1, h = Math.min(box.offsetHeight || w, dest.clientHeight || w), vh = 1000 * h / w;
-    vy = (1000 - vh) / 2; vH = vh; unit = 1000 / w;                 // the crop, and drawing units per screen pixel
-    // phones: Steps is pulled up by Listen's graphic height, so Listen's text starts rising from the bottom of the screen
-    // on the same scroll that carries the image up to the top (until then it sits hidden behind What We Do's picture)
-    stage.style.marginBottom = phone() ? -dest.getBoundingClientRect().height + 'px' : '';
-    const vb = `0 ${vy.toFixed(1)} 1000 ${vH.toFixed(1)}`;
-    // desktop: the drawing is pinned to the shared bottom edge, so it stays put while the frame's top line moves;
-    // phones: pinned to the top edge, so the image scrolls with the page
-    const anchor = phone() ? 'xMidYMin meet' : 'xMidYMax meet';
-    [...document.querySelectorAll('.wd-pic svg, .wd-fly svg'), dest].forEach(v => { v.setAttribute('viewBox', vb); v.setAttribute('preserveAspectRatio', anchor); });
-  };
-  let raf = 0, y0 = 0;
   const tick = () => {
     raf = 0;
-    const H = innerHeight, d = dest.getBoundingClientRect(), b = box.getBoundingClientRect(), st = stage.querySelector('.wd-stick').getBoundingClientRect();
-    const pin = parseFloat(getComputedStyle(list).getPropertyValue('--st-js')) || 50;
-    if (st.top >= 0) y0 = b.top;                                            // where the image sits while the section holds
-    const going = st.top < 0 && d.top > pin + 0.5 && d.top < H;              // What We Do is leaving and Listen hasn't pinned yet
-    stage.classList.toggle('flying', going);
-    stage.classList.toggle('gone', st.top < 0 && !going && d.top <= pin + 0.5);   // once Listen has landed, the rest of What We Do stays out of sight (it overlaps Listen on phones)
-    const rise = phone() ? 0 : K * Math.max(0, box.offsetTop - pin);   // Listen's graphic sits where the drawing ends up after its rise
-    dest.setAttribute('viewBox', vbUp(rise));
-    if (!going) { fly.style.visibility = 'hidden'; box.style.visibility = ''; dest.style.visibility = ''; return; }
-    fly.style.visibility = 'visible';
-    fly.style.left = d.left + 'px'; fly.style.width = (dest.clientWidth - (phone() ? 0 : 1)) + 'px';     // stops short of the divider line, so it draws up in view
-    // the frame's top line moves up with the section's grey grid line as the page scrolls, until it meets the title
-    const top = Math.max(b.top, pin);
-    fly.style.top = top + 'px';
-    // the drawing rises more slowly than the frame line, and finishes as Listen settles into place
-    if (!phone()) fly.firstElementChild.setAttribute('viewBox', vbUp(rise * Math.max(0, Math.min(1, (H - d.top) / Math.max(1, H - pin)))));
-    fly.style.bottom = Math.max(0, H - d.bottom) + 'px';
-    box.style.visibility = 'hidden'; dest.style.visibility = 'hidden';
+    const H = innerHeight, r = run.getBoundingClientRect();
+    // ---- What We Do itself
+    if (r.bottom > -H && r.top < H * 1.5) {
+      const s = -r.top / H, run_ = s / PER;
+      if (run_ !== last) {
+        last = run_;
+        const p = Math.max(0, Math.min(N - 1, run_));
+        const e = RM ? 1 : Math.max(0, Math.min(1, (s + 0.85) / 0.85));   // how far the section has arrived
+        const eL = Math.min(1, e * 1.8), eP = Math.max(0, Math.min(1, (e - 0.45) / 0.55));   // lines draw up first, then the picture opens
+        put(winEl, 'clipPath', `inset(${((1 - eL) * 100).toFixed(1)}% 0 0 0)`);
+        put(vline, 'clipPath', `inset(${((1 - eL) * 100).toFixed(1)}% 0 0 0)`);
+        put(box, 'clipPath', `inset(0 0 0 ${((1 - eP) * 100).toFixed(1)}%)`);
+        put(countEl, 'opacity', e.toFixed(2));
+        const x = `translate3d(${(win - gap / 2 - run_ * gap).toFixed(1)}px,0,0)`;
+        tracks.forEach(t => put(t, 'transform', x));
+        // picture i wipes in over picture i-1 as p goes from i-1 to i (only the ones in play change)
+        pics.forEach((im, i) => { const f = i === 0 ? 1 : Math.max(0, Math.min(1, p - (i - 1))); put(im, 'clipPath', f >= 1 ? 'none' : `inset(0 0 0 ${((1 - f) * 100).toFixed(1)}%)`); });
+        const i = Math.round(p);
+        if (i !== shown) show(i);
+      }
+    }
+    // ---- the hand-off into Listen
+    if (!dest) return;
+    const st = stick.getBoundingClientRect().top;                      // 0 while the section holds, negative as it leaves
+    const d = dest.getBoundingClientRect();
+    const going = st < 0 && d.top > pin + 0.5 && d.top < H;             // What We Do is leaving and Listen hasn't settled
+    flag(run, 'flying', going);
+    flag(run, 'gone', st < 0 && !going && d.top <= pin + 0.5);          // after landing, the rest of What We Do stays out of sight
+    flag(fly, 'on', going); flag(box, 'off', going); flag(dest, 'off', going);
+    if (!going) return;
     firstStep.classList.add('in');
+    const top = Math.max(st + boxTop, pin), bottom = Math.min(H, d.bottom);   // the frame: from the grey grid line (or the title) to Listen's text
+    put(fly, 'left', d.left + 'px');
+    put(fly, 'clipPath', `inset(${top.toFixed(1)}px 0 ${(H - bottom).toFixed(1)}px 0)`);
+    // phones: the pattern rides with the frame's top; desktop: it sits on the bottom edge, lower by the drift still to come
+    const y = phone() ? top : H - flyH + rise * (1 - Math.max(0, Math.min(1, (H - d.top) / Math.max(1, H - pin))));
+    put(flySvg, 'transform', `translate3d(0,${y.toFixed(1)}px,0)`);
+    put(flyLine, 'transform', `translate3d(0,${(bottom - 1).toFixed(1)}px,0)`);   // phones: the divider above "01 Listen"
   };
-  const ask = () => { if (!raf) raf = requestAnimationFrame(tick); };
-  addEventListener('scroll', ask, { passive: true });
-  addEventListener('resize', () => { fit(); ask(); });
-  matchMedia('(max-width: 760px)').addEventListener('change', () => { fit(); ask(); });
-  document.fonts && document.fonts.ready.then(() => { fit(); ask(); });
-  fit(); tick();
+
+  const queue = () => { if (!raf) raf = requestAnimationFrame(tick); };
+  addEventListener('scroll', queue, { passive: true });
+  addEventListener('resize', measure);
+  MQ.addEventListener('change', measure);
+  document.fonts && document.fonts.ready.then(measure);
+  show(0); measure(); tick();
 })();
