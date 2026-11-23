@@ -714,3 +714,8 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 .info-end{padding:var(--sec) var(--frame) var(--frame)}
 .info-end .shot,.info-film.info-end .shot{position:relative;height:25vh;height:25svh;aspect-ratio:auto}
 .info-end img{width:100%;height:100%;object-fit:cover;display:block}
+/* the soft names stop at the window, so the sharp names inside it have no blurred halo behind them */
+.wd-faint{-webkit-mask-image:linear-gradient(to right,#000 0,#000 var(--wl),transparent var(--wl),transparent calc(var(--wl) + var(--ww)),#000 calc(var(--wl) + var(--ww)));mask-image:linear-gradient(to right,#000 0,#000 var(--wl),transparent var(--wl),transparent calc(var(--wl) + var(--ww)),#000 calc(var(--wl) + var(--ww)))}
+/* the closing image sits tight under the client list */
+.cs-sec.cs-sec:not(.wd-sec):not(.ab-sec):has(.cl){padding-bottom:0}
+.info-end{padding-top:0}
