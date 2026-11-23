@@ -566,9 +566,10 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 .wd-sec .st{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter);min-height:0;padding:var(--in) var(--margin) calc(var(--in) * 2);border:0!important}
 .wd-sec .st + .st{border-top:1px solid var(--ink)!important}   /* each step its own ruled section */
 .wd-sec .st-no,.wd-sec .st-word{margin:0;font-weight:500;font-size:var(--small);line-height:1.45;letter-spacing:-.02em;grid-row:1}
-.wd-sec .st-no{grid-column:1/span 3;white-space:nowrap}
-.wd-sec .st-word{grid-column:1/span 3;padding-left:2.1em;color:var(--ink)}
-.wd-sec .st-txt{grid-column:7/span 6;grid-row:1;margin:0;max-width:none;min-height:0;font-weight:500;font-size:var(--fs-body);line-height:1.22;letter-spacing:-.045em;color:var(--ink)}
+.wd-sec .st-no{grid-column:7/span 6;white-space:nowrap}
+.wd-sec .st-word{grid-column:7/span 6;padding-left:2.1em;color:var(--ink)}
+/* desktop: label over the step, in the right half, at the Craft/AI copy size (as in that panel) */
+.wd-sec .st-txt{grid-column:7/span 6;grid-row:2;margin:var(--in) 0 0;max-width:none;min-height:0;font-weight:500;font-size:var(--fs-head);line-height:1.14;letter-spacing:-.055em;color:var(--ink)}
 /* phones: the same, stacked like About Us: label, then the step at the About Us phone size */
 @media (max-width:760px){
   .wd-sec .st{display:block}
