@@ -64,8 +64,9 @@
   requestAnimationFrame(frame);
 })();
 /* After the last service, its image carries straight on as Listen's image (the same picture).
-   The drawing is anchored to the frame's top edge and never scales. As What We Do scrolls away, the frame's top edge moves up
-   with the grey grid line until it meets the title, then holds while Listen settles in under or beside it. */
+   The drawing never scales. As What We Do scrolls away, the frame's top line moves up with the grey grid line until it meets the title.
+   On desktop the drawing stays still while the frame line moves (both frames end at the bottom of the screen);
+   on phones the image scrolls up with the page and the Listen copy comes in underneath. */
 (() => {
   const box = document.querySelector('.wd-pics'), pics = document.querySelectorAll('.wd-pic'), dest = document.querySelector('.wd-sec .st .st-pat');
   if (!box || !pics.length || !dest) return;
@@ -79,7 +80,9 @@
   const fit = () => {
     const w = box.offsetWidth || 1, h = Math.min(box.offsetHeight || w, dest.clientHeight || w), vh = 1000 * h / w;
     const vb = `0 ${((1000 - vh) / 2).toFixed(1)} 1000 ${vh.toFixed(1)}`;
-    const anchor = 'xMidYMin meet';   // the drawing is pinned to the frame's top edge, which moves with the grid line
+    // desktop: the drawing is pinned to the shared bottom edge, so it stays put while the frame's top line moves;
+    // phones: pinned to the top edge, so the image scrolls with the page
+    const anchor = phone() ? 'xMidYMin meet' : 'xMidYMax meet';
     [...document.querySelectorAll('.wd-pic svg, .wd-fly svg'), dest].forEach(v => { v.setAttribute('viewBox', vb); v.setAttribute('preserveAspectRatio', anchor); });
   };
   let raf = 0, y0 = 0;
@@ -93,8 +96,7 @@
     if (!going) { fly.style.visibility = 'hidden'; box.style.visibility = ''; dest.style.visibility = ''; return; }
     fly.style.visibility = 'visible';
     fly.style.left = d.left + 'px'; fly.style.width = dest.clientWidth + 'px';     // stops short of the divider line
-    // the image's top edge moves up with the section's grey grid line as the page scrolls, until it meets the title;
-    // then it holds there while Listen comes in (its copy comes up underneath on phones, beside it on desktop)
+    // the frame's top line moves up with the section's grey grid line as the page scrolls, until it meets the title
     fly.style.top = Math.max(b.top, pin) + 'px';
     fly.style.bottom = Math.max(0, H - d.bottom) + 'px';
     box.style.visibility = 'hidden'; dest.style.visibility = 'hidden';
