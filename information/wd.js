@@ -9,7 +9,7 @@
   const N = items.length, PER = 0.6;          // screens of scrolling per service
   // everything slides in from the right while the section is still coming up the screen, so once it holds,
   // every bit of scrolling turns a service, and it lets go as soon as the last one is in (no dead scroll either end)
-  run.style.height = (100 + N * PER * 100) + 'vh';   // holds one more step, so Digital slides on out of the window into the blur before the section lets go (and its image drops)
+  run.style.height = (100 + (N - 0.75) * PER * 100) + 'vh';   // lets go as Digital starts sliding out of the window into the blur, so its image starts to drop then
 
   const stick = run.querySelector('.wd-stick');
   const tracks = [...run.querySelectorAll('.wd-track')];
@@ -70,12 +70,14 @@
   if (!box || !pics.length || !dest || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   // desktop: the graphics are sized by the box's width (not its height), so a taller box shows more of the drawing below
   // rather than a bigger drawing. The Digital box and the Listen panel are the same width, so the image keeps its size and place.
-  const svgs = () => [...document.querySelectorAll('.wd-pic svg, .wd-fly svg, .wd-sec .st .st-pat')].filter(v => v.getAttribute('viewBox'));
+  const svgs = () => [...document.querySelectorAll('.wd-pic svg, .wd-fly svg'), dest];   // the services, the travelling copy and Listen only (not the other steps)
   const fit = () => {
     const wide = matchMedia('(min-width: 761px)').matches;
+    // the crop matches the picture box's own shape on this screen, so the drawing is always sized by width (never by height)
+    const bw = box.offsetWidth || 1, bh = box.offsetHeight || 1, vh = Math.min(1000, 1000 * bh / bw), vb = `0 ${((1000 - vh) / 2).toFixed(1)} 1000 ${vh.toFixed(1)}`;
     svgs().forEach(v => {
       if (!v.dataset.vb) v.dataset.vb = v.getAttribute('viewBox');
-      v.setAttribute('viewBox', wide ? '0 220 1000 561' : v.dataset.vb);
+      v.setAttribute('viewBox', wide ? vb : v.dataset.vb);
       v.setAttribute('preserveAspectRatio', wide ? 'xMidYMin meet' : 'xMidYMid meet');
     });
   };
@@ -101,7 +103,7 @@
     const top = Math.min(y0, d.top), L = (a, z) => a + (z - a) * t;
     fly.style.visibility = 'visible';
     fly.style.left = L(b.left, d.left) + 'px'; fly.style.top = top + 'px';
-    fly.style.width = L(b.width, d.width) + 'px'; fly.style.height = L(h0 || b.height, d.height) + 'px';
+    fly.style.width = L(b.width - 1, dest.clientWidth) + 'px';             // stops short of the divider lines, so they stay on top fly.style.height = L(h0 || b.height, d.height) + 'px';
     box.style.visibility = 'hidden'; dest.style.visibility = 'hidden';     // the original and Listen's own graphic stay out of sight while the copy travels (one image on screen)
   };
   const ask = () => { if (!raf) raf = requestAnimationFrame(tick); };
