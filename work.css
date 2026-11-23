@@ -549,3 +549,5 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .ab-sec .cs-brief .copy,.hv-mine .hv-txt{font-weight:500;font-size:var(--fs-head);line-height:1.2;letter-spacing:-.055em}
   .wd .wd-desc{font-size:var(--small);line-height:1.45;letter-spacing:-.02em}
 }
+/* phones: label to copy is one step (--in) everywhere, as in the Craft/AI panel; the grid's row gap no longer stacks on top */
+@media (max-width:760px){.cs-brief{row-gap:0}}
