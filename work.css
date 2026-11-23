@@ -668,3 +668,5 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 }
 /* Digital, its travelling copy and Listen are one continuous image: their shapes never grow in (so nothing restarts as Listen arrives) */
 .wd-pic:last-child .s,.wd-fly .s,.wd-sec .st:first-child .st-pat .s{scale:1!important;transition:none!important}
+/* the flipped steps' divider sits on the same pixel column as Listen's and Sharpen's */
+@media (min-width:761px){.wd-sec .st:nth-child(even) .st-copy::before{margin-right:0}}
