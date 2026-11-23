@@ -6,24 +6,44 @@
 <title>Work — Avg Joe</title>
 <meta name="description" content="Selected work from Avg Joe: branding, art direction, packaging, digital and film.">
 <meta name="theme-color" content="#f1eee7">
-<link rel="stylesheet" href="/style.css?v=20261126q">
-<link rel="stylesheet" href="/work.css?v=20261126q">
+<link rel="stylesheet" href="/style.css?v=20261126r">
+<link rel="stylesheet" href="/work.css?v=20261126r">
 </head>
 <body>
 <div class="pt" aria-hidden="true"></div>
 
 <main>
-  <h2 class="sec-title"><span>Work</span>
-    <span class="wk-bar"><span>Filter by:</span><button type="button" class="cats-open" aria-expanded="false" aria-controls="cats"><span class="cats-label">All</span> (<span class="wk-count">5</span>)</button></span>
-  </h2>
+  <h2 class="sec-title wk-title"><span>Work</span></h2>
 
   <!-- opens like Information: one line in headline type, then the work -->
   <header class="info-hero grid wk-intro">
     <h1 class="rv">Where <span class="craft" data-rot data-rot-auto>craft</span> and <span class="ai">AI</span> blend. Ideas made by hand, then built to keep on working.</h1>
   </header>
 
-  <!-- rows of one (full bleed), three, then two across, dealt out in page.js over whatever is showing, so the rhythm holds when you filter -->
+  <!-- the three featured projects: full-screen panels that stack under the title and intro (page.js) -->
   <div class="grid wk-list">
+    <article class="wk" data-cats="Branding|Packaging|Art Direction" data-rot-hover>
+      <a href="/work/bison/"><span class="wk-img"><img class="rv" src="/img/work/bison/cup.jpg" alt="" width="2000" height="1092"></span>
+      <p class="wk-name" data-rot>Bison Coffee</p><p class="wk-line">Bringing quality to a traditional scene</p></a>
+    </article>
+    <article class="wk soon" data-cats="Branding|Automation|Art Direction|Photography" data-rot-hover>
+      <div><span class="wk-img"><img class="rv" src="/img/620.jpg" alt="" width="1800" height="1805" loading="lazy"></span>
+      <p class="wk-name" data-rot>620 Tennis Multicamp</p><p class="wk-line">More time coaching, less time promoting</p></div>
+    </article>
+    <article class="wk soon" data-cats="Branding|Automation|Art Direction|App Build|Photography" data-rot-hover>
+      <div><span class="wk-img"><img class="rv" src="/img/boon-sign.jpg" alt="" width="2200" height="1004" loading="lazy" style="object-position:42% 50%"></span>
+      <p class="wk-name" data-rot>Brewed by Boon</p><p class="wk-line">Crafted by hand, rolled out weekly by AI</p></div>
+    </article>
+  </div>
+
+  <!-- Selected Work: laid out like About Us (filters as the label, a line in large type), then every project, three across; the filters work live -->
+  <section class="cs-sec wk-sel">
+    <h2 class="sec-title"><span>Selected Work</span></h2>
+    <div class="grid cs-brief">
+      <div class="lab wk-filters" role="group" aria-label="Filter the work"></div>
+      <div class="copy"><p>Everything here was made by hand, then set up to keep running without us.</p></div>
+    </div>
+    <div class="wk-grid3">
     <article class="wk" data-cats="Branding|Packaging|Art Direction" data-rot-hover>
       <a href="/work/bison/"><span class="wk-img"><img class="rv" src="/img/work/bison/cup.jpg" alt="" width="2000" height="1092"></span>
       <p class="wk-name" data-rot>Bison Coffee</p><p class="wk-line">Bringing quality to a traditional scene</p></a>
@@ -44,7 +64,8 @@
       <div><span class="wk-img"><img class="rv" src="/img/download-hero.jpg" alt="" width="1080" height="1920" loading="lazy" style="object-position:50% 38%"></span>
       <p class="wk-name" data-rot>Download x Mary Wyatt</p><p class="wk-line">A collection, live at Download Festival</p></div>
     </article>
-  </div>
+    </div>
+  </section>
 </main>
 
 <footer class="foot" id="foot">
@@ -58,11 +79,6 @@
   </div>
 </footer>
 
-<div class="cats-veil" aria-hidden="true"></div>
-<aside class="cats" id="cats" aria-label="Filter work by category" aria-hidden="true">
-  <div class="cats-top"><span>Categories</span><button type="button" class="cats-close">Close</button></div>
-  <ul></ul>
-</aside>
 
 <a id="logo-avg" class="logo" href="/" aria-label="Avg Joe, home">Avg</a>
 <a id="logo-joe" class="logo" href="/" aria-hidden="true" tabindex="-1">Joe</a>
@@ -76,9 +92,9 @@
 </nav>
 
 <script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
-<script src="/page.js?v=20261126q"></script>
-<script src="/booking.js?v=20261126q"></script>
-<script src="/transition.js?v=20261126q"></script>
-<script src="/footer.js?v=20261126q"></script>
+<script src="/page.js?v=20261126r"></script>
+<script src="/booking.js?v=20261126r"></script>
+<script src="/transition.js?v=20261126r"></script>
+<script src="/footer.js?v=20261126r"></script>
 </body>
 </html>

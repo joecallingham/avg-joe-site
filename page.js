@@ -246,41 +246,31 @@
     drawGoo();
   }
 
-  /* ---------- Work index: Mother-style grid + the categories menu ---------- */
-  const wks = $$('.wk');
-  if (wks.length) {
-    // the first three projects showing are full-screen panels that stack as you scroll (after adoratorio.studio):
-    // a thin bar (number, name, what we did, the line) over an image filling the screen; the rest sit underneath as thumbnails
-    wks.forEach(w => {
+  /* ---------- Work index: three stacking panels, then Selected Work with live filters ---------- */
+  const feats = $$('.wk-list .wk'), sel = $$('.wk-sel .wk');
+  if (feats.length || sel.length) {
+    // featured: full-screen panels with a thin bar (number, name, what we did, the line) over the image (after adoratorio.studio)
+    feats.forEach((w, i) => {
       const bar = document.createElement('span'); bar.className = 'wk-cats';
       bar.textContent = w.dataset.cats.split('|').join(' · ');
-      const box = w.querySelector('a, div') || w; box.appendChild(bar);
+      (w.querySelector('a, div') || w).appendChild(bar);
+      w.classList.add('wk-feat');
+      w.querySelector('.wk-name').dataset.no = String(i + 1).padStart(2, '0');
     });
-    const layout = () => {
-      wks.filter(w => !w.hidden).forEach((w, i) => {
-        w.classList.remove('wk-big', 'wk-s12', 'wk-s6', 'wk-s4', 'wk-row-start');
-        w.classList.toggle('wk-feat', i < 3); w.classList.toggle('wk-thumb', i >= 3);
-        w.querySelector('.wk-name').dataset.no = String(i + 1).padStart(2, '0');
-      });
-      // thumbnails sit three across; a short last row widens to fill, so nothing behind shows through a gap
-      const th = wks.filter(w => !w.hidden && w.classList.contains('wk-thumb')), full = th.length - th.length % 3;
-      th.forEach((w, i) => { w.style.gridColumn = i < full ? '' : 'span ' + (12 / (th.length - full)); });
-    };
-    // the intro line holds at the top while the three panels stack beneath it; once the third has landed,
-    // the intro and the stack move up together as the thumbnails arrive
-    const intro = $('.wk-intro'), wlist = $('.wk-list'), wtitle = $('main > .sec-title');
+    sel.forEach(w => w.classList.add('wk-thumb'));
+    // the Work title and the intro hold at the top while the panels stack beneath; when Selected Work arrives, they all move up together
+    const intro = $('.wk-intro'), wlist = $('.wk-list'), wtitle = $('.wk-title'), selSec = $('.wk-sel');
     if (intro && wlist) {
       let ih = 0, base = 0, th = 0, raf = 0;
       const measure = () => {
         base = matchMedia('(max-width: 760px)').matches ? 3.4 * parseFloat(getComputedStyle(document.documentElement).fontSize) : 0;
-        th = wtitle ? wtitle.getBoundingClientRect().height : 0;         // the Work title holds too, above the intro
+        th = wtitle ? wtitle.getBoundingClientRect().height : 0;
         ih = intro.getBoundingClientRect().height;
         wlist.style.setProperty('--wk-ih', (th + ih) + 'px'); wlist.style.setProperty('--wk-base', base + 'px');
       };
       const tick = () => {
         raf = 0;
-        const H = innerHeight, firstThumb = wks.find(w => !w.hidden && w.classList.contains('wk-thumb'));
-        const ref = firstThumb ? firstThumb.getBoundingClientRect().top : wlist.getBoundingClientRect().bottom;
+        const H = innerHeight, ref = selSec ? selSec.getBoundingClientRect().top : wlist.getBoundingClientRect().bottom;
         const off = Math.min(0, ref - H);
         intro.style.top = (base + th + off).toFixed(1) + 'px';
         if (wtitle) wtitle.style.top = (base + off).toFixed(1) + 'px';
@@ -292,43 +282,25 @@
       document.fonts && document.fonts.ready.then(() => { measure(); ask(); });
       measure(); tick();
     }
-    const panel = $('#cats'), veil = $('.cats-veil'), opener = $('.cats-open'), list = $('ul', panel);
-    const counts = new Map();
-    wks.forEach(w => w.dataset.cats.split('|').forEach(c => counts.set(c, (counts.get(c) || 0) + 1)));
-    const cats = [['All', wks.length], ...[...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))];
-    cats.forEach(([name, n]) => {
-      const li = document.createElement('li'), b = document.createElement('button');
-      b.type = 'button'; b.dataset.cat = name; b.setAttribute('aria-pressed', String(name === 'All'));
-      b.innerHTML = `<span class="cn">${name}</span><sup>${n}</sup>`;
-      b.addEventListener('click', () => pick(name));
-      li.appendChild(b); list.appendChild(li);
-    });
-    // each project lists what was involved; these are the only lozenges on the site, and they light up for the picked filter
-    wks.forEach(w => {
-      const ul = document.createElement('ul'); ul.className = 'wk-tags';
-      w.dataset.cats.split('|').forEach(c => { const li = document.createElement('li'); li.textContent = c; li.dataset.cat = c; ul.appendChild(li); });
-      (w.querySelector('a, div') || w).appendChild(ul);
-    });
-    let byKey = false;
-    const open = on => {
-      panel.classList.toggle('open', on); veil.classList.toggle('open', on);
-      panel.setAttribute('aria-hidden', String(!on)); opener.setAttribute('aria-expanded', String(on));
-      if (on) { lenis.stop(); if (byKey) setTimeout(() => $('[aria-pressed="true"]', list).focus({ preventScroll: true }), 350); } else { lenis.start(); if (byKey) opener.focus({ preventScroll: true }); }
-    };
-    function pick(name) {
-      $$('button', list).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === name)));
-      wks.forEach(w => { w.hidden = name !== 'All' && !w.dataset.cats.split('|').includes(name); });
-      $('.cats-label').textContent = name; $('.wk-count').textContent = wks.filter(w => !w.hidden).length;
-      $$('.wk-tags li').forEach(li => li.classList.toggle('on', li.dataset.cat === name));
-      layout(); open(false);
-      wks.filter(w => !w.hidden).forEach((w, i) => { const im = $('img', w); im.classList.remove('in'); setTimeout(() => im.classList.add('in'), 60 + i * 70); });
-      lenis.scrollTo(0, { duration: 0.8 });
+    // Selected Work filters: plain words in the label column; picking one filters the grid in place
+    const fl = $('.wk-filters');
+    if (fl && sel.length) {
+      const counts = new Map();
+      sel.forEach(w => w.dataset.cats.split('|').forEach(c => counts.set(c, (counts.get(c) || 0) + 1)));
+      const cats = [['All', sel.length], ...[...counts].sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]))];
+      cats.forEach(([name, n]) => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.dataset.cat = name; b.setAttribute('aria-pressed', String(name === 'All'));
+        b.innerHTML = `${name}<sup>${n}</sup>`;
+        b.addEventListener('click', () => pick(name));
+        fl.appendChild(b);
+      });
+      const pick = name => {
+        $$('button', fl).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === name)));
+        sel.forEach(w => { w.hidden = name !== 'All' && !w.dataset.cats.split('|').includes(name); });
+        sel.filter(w => !w.hidden).forEach((w, i) => { const im = $('img', w); im.classList.remove('in'); setTimeout(() => im.classList.add('in'), 60 + i * 70); });
+      };
     }
-    opener.addEventListener('click', e => { byKey = e.detail === 0; open(true); });
-    $('.cats-close').addEventListener('click', () => open(false));
-    veil.addEventListener('click', () => open(false));
-    addEventListener('keydown', e => { if (e.key === 'Escape' && panel.classList.contains('open')) open(false); });
-    layout();
   }
 
   // logo shape buttons: <button data-logo="url"> swaps the mask image on the stage

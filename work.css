@@ -811,3 +811,18 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 .wk.wk-feat .wk-img{border-top:0!important;margin:0 var(--frame) var(--frame);width:auto}
 /* the Work title holds at the top too, above the intro (page.js moves it up with the stack) */
 .page main > .sec-title:has(.wk-bar){position:sticky;z-index:4;background:var(--cream)}
+
+/* ---- Work page: Selected Work (26 Nov). Laid out like About Us: the filters as the label, a line in large type;
+   then every project, three even columns, ruled like the rest of the site ---- */
+.page main > .sec-title.wk-title{position:sticky;z-index:4;background:var(--cream)}
+.wk-sel{position:relative;z-index:3;background:var(--cream);padding-bottom:0!important}
+.wk-filters{display:flex;flex-direction:column;align-items:flex-start;gap:.15rem}
+.wk-filters button{appearance:none;border:0;background:none;padding:0;font:inherit;font-size:var(--small);line-height:1.45;letter-spacing:-.02em;color:#8e8b86;cursor:pointer;transition:color .25s}
+.wk-filters button:hover,.wk-filters button[aria-pressed="true"]{color:var(--ink)}
+.wk-filters sup{font-size:.7em;margin-left:.25em;vertical-align:super}
+.wk-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:var(--sec);border-top:1px solid var(--ink);overflow:clip}
+.wk-grid3 .wk.wk-thumb{grid-column:auto!important}
+@media (max-width:760px){
+  .wk-filters{flex-direction:row;flex-wrap:wrap;gap:.2rem 1rem}
+  .wk-grid3{grid-template-columns:1fr}
+}
