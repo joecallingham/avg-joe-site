@@ -83,6 +83,9 @@
   const fit = () => {
     const w = box.offsetWidth || 1, h = Math.min(box.offsetHeight || w, dest.clientHeight || w), vh = 1000 * h / w;
     vy = (1000 - vh) / 2; vH = vh; unit = 1000 / w;                 // the crop, and drawing units per screen pixel
+    // phones: Steps is pulled up by Listen's graphic height, so Listen's text starts rising from the bottom of the screen
+    // on the same scroll that carries the image up to the top (until then it sits hidden behind What We Do's picture)
+    stage.style.marginBottom = phone() ? -dest.getBoundingClientRect().height + 'px' : '';
     const vb = `0 ${vy.toFixed(1)} 1000 ${vH.toFixed(1)}`;
     // desktop: the drawing is pinned to the shared bottom edge, so it stays put while the frame's top line moves;
     // phones: pinned to the top edge, so the image scrolls with the page
@@ -97,6 +100,7 @@
     if (st.top >= 0) y0 = b.top;                                            // where the image sits while the section holds
     const going = st.top < 0 && d.top > pin + 0.5 && d.top < H;              // What We Do is leaving and Listen hasn't pinned yet
     stage.classList.toggle('flying', going);
+    stage.classList.toggle('gone', st.top < 0 && !going && d.top <= pin + 0.5);   // once Listen has landed, the rest of What We Do stays out of sight (it overlaps Listen on phones)
     const rise = phone() ? 0 : K * Math.max(0, box.offsetTop - pin);   // Listen's graphic sits where the drawing ends up after its rise
     dest.setAttribute('viewBox', vbUp(rise));
     if (!going) { fly.style.visibility = 'hidden'; box.style.visibility = ''; dest.style.visibility = ''; return; }

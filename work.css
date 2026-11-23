@@ -636,3 +636,4 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .st.in .st-copy::before{transform:scaleY(1)}
 }
 @media (min-width:761px) and (prefers-reduced-motion:reduce){.st-copy::before{transform:none;transition:none}}
+.wd.gone .wd-stick{visibility:hidden}
