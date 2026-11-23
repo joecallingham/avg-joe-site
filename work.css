@@ -576,3 +576,5 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .wd-sec .st-word{margin-left:.6em;padding-left:0}
   .wd-sec .st-txt{display:block;margin-top:var(--in);font-size:var(--fs-head);line-height:1.2;letter-spacing:-.055em}
 }
+/* phones: What We Do's pictures run from the left edge to the window's right line */
+@media (max-width:760px){.wd .wd-pics{left:0;width:calc(var(--wl) + var(--ww))}}
