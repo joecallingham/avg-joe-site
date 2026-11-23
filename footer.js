@@ -39,7 +39,8 @@
   tick(); setInterval(tick, 20000);
 })();
 /* The closing image (Information page): it lives underneath the page, on the footer's level. The content scrolls up off it,
-   uncovering it full screen; then, as the footer comes up, its frame shrinks into the box between Extra and Ordinary.
+   uncovering it full screen; its frame starts shrinking as soon as the content starts to leave, and ends in the box
+   between Extra and Ordinary once the footer is in.
    As on the home page, the picture partly scales with its frame and is partly cropped by it mid-move, and the corners
    round off as it leaves full screen. Driven straight off the scroll, so it never runs ahead of it. */
 (() => {
@@ -54,12 +55,13 @@
   const tick = () => {
     raf = 0;
     const W = innerWidth, H = innerHeight, s = sec.getBoundingClientRect(), f = foot.getBoundingClientRect();
-    const t = Math.max(0, Math.min(1, (H - f.top) / H));                 // 0 as the footer starts to come up, 1 once it's in
+    const t = Math.max(0, Math.min(1, (H - s.top) / (s.height + H)));    // 0 as the page content starts to scroll off, 1 once the footer is in
     const mode = s.top >= H ? 'rest' : t >= 0.995 ? 'in' : 'out';
     if (mode !== state) { state = mode; slot.classList.toggle('full', mode === 'in'); fly.classList.toggle('on', mode === 'out'); }
     if (mode !== 'out') return;
     const b = slot.getBoundingClientRect(), e = ease(t), L = (p, q) => p + (q - p) * e;
-    const x = L(0, b.left), y = L(0, b.top), w = L(W, b.width), h = L(H, b.height);
+    const by = Math.min(b.top, (H - b.height) / 2);                     // aim for the middle of the screen until the box rises past it, so it never drifts off
+    const x = L(0, b.left), y = L(0, by), w = L(W, b.width), h = L(H, b.height);
     fly.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;
     fly.style.width = w.toFixed(1) + 'px'; fly.style.height = h.toFixed(1) + 'px';
     fly.style.borderRadius = (0.16 * Math.min(w, h) * e).toFixed(1) + 'px';

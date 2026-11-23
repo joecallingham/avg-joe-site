@@ -697,3 +697,12 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 /* clients: dividers only between names (no line above the first or below the last) */
 .cl-list{border-bottom:0}
 .cl-row:first-child{border-top:0}
+/* clients: the dividers run full bleed across the page */
+.cl{overflow:hidden}
+.cl-row{border-top:0;position:relative}
+.cl-row + .cl-row::before{content:'';position:absolute;top:0;left:-100vw;right:-100vw;height:1px;background:var(--ink)}
+/* clients: the picture sits over the full-bleed lines; hovering fades the other names, never the lines */
+.cl-pic{z-index:2}
+.cl-list:hover .cl-row{opacity:1}
+.cl-name{transition:opacity .3s ease}
+@media (min-width:761px){.cl-list:hover .cl-row .cl-name{opacity:.32}.cl-list:hover .cl-row:hover .cl-name{opacity:1}}
