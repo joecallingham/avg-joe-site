@@ -568,3 +568,5 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 @media (min-width:761px){.cs-brief .copy{line-height:1.22}}
 /* desktop: case-study hero lines use the featured work title size */
 @media (min-width:761px){.cs-hero h1{font-size:var(--fs-title);line-height:1.14;letter-spacing:-.05em}}
+/* desktop: What We Do descriptions at the nav size, in a narrow box (about 8-10 words a line) */
+@media (min-width:761px){.wd .wd-desc{font-size:var(--small);line-height:1.45;letter-spacing:-.02em;max-width:22em;text-wrap:pretty}}
