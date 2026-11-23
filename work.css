@@ -590,9 +590,11 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 }
 /* phones: What We Do's pictures run from the left edge to the window's right line */
 @media (max-width:760px){.wd .wd-pics{left:0;width:calc(var(--wl) + var(--ww))}}
-/* desktop: What We Do's pictures run from the window's left line to the right edge; the counter sits at the end of the left half, number only */
+/* desktop: What We Do's pictures fill the left half; description and counter (number only) sit in the right half */
 @media (min-width:761px){
-  .wd .wd-pics{width:calc(100% - var(--wl))}
-  .wd .wd-count{right:calc(100% - var(--wl) + var(--margin))}
+  .wd .wd-pics{left:0;width:var(--wl)}   /* pictures fill the left half, up to the window's left line */
+  .wd .wd-desc{left:calc(var(--wl) + var(--margin))}   /* description and counter sit in the right half */
+  .wd .wd-count{right:var(--margin)}
   .wd .wd-cname{display:none}
+  .wd .wd-win{bottom:calc(100% - var(--split))}   /* the window's guide lines stop at the split, as in the mock */
 }
