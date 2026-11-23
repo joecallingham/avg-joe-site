@@ -642,3 +642,9 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 @media (min-width:761px){.wd-sec .st:first-child .st-copy{border-top:1px solid var(--ink)}}
 /* phones: What We Do's stage is the full (toolbars-hidden) screen height, so its picture still reaches the bottom when Chrome's bars collapse */
 @media (max-width:760px){.wd-stick{height:100vh;height:100lvh}}
+/* What We Do graphics: each service's shapes grow in when it comes up (as the step panels' do) */
+.wd-pic .s{transform-box:fill-box;transform-origin:center;scale:.2;transition:scale .9s cubic-bezier(.34,1.3,.64,1)}
+.wd-pic.on .s{scale:1}
+.wd-pic.on .s:nth-of-type(2){transition-delay:.06s}.wd-pic.on .s:nth-of-type(3){transition-delay:.12s}.wd-pic.on .s:nth-of-type(4){transition-delay:.18s}
+.wd-fly .s{scale:1}
+@media (prefers-reduced-motion:reduce){.wd-pic .s{scale:1;transition:none}}

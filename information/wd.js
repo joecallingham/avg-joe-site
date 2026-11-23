@@ -29,6 +29,7 @@
   let shown = -1, swapT = 0;
   const show = i => {
     shown = i;
+    pics.forEach((im, k) => im.classList.toggle('on', k <= i));   // each service's shapes grow in as it comes up (as the step panels' do) and stay grown under the next
     cName.textContent = items[i].name; cNum.textContent = pad(i + 1) + ' | ' + pad(N);
     clearTimeout(swapT);
     desc.classList.add('out');
