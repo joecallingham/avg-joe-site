@@ -809,3 +809,5 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 .wk-intro .craft{display:inline-block;cursor:default}
 /* the panel images are framed like the Information page's film: a cream gap of --frame at the sides and bottom */
 .wk.wk-feat .wk-img{border-top:0!important;margin:0 var(--frame) var(--frame);width:auto}
+/* the Work title holds at the top too, above the intro (page.js moves it up with the stack) */
+.page main > .sec-title:has(.wk-bar){position:sticky;z-index:4;background:var(--cream)}

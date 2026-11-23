@@ -268,20 +268,22 @@
     };
     // the intro line holds at the top while the three panels stack beneath it; once the third has landed,
     // the intro and the stack move up together as the thumbnails arrive
-    const intro = $('.wk-intro'), wlist = $('.wk-list');
+    const intro = $('.wk-intro'), wlist = $('.wk-list'), wtitle = $('main > .sec-title');
     if (intro && wlist) {
-      let ih = 0, base = 0, raf = 0;
+      let ih = 0, base = 0, th = 0, raf = 0;
       const measure = () => {
         base = matchMedia('(max-width: 760px)').matches ? 3.4 * parseFloat(getComputedStyle(document.documentElement).fontSize) : 0;
+        th = wtitle ? wtitle.getBoundingClientRect().height : 0;         // the Work title holds too, above the intro
         ih = intro.getBoundingClientRect().height;
-        wlist.style.setProperty('--wk-ih', ih + 'px'); wlist.style.setProperty('--wk-base', base + 'px');
+        wlist.style.setProperty('--wk-ih', (th + ih) + 'px'); wlist.style.setProperty('--wk-base', base + 'px');
       };
       const tick = () => {
         raf = 0;
-        const H = innerHeight, th = wks.find(w => !w.hidden && w.classList.contains('wk-thumb'));
-        const ref = th ? th.getBoundingClientRect().top : wlist.getBoundingClientRect().bottom;
+        const H = innerHeight, firstThumb = wks.find(w => !w.hidden && w.classList.contains('wk-thumb'));
+        const ref = firstThumb ? firstThumb.getBoundingClientRect().top : wlist.getBoundingClientRect().bottom;
         const off = Math.min(0, ref - H);
-        intro.style.top = (base + off).toFixed(1) + 'px';
+        intro.style.top = (base + th + off).toFixed(1) + 'px';
+        if (wtitle) wtitle.style.top = (base + off).toFixed(1) + 'px';
         wlist.style.setProperty('--wk-off', off.toFixed(1) + 'px');
       };
       const ask = () => { if (!raf) raf = requestAnimationFrame(tick); };
