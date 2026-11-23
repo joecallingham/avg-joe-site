@@ -64,9 +64,8 @@
   requestAnimationFrame(frame);
 })();
 /* After the last service, its image carries straight on as Listen's image (the same picture).
-   Both boxes reach the bottom of the screen, and the drawing is anchored to that bottom edge in both, so it never moves or scales.
-   As What We Do scrolls away, a copy holds the image's place: its top edge stays where it was, then rides up with the Listen panel
-   until it lands, uncovering more of the picture as it goes. */
+   The drawing is anchored to the frame's top edge and never scales. As What We Do scrolls away, the frame's top edge moves up
+   with the grey grid line until it meets the title, then holds while Listen settles in under or beside it. */
 (() => {
   const box = document.querySelector('.wd-pics'), pics = document.querySelectorAll('.wd-pic'), dest = document.querySelector('.wd-sec .st .st-pat');
   if (!box || !pics.length || !dest) return;
@@ -80,7 +79,7 @@
   const fit = () => {
     const w = box.offsetWidth || 1, h = Math.min(box.offsetHeight || w, dest.clientHeight || w), vh = 1000 * h / w;
     const vb = `0 ${((1000 - vh) / 2).toFixed(1)} 1000 ${vh.toFixed(1)}`;
-    const anchor = phone() ? 'xMidYMin meet' : 'xMidYMax meet';   // desktop: pinned to the shared bottom edge; phones: to the top edge
+    const anchor = 'xMidYMin meet';   // the drawing is pinned to the frame's top edge, which moves with the grid line
     [...document.querySelectorAll('.wd-pic svg, .wd-fly svg'), dest].forEach(v => { v.setAttribute('viewBox', vb); v.setAttribute('preserveAspectRatio', anchor); });
   };
   let raf = 0, y0 = 0;
@@ -94,9 +93,9 @@
     if (!going) { fly.style.visibility = 'hidden'; box.style.visibility = ''; dest.style.visibility = ''; return; }
     fly.style.visibility = 'visible';
     fly.style.left = d.left + 'px'; fly.style.width = dest.clientWidth + 'px';     // stops short of the divider line
-    // desktop: the top edge holds where the image was, then rides up with Listen.
-    // phones: the image just scrolls up with the page (and the divider) until it meets the title, then the Listen copy comes up underneath it
-    fly.style.top = (phone() ? Math.max(b.top, pin) : Math.min(y0, d.top)) + 'px';
+    // the image's top edge moves up with the section's grey grid line as the page scrolls, until it meets the title;
+    // then it holds there while Listen comes in (its copy comes up underneath on phones, beside it on desktop)
+    fly.style.top = Math.max(b.top, pin) + 'px';
     fly.style.bottom = Math.max(0, H - d.bottom) + 'px';
     box.style.visibility = 'hidden'; dest.style.visibility = 'hidden';
     firstStep.classList.add('in');
