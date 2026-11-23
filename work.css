@@ -802,3 +802,10 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 /* the thumbnails slide up over the last panel, like one more layer in the stack */
 .wk.wk-thumb{position:relative;z-index:2;background:var(--cream)}
 @media (max-width:760px){.wk.wk-thumb{grid-column:1/-1!important}}
+/* the intro holds at the top while the three panels stack beneath it (page.js moves both up once the third has landed) */
+.wk-intro{position:sticky;top:0;z-index:3;background:var(--cream);border-bottom:1px solid var(--ink);margin-bottom:-1px}
+.wk.wk-feat{top:calc(var(--wk-base,0px) + var(--wk-ih,0px) + var(--wk-off,0px));height:calc(100vh - var(--wk-base,0px) - var(--wk-ih,0px));height:calc(100svh - var(--wk-base,0px) - var(--wk-ih,0px))}
+@media (max-width:760px){.wk.wk-feat{top:calc(var(--wk-base,0px) + var(--wk-ih,0px) + var(--wk-off,0px));height:calc(100svh - var(--wk-base,0px) - var(--wk-ih,0px))}}
+.wk-intro .craft{display:inline-block;cursor:default}
+/* the panel images are framed like the Information page's film: a cream gap of --frame at the sides and bottom */
+.wk.wk-feat .wk-img{border-top:0!important;margin:0 var(--frame) var(--frame);width:auto}

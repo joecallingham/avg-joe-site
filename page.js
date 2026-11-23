@@ -266,6 +266,30 @@
       const th = wks.filter(w => !w.hidden && w.classList.contains('wk-thumb')), full = th.length - th.length % 3;
       th.forEach((w, i) => { w.style.gridColumn = i < full ? '' : 'span ' + (12 / (th.length - full)); });
     };
+    // the intro line holds at the top while the three panels stack beneath it; once the third has landed,
+    // the intro and the stack move up together as the thumbnails arrive
+    const intro = $('.wk-intro'), wlist = $('.wk-list');
+    if (intro && wlist) {
+      let ih = 0, base = 0, raf = 0;
+      const measure = () => {
+        base = matchMedia('(max-width: 760px)').matches ? 3.4 * parseFloat(getComputedStyle(document.documentElement).fontSize) : 0;
+        ih = intro.getBoundingClientRect().height;
+        wlist.style.setProperty('--wk-ih', ih + 'px'); wlist.style.setProperty('--wk-base', base + 'px');
+      };
+      const tick = () => {
+        raf = 0;
+        const H = innerHeight, th = wks.find(w => !w.hidden && w.classList.contains('wk-thumb'));
+        const ref = th ? th.getBoundingClientRect().top : wlist.getBoundingClientRect().bottom;
+        const off = Math.min(0, ref - H);
+        intro.style.top = (base + off).toFixed(1) + 'px';
+        wlist.style.setProperty('--wk-off', off.toFixed(1) + 'px');
+      };
+      const ask = () => { if (!raf) raf = requestAnimationFrame(tick); };
+      addEventListener('scroll', ask, { passive: true });
+      addEventListener('resize', () => { measure(); ask(); });
+      document.fonts && document.fonts.ready.then(() => { measure(); ask(); });
+      measure(); tick();
+    }
     const panel = $('#cats'), veil = $('.cats-veil'), opener = $('.cats-open'), list = $('ul', panel);
     const counts = new Map();
     wks.forEach(w => w.dataset.cats.split('|').forEach(c => counts.set(c, (counts.get(c) || 0) + 1)));
