@@ -16,6 +16,8 @@
   tracks.forEach(t => t.replaceChildren(...items.map(it => { const s = document.createElement('span'); s.textContent = it.name; return s; })));
   const pics = [...run.querySelectorAll('.wd-pic')];
   const winEl = run.querySelector('.wd-win'), rule = run.querySelector('.wd-rule'), picsBox = run.querySelector('.wd-pics'), countEl = run.querySelector('.wd-count');
+  // desktop: the window's left line runs the full height (from the bottom line up); the pictures open out of it
+  const vline = document.createElement('div'); vline.className = 'wd-vline'; stick.appendChild(vline);
   const desc = run.querySelector('.wd-desc'), cName = run.querySelector('.wd-cname'), cNum = run.querySelector('.wd-cnum');
   const pad = n => String(n).padStart(2, '0');
 
@@ -47,8 +49,10 @@
     last = run_;
     const e = RM ? 1 : q, off = (1 - e) * innerWidth;                 // linear, so it moves with the scroll, not ahead of it
     const x = win - gap / 2 - run_ * gap;
-    winEl.style.clipPath = `inset(${((1 - e) * 100).toFixed(2)}% 0 0 0)`;          // the window's two lines draw up from their base as the section arrives
-    picsBox.style.clipPath = `inset(${((1 - e) * 100).toFixed(2)}% 0 0 0)`;          // the pictures rise in place with the lines (they no longer slide across the text)
+    const eL = Math.min(1, e * 1.8), eP = Math.max(0, Math.min(1, (e - 0.45) / 0.55));   // lines first, then the picture
+    winEl.style.clipPath = `inset(${((1 - eL) * 100).toFixed(2)}% 0 0 0)`;          // the window's lines draw up from their base as the section arrives
+    vline.style.clipPath = `inset(${((1 - eL) * 100).toFixed(2)}% 0 0 0)`;
+    picsBox.style.clipPath = `inset(0 0 0 ${((1 - eP) * 100).toFixed(2)}%)`;         // then the picture opens out of the left line, right to left
     countEl.style.opacity = e.toFixed(3);                                              // the counter fades in where it sits (no slide across the description)
     tracks.forEach(t => t.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`);
     // picture i wipes in from the right over picture i-1 as p goes from i-1 to i

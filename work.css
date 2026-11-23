@@ -598,3 +598,9 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .wd .wd-cname{display:none}
   .wd .wd-win{bottom:calc(100% - var(--split))}   /* the window's guide lines stop at the split, as in the mock */
 }
+/* desktop: the window's left line runs from the bottom line all the way up (wd.js adds it and draws it up); the window keeps only its right line */
+.wd-vline{display:none}
+@media (min-width:761px){
+  .wd-vline{display:block;position:absolute;left:var(--wl);top:0;bottom:var(--wd-bot);width:1px;margin-left:-1px;background:rgba(11,11,11,.14);pointer-events:none;z-index:1}
+  .wd .wd-win{border-left-color:transparent}
+}
