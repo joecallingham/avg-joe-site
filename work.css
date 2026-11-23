@@ -694,3 +694,6 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 @media (prefers-reduced-motion:reduce){.cl-pic,.cl-pic img,.cl-row{transition:none}}
 @media (min-width:761px){.cl-row{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}}   /* names get the room, so they stay on one line */
 .cl-row{grid-template-columns:1fr!important}   /* names only */
+/* clients: dividers only between names (no line above the first or below the last) */
+.cl-list{border-bottom:0}
+.cl-row:first-child{border-top:0}
