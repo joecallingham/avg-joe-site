@@ -104,7 +104,7 @@
     flag(fly, 'on', going); flag(box, 'off', going); flag(dest, 'off', going);
     if (!going) return;
     firstStep.classList.add('in');
-    const top = Math.max(st + boxTop, pin), bottom = Math.min(H, d.bottom);   // the frame: from the grey grid line (or the title) to Listen's text
+    const top = Math.max(box.getBoundingClientRect().top, pin), bottom = Math.min(H, d.bottom);   // the frame: from the grey grid line (read live, so it always follows it) or the title, to Listen's text
     put(fly, 'left', d.left + 'px');
     put(fly, 'clipPath', `inset(${top.toFixed(1)}px 0 ${(H - bottom).toFixed(1)}px 0)`);
     // phones: the pattern rides with the frame's top; desktop: it sits on the bottom edge, lower by the drift still to come

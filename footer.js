@@ -38,3 +38,44 @@
   };
   tick(); setInterval(tick, 20000);
 })();
+/* The closing image (Information page): full width and a third of the screen tall; as the footer comes up its frame
+   shrinks and travels into the box between Extra and Ordinary. As on the home page, the picture partly scales with
+   its frame and is partly cropped by it mid-move, and the corners round off as it leaves full width. Driven straight
+   off the scroll, so it never runs ahead of it. */
+(() => {
+  const sec = document.querySelector('.end-img'), foot = document.getElementById('foot'), slot = foot && foot.querySelector('.fm-slot');
+  if (!sec || !slot) return;
+  const src = sec.querySelector('img');
+  const still = src.cloneNode(); still.loading = 'eager'; slot.appendChild(still);   // loaded up front, so it's there the moment the image lands
+  const fly = document.createElement('div'), img = src.cloneNode(); img.loading = 'eager';
+  fly.className = 'ei-fly'; fly.setAttribute('aria-hidden', 'true'); fly.appendChild(img); document.body.appendChild(fly);
+  const CROP = 0.5;
+  const ease = t => t * t * (3 - 2 * t);
+  let raf = 0, state = '';
+  const tick = () => {
+    raf = 0;
+    const H = innerHeight, f = foot.getBoundingClientRect();
+    const t = Math.max(0, Math.min(1, (H - f.top) / H));               // 0 as the footer starts to come up, 1 once it's in
+    const mode = t <= 0 ? 'rest' : t >= 0.995 ? 'in' : 'moving';
+    if (mode !== state) {
+      state = mode;
+      sec.classList.toggle('away', mode !== 'rest');
+      slot.classList.toggle('full', mode === 'in');
+      fly.classList.toggle('on', mode === 'moving');
+    }
+    if (mode !== 'moving') return;
+    const a = sec.getBoundingClientRect(), b = slot.getBoundingClientRect(), e = ease(t);
+    const L = (p, q) => p + (q - p) * e;
+    const x = L(a.left, b.left), y = L(a.top, b.top), w = L(a.width, b.width), h = L(a.height, b.height);
+    fly.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;
+    fly.style.width = w.toFixed(1) + 'px'; fly.style.height = h.toFixed(1) + 'px';
+    fly.style.borderRadius = (0.16 * Math.min(w, h) * e).toFixed(1) + 'px';
+    // the picture: sized for the full frame, scaled part of the way with the frame and cropped the rest
+    const crop = CROP * Math.sin(Math.PI * e), iw = w + (a.width - w) * crop, ih = h + (a.height - h) * crop;
+    const k = Math.max(iw / a.width, ih / a.height);
+    img.style.width = a.width + 'px'; img.style.height = a.height + 'px';
+    img.style.transform = `translate3d(${((w - a.width * k) / 2).toFixed(1)}px,${((h - a.height * k) / 2).toFixed(1)}px,0) scale(${k.toFixed(4)})`;
+  };
+  const ask = () => { if (!raf) raf = requestAnimationFrame(tick); };
+  addEventListener('scroll', ask, { passive: true }); addEventListener('resize', ask); tick();
+})();
