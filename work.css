@@ -959,3 +959,6 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 @media (max-width:760px){.clp-name{grid-column:1/span 8}.clp-bar > .clp-more{grid-column:9/span 4}}
 /* clients: button without its divider, right-aligned to the margin */
 .clp-bar > .clp-more{border-left:0;justify-content:flex-end;padding-left:0;padding-right:var(--margin)}
+/* clients: the title's own rule is the line under "Clients"; the first panel's top rule sat on it and doubled it */
+.clp:first-child{border-top-color:transparent}
+@media (min-width:761px){.clp-line{grid-column:6/span 5}}   /* descriptions one column further along */
