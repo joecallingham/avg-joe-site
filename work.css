@@ -950,3 +950,11 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 .clp-no{font-size:var(--small);letter-spacing:-.02em;vertical-align:.35em}
 .clp-line{grid-column:9/span 4;padding-right:var(--margin)}
 @media (max-width:760px){.clp-name{grid-column:1/-1;line-height:1.25}}
+
+/* clients: number (and line) in the left half, the name starts exactly at the middle of the screen */
+.clp-bar{grid-template-columns:1fr 1fr;column-gap:0}
+.clp-left{grid-column:1;display:flex;align-items:baseline;gap:.8em;padding-left:var(--margin);padding-right:var(--gutter);font-size:var(--small);letter-spacing:-.02em;font-weight:500;min-width:0}
+.clp-left .clp-no{margin:0;vertical-align:0}
+.clp-left .clp-line{grid-column:auto;padding:0;text-align:left;color:#8e8b86;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clp-name{grid-column:2;padding-left:0;padding-right:var(--margin)}
+@media (max-width:760px){.clp-name{grid-column:2}.clp-left .clp-line{display:none}}
