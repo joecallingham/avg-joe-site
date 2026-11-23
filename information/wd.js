@@ -37,10 +37,17 @@
   const flag = (el, c, on) => { if (el.classList.contains(c) !== on) el.classList.toggle(c, on); };
 
   // ---- measured once, and again on resize / when fonts land
-  let gap = 0, win = 0, pin = 50, unit = 1, vy = 0, vH = 1000, rise = 0, flyH = 0, boxTop = 0, last = null, raf = 0;
+  let gap = 0, win = 0, anchor = [], pin = 50, unit = 1, vy = 0, vH = 1000, rise = 0, flyH = 0, boxTop = 0, last = null, raf = 0;
   const measure = () => {
     gap = winEl.offsetWidth; win = winEl.offsetLeft + gap / 2;
-    tracks.forEach(t => [...t.children].forEach((s, i) => { s.style.left = (i * gap) + 'px'; s.style.width = gap + 'px'; }));
+    // the names sit one after another with the same gap between every pair; anchor[i] is where name i lines up with the window
+    const spans = [...tracks[0].children], fs = parseFloat(getComputedStyle(tracks[0]).fontSize) || 16, G = 1.1 * fs;
+    let x = 0; const lefts = [], widths = [];
+    spans.forEach(sp => { sp.style.width = 'auto'; sp.style.left = '0px'; });
+    spans.forEach((sp, i) => { const w = sp.getBoundingClientRect().width; lefts.push(x); widths.push(w); x += w + G; });
+    tracks.forEach(t => [...t.children].forEach((sp, i) => { sp.style.left = lefts[i] + 'px'; sp.style.width = widths[i] + 'px'; }));
+    const padL = phone() ? parseFloat(getComputedStyle(spans[0]).paddingLeft) || 0 : 0;
+    anchor = lefts.map((l, i) => phone() ? l - (winEl.offsetLeft + padL) + padL : l + widths[i] / 2 - win);   // desktop: centred in the window; phones: on its left line
     if (dest) {
       pin = parseFloat(getComputedStyle(list).getPropertyValue('--st-js')) || 50;
       // phones: Steps is pulled up by Listen's graphic height, so Listen's text rises on the same scroll as the image
@@ -50,9 +57,9 @@
       unit = 1000 / w; vH = 1000 * h / w; vy = (1000 - vH) / 2; boxTop = box.offsetTop;
       rise = phone() ? 0 : 0.3 * Math.max(0, boxTop - pin);         // desktop: how far the pattern drifts up on the way
       const vb = up => `0 ${(vy + up * unit).toFixed(1)} 1000 ${vH.toFixed(1)}`;
-      const anchor = phone() ? 'xMidYMin meet' : 'xMidYMax meet';   // desktop: pinned to the shared bottom edge; phones: to the top
-      pics.forEach(p => { const v = p.querySelector('svg'); v.setAttribute('viewBox', vb(0)); v.setAttribute('preserveAspectRatio', anchor); });
-      for (const v of [dest, flySvg]) { v.setAttribute('viewBox', vb(rise)); v.setAttribute('preserveAspectRatio', anchor); }
+      const fitTo = phone() ? 'xMidYMin meet' : 'xMidYMax meet';   // desktop: pinned to the shared bottom edge; phones: to the top
+      pics.forEach(p => { const v = p.querySelector('svg'); v.setAttribute('viewBox', vb(0)); v.setAttribute('preserveAspectRatio', fitTo); });
+      for (const v of [dest, flySvg]) { v.setAttribute('viewBox', vb(rise)); v.setAttribute('preserveAspectRatio', fitTo); }
       flyH = Math.max(box.offsetHeight, dh) + rise;                    // desktop: taller by the drift, so the picture always reaches the frame's top line
       fly.style.width = (dest.clientWidth - (phone() ? 0 : 1)) + 'px';   // stops short of the divider line, which draws up beside it
       flySvg.style.height = flyH + 'px';
@@ -86,7 +93,9 @@
         put(vline, 'clipPath', `inset(${((1 - eL) * 100).toFixed(1)}% 0 0 0)`);
         put(box, 'clipPath', `inset(0 0 0 ${((1 - eP) * 100).toFixed(1)}%)`);
         put(countEl, 'opacity', e.toFixed(2));
-        const x = `translate3d(${(win - gap / 2 - run_ * gap).toFixed(1)}px,0,0)`;
+        // glide between the anchors (and on past either end at the last spacing), so it still moves straight off the scroll
+        const k = Math.floor(run_), f = run_ - k, A = j => j < 0 ? anchor[0] + j * (anchor[1] - anchor[0]) : j > N - 1 ? anchor[N - 1] + (j - N + 1) * (anchor[N - 1] - anchor[N - 2]) : anchor[j];
+        const x = `translate3d(${(-(A(k) + (A(k + 1) - A(k)) * f)).toFixed(1)}px,0,0)`;
         tracks.forEach(t => put(t, 'transform', x));
         // picture i wipes in over picture i-1 as p goes from i-1 to i (only the ones in play change)
         pics.forEach((im, i) => { const f = i === 0 ? 1 : Math.max(0, Math.min(1, p - (i - 1))); put(im, 'clipPath', f >= 1 ? 'none' : `inset(0 0 0 ${((1 - f) * 100).toFixed(1)}%)`); });

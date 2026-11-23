@@ -706,3 +706,7 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 .cl-list:hover .cl-row{opacity:1}
 .cl-name{transition:opacity .3s ease}
 @media (min-width:761px){.cl-list:hover .cl-row .cl-name{opacity:.32}.cl-list:hover .cl-row:hover .cl-name{opacity:1}}
+/* no divider above "01 Listen" (desktop or phone, during the hand-off or after) */
+.wd-fly-line{display:none!important}
+.wd-sec .st:first-child .st-copy{border-top:0!important}
+@media (max-width:760px){.wd-sec .st:first-child .st-pat{border-bottom:0}}
