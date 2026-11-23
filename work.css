@@ -660,3 +660,9 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 .wd-track{backface-visibility:hidden}
 /* only Listen's black divider draws up; the other steps' dividers are simply there */
 @media (min-width:761px){.wd-sec .st:not(:first-child) .st-copy::before{transform:none;transition:none}}
+/* desktop: the steps alternate: Listen and Sharpen graphic left, Make and Hand Over graphic right (the divider moves with it) */
+@media (min-width:761px){
+  .wd-sec .st:nth-child(even) .st-pat{grid-column:2;grid-row:1}
+  .wd-sec .st:nth-child(even) .st-copy{grid-column:1;grid-row:1}
+  .wd-sec .st:nth-child(even) .st-copy::before{left:auto;right:0;margin-left:0;margin-right:-1px}
+}
