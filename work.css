@@ -613,3 +613,6 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 .wd-fly .wd-fly-next{position:absolute;inset:0}
 .wd-fly-next .s{scale:1}
 .wd-pic svg,.wd-fly svg,.st-pat{overflow:hidden}
+/* What We Do: the pictures run full bleed to the bottom of the screen, with the bottom divider and the window's left line down there too */
+.wd{--wd-bot:0px}
+@media (max-width:760px){.wd{--wd-bot:0px}}
