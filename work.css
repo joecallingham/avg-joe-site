@@ -564,3 +564,5 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 @media (min-width:761px){
   .ca-state,.wk-head h1,.info-hero h1,.cs-hero h1,.hello .big-line,.cs-next a.big,.hv-txt,.ca-copy,.split .pull{line-height:1.14}
 }
+/* desktop: About Us and the case-study briefs get a little more leading */
+@media (min-width:761px){.cs-brief .copy{line-height:1.22}}
