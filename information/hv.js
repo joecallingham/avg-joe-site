@@ -59,4 +59,8 @@
   if (!steps.length) return;
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .3 });
   steps.forEach(s => io.observe(s));
+  // the panels pin exactly on the held title's bottom line, so its line and theirs are one line
+  const list = document.querySelector('.wd-sec .steps4'), title = document.querySelector('.wd-sec > .sec-title');
+  const pin = () => { if (!list || !title) return; const top = parseFloat(getComputedStyle(title).top) || 0; list.style.setProperty('--st-js', (top + title.getBoundingClientRect().height - 1).toFixed(2) + 'px'); };
+  pin(); addEventListener('resize', pin); document.fonts && document.fonts.ready.then(pin);
 })();
