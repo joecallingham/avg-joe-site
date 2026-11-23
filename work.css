@@ -560,3 +560,7 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .wd-sec .st-word{margin-left:.6em;color:var(--ink)}
   .wd-sec .st-txt{display:block;margin:var(--in) 0 0;max-width:none;min-height:0;font-weight:500;font-size:var(--fs-head);line-height:1.2;letter-spacing:-.055em;color:var(--ink)}
 }
+/* desktop: more leading on the headlines too (single-line rows like .wd-row and .hv-word keep theirs) */
+@media (min-width:761px){
+  .ca-state,.wk-head h1,.info-hero h1,.cs-hero h1,.hello .big-line,.cs-next a.big,.hv-txt,.ca-copy,.split .pull{line-height:1.14}
+}

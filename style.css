@@ -473,3 +473,7 @@ html.intro-dark .nb-ic{color:rgba(241,238,231,.5)}
   .line{line-height:1.32}
   .sec-title,.credit,#wheel-desc,.nb{line-height:1.45}
 }
+/* desktop: more leading on the headlines too */
+@media (min-width:761px){
+  .big,.case-boon h2,.case-620 h2,.case h2,.bk-big{line-height:1.14}
+}
