@@ -9,7 +9,7 @@
   const N = items.length, PER = 0.6;          // screens of scrolling per service
   // everything slides in from the right while the section is still coming up the screen, so once it holds,
   // every bit of scrolling turns a service, and it lets go as soon as the last one is in (no dead scroll either end)
-  run.style.height = (100 + (N - 1) * PER * 100) + 'vh';   // lets go the moment the last service is in
+  run.style.height = (100 + N * PER * 100) + 'vh';   // holds one more step, so Digital slides on out of the window into the blur before the section lets go (and its image drops)
 
   const stick = run.querySelector('.wd-stick');
   const tracks = [...run.querySelectorAll('.wd-track')];
@@ -64,15 +64,27 @@
   requestAnimationFrame(frame);
 })();
 /* After the last service (Digital), its graphic drops down and grows into the first step's graphic space (Listen),
-   showing more of the drawing as it goes, and lands as Listen's graphic, which is the same image. Scrolling back reverses it. */
+   its bottom edge moving down to show more of the drawing (which keeps its size), and lands as Listen's graphic, the same image. Scrolling back reverses it. */
 (() => {
   const box = document.querySelector('.wd-pics'), pics = document.querySelectorAll('.wd-pic'), dest = document.querySelector('.wd-sec .st .st-pat');
   if (!box || !pics.length || !dest || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // desktop: the graphics are sized by the box's width (not its height), so a taller box shows more of the drawing below
+  // rather than a bigger drawing. The Digital box and the Listen panel are the same width, so the image keeps its size and place.
+  const svgs = () => [...document.querySelectorAll('.wd-pic svg, .wd-fly svg, .wd-sec .st .st-pat')].filter(v => v.getAttribute('viewBox'));
+  const fit = () => {
+    const wide = matchMedia('(min-width: 761px)').matches;
+    svgs().forEach(v => {
+      if (!v.dataset.vb) v.dataset.vb = v.getAttribute('viewBox');
+      v.setAttribute('viewBox', wide ? '0 220 1000 561' : v.dataset.vb);
+      v.setAttribute('preserveAspectRatio', wide ? 'xMidYMin meet' : 'xMidYMid meet');
+    });
+  };
   const fly = document.createElement('div');
   fly.className = 'wd-fly'; fly.setAttribute('aria-hidden', 'true');
   fly.innerHTML = pics[pics.length - 1].innerHTML;
   const firstStep = dest.closest('.st');
   document.body.appendChild(fly);
+  fit(); addEventListener('resize', fit);
   const list = document.querySelector('.wd-sec .steps4');
   let raf = 0, y0 = null, h0 = 0;
   const tick = () => {
@@ -83,8 +95,9 @@
     const b = box.getBoundingClientRect();
     if (t <= 0 || t >= 1 || b.width === 0) { fly.style.visibility = 'hidden'; box.style.visibility = ''; dest.style.visibility = ''; if (t <= 0) { y0 = null; h0 = b.height; } return; }
     // a simple drop: the image holds where it was (at the split) while the page moves on, so it drops down into the next section;
-    // once Listen's graphic space reaches it, it rides up with that panel and settles in. It grows steadily into Listen's frame.
-    if (y0 === null) y0 = b.top;
+    // once Listen's graphic space reaches it, it rides up with that panel and settles in. The drawing never scales:
+    // only the frame's bottom edge moves down, uncovering more of the image.
+    if (y0 === null) y0 = b.top - box.closest('.wd-stick').getBoundingClientRect().top;   // where the image sat while the section held (fast scrolls can't shift it)
     const top = Math.min(y0, d.top), L = (a, z) => a + (z - a) * t;
     fly.style.visibility = 'visible';
     fly.style.left = L(b.left, d.left) + 'px'; fly.style.top = top + 'px';
