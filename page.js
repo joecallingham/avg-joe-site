@@ -249,21 +249,22 @@
   /* ---------- Work index: Mother-style grid + the categories menu ---------- */
   const wks = $$('.wk');
   if (wks.length) {
-    // rows of one (full bleed), three, then two across, over whatever is showing, so the rhythm survives a filter;
-    // a short last row widens to fill the page
-    const ROWS = [1, 3, 2];
+    // the first three projects showing are full-screen panels that stack as you scroll (after adoratorio.studio):
+    // a thin bar (number, name, what we did, the line) over an image filling the screen; the rest sit underneath as thumbnails
+    wks.forEach(w => {
+      const bar = document.createElement('span'); bar.className = 'wk-cats';
+      bar.textContent = w.dataset.cats.split('|').join(' · ');
+      const box = w.querySelector('a, div') || w; box.appendChild(bar);
+    });
     const layout = () => {
-      const vis = wks.filter(w => !w.hidden);
-      let i = 0, r = 0;
-      while (i < vis.length) {
-        const n = Math.min(ROWS[r % ROWS.length], vis.length - i), span = 12 / n;
-        vis.slice(i, i + n).forEach((w, k) => {
-          w.classList.remove('wk-big', 'wk-s12', 'wk-s6', 'wk-s4');
-          w.classList.add('wk-s' + span);
-          w.classList.toggle('wk-row-start', k === 0);
-        });
-        i += n; r++;
-      }
+      wks.filter(w => !w.hidden).forEach((w, i) => {
+        w.classList.remove('wk-big', 'wk-s12', 'wk-s6', 'wk-s4', 'wk-row-start');
+        w.classList.toggle('wk-feat', i < 3); w.classList.toggle('wk-thumb', i >= 3);
+        w.querySelector('.wk-name').dataset.no = String(i + 1).padStart(2, '0');
+      });
+      // thumbnails sit three across; a short last row widens to fill, so nothing behind shows through a gap
+      const th = wks.filter(w => !w.hidden && w.classList.contains('wk-thumb')), full = th.length - th.length % 3;
+      th.forEach((w, i) => { w.style.gridColumn = i < full ? '' : 'span ' + (12 / (th.length - full)); });
     };
     const panel = $('#cats'), veil = $('.cats-veil'), opener = $('.cats-open'), list = $('ul', panel);
     const counts = new Map();

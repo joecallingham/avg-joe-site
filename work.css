@@ -775,3 +775,30 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .wk.wk-s12 .wk-name{grid-column:1;grid-row:2;padding-bottom:calc(var(--in) * 1.5)!important}
   .wk.wk-s12 .wk-line{grid-column:2;grid-row:2;padding-top:var(--in)!important}
 }
+
+/* ---- Work page (26 Nov, after adoratorio.studio): the first three projects are full-screen panels that stack as you
+   scroll; each has a thin bar (number, name, what we did, the line) over an image filling the screen.
+   The rest sit underneath as thumbnails, three across. ---- */
+.wk-list{overflow:clip!important}   /* clip, not hidden: hidden would stop the panels pinning */
+.wk-cats{display:none}
+.wk.wk-feat{grid-column:1/-1;position:sticky;top:0;height:100vh;height:100svh;background:var(--cream);box-shadow:none!important;border-top:1px solid var(--ink);z-index:1}
+.wk.wk-feat > a,.wk.wk-feat > div{display:grid!important;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:auto minmax(0,1fr);column-gap:var(--gutter);height:100%}
+.wk.wk-feat .wk-name,.wk.wk-feat .wk-cats,.wk.wk-feat .wk-line{grid-row:1;display:block;margin:0;padding:.9rem 0 .8rem!important;font-size:var(--small)!important;line-height:1.35!important;letter-spacing:-.02em!important;color:var(--ink)!important;font-weight:500}
+.wk.wk-feat .wk-name{grid-column:1/span 4;padding-left:var(--margin)!important}
+.wk.wk-feat .wk-name::before{content:attr(data-no);margin-right:.8em;color:#8e8b86}
+.wk.wk-feat .wk-cats{grid-column:5/span 4;color:#8e8b86!important}
+.wk.wk-feat .wk-line{grid-column:9/span 4;text-align:right;padding-right:var(--margin)!important}
+.wk.wk-feat .wk-img{grid-column:1/-1;grid-row:2;height:100%!important;aspect-ratio:auto!important;border-top:1px solid var(--ink)}
+.wk.wk-thumb{grid-column:span 4}
+.wk.wk-thumb .wk-img{aspect-ratio:4/5;height:auto!important}
+.wk.wk-thumb .wk-line{font-size:var(--fs-body)!important;line-height:1.22!important;letter-spacing:-.045em!important}
+@media (max-width:760px){
+  .wk.wk-feat{top:3.4rem;height:calc(100vh - 3.4rem);height:calc(100svh - 3.4rem)}
+  .wk.wk-feat .wk-name{grid-column:1/span 7}
+  .wk.wk-feat .wk-cats{display:none!important}
+  .wk.wk-feat .wk-line{grid-column:8/span 5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wk.wk-thumb{grid-column:1/-1}
+}
+/* the thumbnails slide up over the last panel, like one more layer in the stack */
+.wk.wk-thumb{position:relative;z-index:2;background:var(--cream)}
+@media (max-width:760px){.wk.wk-thumb{grid-column:1/-1!important}}
