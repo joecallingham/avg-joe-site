@@ -666,3 +666,5 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
   .wd-sec .st:nth-child(even) .st-copy{grid-column:1;grid-row:1}
   .wd-sec .st:nth-child(even) .st-copy::before{left:auto;right:0;margin-left:0;margin-right:-1px}
 }
+/* Digital, its travelling copy and Listen are one continuous image: their shapes never grow in (so nothing restarts as Listen arrives) */
+.wd-pic:last-child .s,.wd-fly .s,.wd-sec .st:first-child .st-pat .s{scale:1!important;transition:none!important}
