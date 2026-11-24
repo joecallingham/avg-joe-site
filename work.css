@@ -1099,3 +1099,4 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
   /* until you scroll, cream covers the strip under Avg / Joe; it rides up with the headline, opening the film's top edge */
   .if-front::before{content:'';position:absolute;left:0;right:0;bottom:100%;height:3.5rem;background:var(--cream)}
 }
+.ab-sec{margin-bottom:-1px}   /* as About Us leaves, its held title rule lands exactly on the next section's rule instead of doubling it */

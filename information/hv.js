@@ -62,7 +62,7 @@
   // the panels pin exactly on the held title's bottom line, so its line and theirs are one line
   const list = document.querySelector('.wd-sec .steps4'), title = document.querySelector('.wd-sec > .sec-title');
   const pin = () => { if (!list || !title) return; const top = parseFloat(getComputedStyle(title).top) || 0; list.style.setProperty('--st-js', (top + title.getBoundingClientRect().height - 1).toFixed(2) + 'px'); };
-  pin(); addEventListener('resize', pin); document.fonts && document.fonts.ready.then(pin);
+  pin(); addEventListener('resize', (f => { let w = innerWidth; return () => { if (innerWidth === w && matchMedia('(pointer: coarse)').matches) return; w = innerWidth; f(); }; })(pin)); document.fonts && document.fonts.ready.then(pin);
 })();
 /* Clients: hovering a row shows that client's picture on the left (desktop); rows without a picture clear it */
 (() => {
@@ -110,5 +110,5 @@
     if (stuck !== lastStuck) { lastStuck = stuck; title.classList.toggle('stuck', stuck); }
   };
   addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(tick); }, { passive: true });
-  pin(); addEventListener('resize', pin); document.fonts && document.fonts.ready.then(pin);
+  pin(); addEventListener('resize', (f => { let w = innerWidth; return () => { if (innerWidth === w && matchMedia('(pointer: coarse)').matches) return; w = innerWidth; f(); }; })(pin)); document.fonts && document.fonts.ready.then(pin);
 })();

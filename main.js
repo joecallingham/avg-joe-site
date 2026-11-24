@@ -828,6 +828,6 @@
   const ask = () => { if (!raf) raf = requestAnimationFrame(tick); };
   addEventListener('scroll', ask, { passive: true });
   scroller && scroller.addEventListener('scroll', ask, { passive: true });
-  addEventListener('resize', pin); document.fonts && document.fonts.ready.then(pin);
+  addEventListener('resize', (f => { let w = innerWidth; return () => { if (innerWidth === w && matchMedia('(pointer: coarse)').matches) return; w = innerWidth; f(); }; })(pin)); document.fonts && document.fonts.ready.then(pin);
   pin();
 })();

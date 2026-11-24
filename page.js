@@ -316,7 +316,7 @@
       };
       const ask = () => { if (!raf) raf = requestAnimationFrame(tick); };
       addEventListener('scroll', ask, { passive: true });
-      addEventListener('resize', () => { measure(); ask(); });
+      addEventListener('resize', (f => { let w = innerWidth; return () => { if (innerWidth === w && matchMedia('(pointer: coarse)').matches) return; w = innerWidth; f(); }; })(() => { measure(); ask(); }));
       document.fonts && document.fonts.ready.then(() => { measure(); ask(); });
       measure(); tick();
     }

@@ -543,7 +543,6 @@ html.cases-off #s-cases{background:var(--cream)}
 }
 /* Information: Clients sits right under the last What We Do step, no extra run of space */
 .wd-sec{padding-bottom:0!important}
-@media (max-width:760px){.cl-sec{border-top:var(--line)}}   /* phones: keep a rule between Hand Over and Clients */
 @media (max-width:760px){.cl-title:not(.stuck)::before{display:none}}
 
 /* Home Featured Work: moves and looks like the Work page rows (number and name, View case study on the right, a third-height picture) */

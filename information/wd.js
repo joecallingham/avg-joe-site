@@ -124,7 +124,8 @@
 
   const queue = () => { if (!raf) raf = requestAnimationFrame(tick); };
   addEventListener('scroll', queue, { passive: true });
-  addEventListener('resize', measure);
+  // phones fire resize as the browser bar shows and hides while you scroll: only re-measure when the width really changes
+  addEventListener('resize', (f => { let w = innerWidth; return () => { if (innerWidth === w && matchMedia('(pointer: coarse)').matches) return; w = innerWidth; f(); }; })(measure));
   MQ.addEventListener('change', measure);
   document.fonts && document.fonts.ready.then(measure);
   show(0); measure(); tick();
