@@ -44,6 +44,29 @@
   .cs-page .fg-type+.cap{grid-column:1/-1;border-left:0;border-top:var(--line)}
   .cs-hero figure .fg-hero{aspect-ratio:4/5}
 }
+
+/* editorial image runs, like a studio case study: full-bleed, offset and paired images on the 12-column grid */
+.fg-ed{padding-top:var(--gutter);row-gap:var(--gutter);align-items:start}
+.cs-sec>.grid.fg-ed{padding-top:var(--gutter)}
+.fg-ed .shot img{display:block;width:100%;height:auto}
+.fg-ed .shot img.fg-icon{width:clamp(12rem,24%,24rem);height:auto}
+.fg-film video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.x-full{grid-column:1/-1}.x-l8{grid-column:1/span 8}.x-r8{grid-column:5/span 8}.x-l7{grid-column:1/span 7}.x-r5{grid-column:8/span 5}
+.x-l6{grid-column:1/span 6}.x-r6{grid-column:7/span 6}.x-r4{grid-column:9/span 4}
+.x-r-cap{grid-column:9/span 4;align-self:end}.x-l-cap{grid-column:1/span 4;align-self:end}
+.fg-tall{align-self:stretch}.fg-tall img{height:100%!important;object-fit:cover}
+.fg-film{aspect-ratio:16/8.5}
+.fg-ed .fg-leaf{grid-column:9/span 4}
+.fg-ed .fg-browser{grid-column:auto}.fg-ed .fg-browser.x-full{grid-column:1/-1}.fg-ed .fg-browser.x-l6{grid-column:1/span 6}.fg-ed .fg-browser.x-r6{grid-column:7/span 6}
+.fg-ed .fg-type{grid-column:1/-1;aspect-ratio:16/7}
+.fg-ed .x-l8+.fg-type{margin-top:0}
+.fg-next{display:block;margin:0 var(--frame) var(--frame);overflow:hidden}
+.fg-next img{display:block;width:100%;height:auto;aspect-ratio:16/7;object-fit:cover;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.fg-next:hover img{transform:scale(1.02)}
+@media (max-width:760px){
+  .x-full,.x-l8,.x-r8,.x-l7,.x-r5,.x-l6,.x-r6,.x-r4,.x-r-cap,.x-l-cap,.fg-ed .fg-leaf,.fg-ed .fg-browser.x-l6,.fg-ed .fg-browser.x-r6{grid-column:1/-1}
+  .fg-tall img{height:auto!important}
+}
 @media (prefers-reduced-motion:reduce){.fg-icon{animation:none}}
 </style>
 </head>
@@ -57,11 +80,11 @@
 
   <header class="cs-hero grid">
     <div class="txt">
-      <h1 class="rv">Figtree was built by people who ran rental homes for a decade. We gave their pricing software a brand and a website that feel like a home, not a spreadsheet.</h1>
+      <h1 class="rv">Figtree: giving pricing software the warmth of the homes it prices.</h1>
       <dl class="facts rv">
         <div><dt>Client</dt><dd>Figtree Technology</dd></div>
-        <div><dt>Year</dt><dd>2026</dd></div>
-        <div><dt>What we did</dt><dd>Branding, Art Direction, Motion, Website</dd></div>
+        <div><dt>Industry</dt><dd>Property Technology</dd></div>
+        <div><dt>What we did</dt><dd>Brand Identity, Typography, Colour, Art Direction, Motion, Website</dd></div>
       </dl>
     </div>
     <figure>
@@ -75,28 +98,35 @@
   </header>
 
   <section class="cs-sec">
-    <h2 class="sec-title"><span>The Brief</span></h2>
+    <h2 class="sec-title"><span>Built by operators</span></h2>
     <div class="grid cs-brief">
-      <p class="lab rv">Revenue management for build-to-rent</p>
+      <p class="lab rv">The story</p>
       <div class="copy rv">
-        <p>Figtree recommends a rent for every home in a build-to-rent portfolio, using machine learning and rules the operator sets. Its founders spent more than ten years running these buildings before they wrote a line of code.</p>
-        <p>They had a name and a product, but no brand. They needed one that asset managers and investors would trust with their pricing, and that didn't look like every other grey property dashboard. We started from scratch: logo, type, colour, art direction and the website.</p>
+        <p>Figtree's founders didn't set out to start a software company. They spent more than ten years running build-to-rent buildings, and pricing every home in a spreadsheet.</p>
+        <p>That is still how most of the industry does it. Rents are set from spreadsheets and gut feel, decisions get argued over in meetings, and money is left on the table when demand moves. Figtree recommends a rent for every home, using machine learning inside rules the operator sets.</p>
+        <p>Property software tends to look the same: navy, grey and stock photos of skylines. Figtree sells to asset managers and investors, so it had to feel credible. But it is software about homes, so it also had to feel warm. We started with a name and built everything else from scratch.</p>
       </div>
+    </div>
+    <div class="grid fg-ed">
+      <span class="shot x-full rv"><img src="/img/work/figtree/art/wordmark.jpg" alt="The Figtree wordmark in white on the textured orange" width="1600" height="900" loading="lazy"></span>
     </div>
   </section>
 
-  <section class="cs-sec cs-did">
-    <h2 class="sec-title"><span>What We Did</span></h2>
-    <ol class="steps4" aria-label="What we did">
-      <li class="st"><span class="st-no">01</span><h3 class="st-word">Identity</h3><p class="st-txt">A wordmark whose i is dotted with a leaf, and an icon that still reads as a favicon.</p></li>
-      <li class="st"><span class="st-no">02</span><h3 class="st-word">Colour &amp; Type</h3><p class="st-txt">One warm orange, soft peach and near-black. Gilroy for the mark, Circular for the rest.</p></li>
-      <li class="st"><span class="st-no">03</span><h3 class="st-word">Art Direction</h3><p class="st-txt">Moving textured gradients, a glowing icon and product illustrations that animate.</p></li>
-      <li class="st"><span class="st-no">04</span><h3 class="st-word">Website</h3><p class="st-txt">Three pages with custom scroll motion, built so the team can edit it themselves.</p></li>
-    </ol>
-  </section>
-
   <section class="cs-sec">
-    <h2 class="sec-title"><span>Logo &amp; Colour</span></h2>
+    <h2 class="sec-title"><span>A leaf for a dot</span></h2>
+    <div class="grid cs-brief">
+      <p class="lab rv">Logo</p>
+      <div class="copy rv">
+        <p>The wordmark is built from Gilroy Bold, heavy and plain, with one change: the dot of the i is a leaf. It's the only flourish in the logo, so it carries the whole idea of steady growth.</p>
+        <p>On its own the leaf becomes the icon, cut out of a rounded square. It's simple enough to read as a favicon and bold enough to sign off a slide.</p>
+      </div>
+    </div>
+    <div class="grid fg-ed">
+      <span class="shot x-full rv"><img src="/img/work/figtree/comp/leaf.jpg" alt="Close-up of the wordmark: the dot of the i is a small orange leaf" width="2400" height="1520" loading="lazy"></span>
+      <span class="shot x-l7 rv"><img src="/img/work/figtree/comp/lock.jpg" alt="The wordmark in four colourways: on orange, charcoal, white and peach" width="2400" height="1800" loading="lazy"></span>
+      <p class="cap x-r-cap rv">Four colourways cover almost every use. The leaf stays orange wherever the background allows it.</p>
+      <span class="shot x-r8 rv"><img src="/img/work/figtree/comp/icons.jpg" alt="The leaf icon at 300, 150, 80, 40 and 20 pixels" width="2400" height="1280" loading="lazy"></span>
+    </div>
     <div class="grid">
       <div class="panel pal-stage rv">
         <div class="pal-logo" role="img" aria-label="Figtree logo in the colours you picked"></div>
@@ -108,92 +138,22 @@
           <button class="chip" data-logo="/img/work/figtree/logo-icon.png" data-ar="1" aria-pressed="false">Icon</button>
           <button class="chip" data-logo="/img/work/figtree/logo-leaf.png" data-ar="0.8125" aria-pressed="false">Leaf</button>
         </div>
-        <p class="cap">The leaf on the i grows into everything else: the icon, the favicon and the glow on the website. Pick a colour from the brand in the notch below.</p>
       </div>
     </div>
   </section>
 
   <section class="cs-sec">
-    <h2 class="sec-title"><span>Type</span></h2>
-    <div class="grid">
-      <div class="panel fg-type rv" role="img" aria-label="Type specimen: Gilroy Bold for the wordmark, Circular Std Light for headlines and body copy"><i></i></div>
-      <p class="cap rv">Gilroy Bold is kept for the wordmark. Everything else is set in Circular Light, large and loosely spaced, so the copy reads calm next to the bright colour.</p>
-    </div>
-  </section>
-
-  <section class="cs-sec">
-    <h2 class="sec-title"><span>Art Direction</span></h2>
-    <div class="grid">
-      <div class="fg-art rv">
-        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/bg.jpg" aria-label="The moving textured gradient behind the website"><source src="/img/work/figtree/bg.mp4" type="video/mp4"></video>
-        <img src="/img/work/figtree/art/wordmark.jpg" alt="The Figtree wordmark in white on the textured orange" width="1600" height="900" loading="lazy">
-        <img src="/img/work/figtree/art/light.jpg" alt="Light streaks: an orange gradient study" width="1600" height="900" loading="lazy">
-        <img src="/img/work/figtree/art/gradient.jpg" alt="A soft orange gradient with a white glow" width="1600" height="900" loading="lazy">
-      </div>
-      <div class="fg-leaf rv">
-        <video data-auto muted loop playsinline preload="none" aria-label="The Figtree icon turning into a spark and back"><source src="/img/work/figtree/ui/figtree-icon.mp4" type="video/mp4"></video>
-        <p class="cap">Fine lines drawn over soft gradients, so the orange has texture without needing photography. The icon turns into a spark wherever Figtree's assistant is working.</p>
+    <h2 class="sec-title"><span>One warm orange</span></h2>
+    <div class="grid cs-brief">
+      <p class="lab rv">Colour</p>
+      <div class="copy rv">
+        <p>Property technology defaults to blue. We went the other way, with an orange that feels like warm light rather than a warning sign. Peach gives it room to breathe, amber picks out highlights and a near-black charcoal carries the text.</p>
+        <p>It took a few rounds to get there. We tried electric blues, then golds and greens, then a family of sub-brands in orange, cyan and purple. Each round we cut back, until one colour family was left.</p>
       </div>
     </div>
-  </section>
-
-  <section class="cs-sec">
-    <h2 class="sec-title"><span>The Website</span></h2>
-    <div class="grid">
-      <div class="fg-browser fg-wide rv">
-        <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
-        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/site/hero.jpg" aria-label="The Figtree homepage: the product rises out of the orange as you scroll"><source src="/img/work/figtree/site/hero.mp4" type="video/mp4"></video>
-      </div>
-      <div class="fg-browser fg-half rv">
-        <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
-        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/site/features.jpg" aria-label="Four benefit cards stacking as you scroll"><source src="/img/work/figtree/site/features.mp4" type="video/mp4"></video>
-      </div>
-      <div class="fg-browser fg-half rv">
-        <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
-        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/site/bento.jpg" aria-label="The feature grid, each card with its own animated illustration"><source src="/img/work/figtree/site/bento.mp4" type="video/mp4"></video>
-      </div>
-      <div class="fg-browser fg-half rv">
-        <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
-        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/site/how.jpg" aria-label="How it works: a glowing light follows the three steps"><source src="/img/work/figtree/site/how.mp4" type="video/mp4"></video>
-      </div>
-      <div class="fg-browser fg-half rv">
-        <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
-        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/site/team.jpg" aria-label="Built by Operators: the founders' cards stack up"><source src="/img/work/figtree/site/team.mp4" type="video/mp4"></video>
-      </div>
-      <div class="fg-phone rv">
-        <div class="dev"><video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/site/phone.jpg" aria-label="The Figtree homepage on a phone"><source src="/img/work/figtree/site/phone.mp4" type="video/mp4"></video></div>
-      </div>
-      <div class="fg-side rv">
-        <span class="shot"><img src="/img/work/figtree/laptop.jpg" alt="Mockup: the Figtree dashboard on a laptop resting on an orange chair" width="2000" height="1500" loading="lazy"><span class="credit">Mockup</span></span>
-      </div>
+    <div class="grid fg-ed">
+      <span class="shot x-full rv"><img src="/img/work/figtree/comp/col.jpg" alt="The palette: Figtree Orange #F15A24, Amber #FBB03B, Peach #FFD9C0 and Charcoal #212121" width="2400" height="1640" loading="lazy"></span>
     </div>
-  </section>
-
-  <section class="cs-sec">
-    <h2 class="sec-title"><span>Product Illustrations</span></h2>
-    <div class="grid">
-      <div class="fg-ui rv">
-        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-dashboard.mp4" type="video/mp4"></video><figcaption>Performance dashboard</figcaption></figure>
-        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-insights.mp4" type="video/mp4"></video><figcaption>Market insight</figcaption></figure>
-        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-availability-2.mp4" type="video/mp4"></video><figcaption>Availability &amp; pricing</figcaption></figure>
-        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-approvals.mp4" type="video/mp4"></video><figcaption>Approval workflows</figcaption></figure>
-        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-pricing-rules-2.mp4" type="video/mp4"></video><figcaption>Pricing strategies &amp; rules</figcaption></figure>
-        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-rent-review-support.mp4" type="video/mp4"></video><figcaption>Rent review tracking</figcaption></figure>
-        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-custom-report.mp4" type="video/mp4"></video><figcaption>Custom reports</figcaption></figure>
-        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/figtree-icon.mp4" type="video/mp4"></video><figcaption>Digital assistant</figcaption></figure>
-      </div>
-    </div>
-  </section>
-
-  <section class="cs-sec">
-    <h2 class="sec-title"><span>Stationery</span></h2>
-    <div class="grid">
-      <span class="shot fg-wide rv"><img src="/img/work/figtree/stationery.jpg" alt="Mockup: Figtree letterhead, business cards and a laptop sticker listing the company's principles" width="2400" height="1500" loading="lazy"><span class="credit">Mockup</span></span>
-    </div>
-  </section>
-
-  <section class="cs-sec">
-    <h2 class="sec-title"><span>Routes We Explored</span></h2>
     <div class="grid routes">
       <div class="fader-wrap rv">
         <div class="fader" data-fader="2400" role="img" aria-label="Eight early directions for Figtree, cross-fading">
@@ -208,7 +168,118 @@
         </div>
         <span class="fader-count"></span>
       </div>
-      <p class="cap rv">We tried electric blues, then golds and greens with a family of sub-brands: Rent, Build, Tech, Home. The leaf survived every round. The colour settled on one warm orange, because the product is about homes.</p>
+      <p class="cap rv">Early rounds: blue gradients, gold and green, and a sub-brand system for Rent, Build, Tech and Home. The leaf survived every one.</p>
+    </div>
+  </section>
+
+  <section class="cs-sec">
+    <h2 class="sec-title"><span>Quiet type, loud colour</span></h2>
+    <div class="grid cs-brief">
+      <p class="lab rv">Typography</p>
+      <div class="copy rv">
+        <p>With the colour doing the shouting, the type stays calm. Circular Std Light sets every headline and paragraph, large and with plenty of space around it. Gilroy Bold appears only in the wordmark, so the logo never competes with the words around it.</p>
+      </div>
+    </div>
+    <div class="grid fg-ed">
+      <span class="shot x-l8 rv"><img src="/img/work/figtree/comp/head.jpg" alt="The homepage headline, Optimise your rental pricing, in Circular Light on charcoal" width="2400" height="1520" loading="lazy"></span>
+      <div class="panel fg-type x-full rv" role="img" aria-label="Type specimen: Gilroy Bold for the wordmark, Circular Std Light for headlines and body copy"><i></i></div>
+    </div>
+  </section>
+
+  <section class="cs-sec">
+    <h2 class="sec-title"><span>Warm light, fine lines</span></h2>
+    <div class="grid cs-brief">
+      <p class="lab rv">Art direction</p>
+      <div class="copy rv">
+        <p>We didn't want photos of buildings. Instead the brand uses soft orange gradients with fine contour lines drawn over them, part map of rising ground, part rising chart. On screen they move slowly, like light shifting across a wall.</p>
+        <p>The glowing icon sits on top as the brand's signature image. In the product it turns into a spark wherever Figtree's assistant is working.</p>
+      </div>
+    </div>
+    <div class="grid fg-ed">
+      <span class="shot fg-hero x-full fg-film rv">
+        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/bg.jpg" aria-label="The moving textured gradient behind the website, with the glowing icon"><source src="/img/work/figtree/bg.mp4" type="video/mp4"></video>
+        <img class="fg-icon" src="/img/work/figtree/icon-glow.png" alt="" width="1100" height="1100" loading="lazy">
+      </span>
+      <span class="shot x-l6 rv"><img src="/img/work/figtree/art/light.jpg" alt="Light streaks: an orange gradient study" width="1600" height="900" loading="lazy"></span>
+      <span class="shot x-r6 rv"><img src="/img/work/figtree/art/gradient.jpg" alt="A soft orange gradient with a white glow" width="1600" height="900" loading="lazy"></span>
+      <div class="x-r4 fg-leaf rv">
+        <video data-auto muted loop playsinline preload="none" aria-label="The Figtree icon turning into a spark and back"><source src="/img/work/figtree/ui/figtree-icon.mp4" type="video/mp4"></video>
+        <p class="cap">The icon becomes a spark for the digital assistant.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cs-sec">
+    <h2 class="sec-title"><span>Drawing the product</span></h2>
+    <div class="grid cs-brief">
+      <p class="lab rv">Illustration</p>
+      <div class="copy rv">
+        <p>Real dashboards are dense and change all the time, so we drew the product instead. Simplified cards, charts and maps in the brand colours, each animated to show what a feature does. They explain the platform faster than a screenshot, and they don't go out of date.</p>
+      </div>
+    </div>
+    <div class="grid fg-ed">
+      <span class="shot x-full rv"><img src="/img/work/figtree/comp/ui.jpg" alt="Product cards floating over the orange: a map of London, unit stats, a void-days chart, search and filters" width="2400" height="1640" loading="lazy"></span>
+      <div class="fg-ui x-full rv">
+        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-dashboard.mp4" type="video/mp4"></video><figcaption>Performance dashboard</figcaption></figure>
+        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-insights.mp4" type="video/mp4"></video><figcaption>Market insight</figcaption></figure>
+        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-availability-2.mp4" type="video/mp4"></video><figcaption>Availability &amp; pricing</figcaption></figure>
+        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-approvals.mp4" type="video/mp4"></video><figcaption>Approval workflows</figcaption></figure>
+        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-pricing-rules-2.mp4" type="video/mp4"></video><figcaption>Pricing strategies &amp; rules</figcaption></figure>
+        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-rent-review-support.mp4" type="video/mp4"></video><figcaption>Rent review tracking</figcaption></figure>
+        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-custom-report.mp4" type="video/mp4"></video><figcaption>Custom reports</figcaption></figure>
+        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/figtree-icon.mp4" type="video/mp4"></video><figcaption>Digital assistant</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="cs-sec">
+    <h2 class="sec-title"><span>A site that moves like the product</span></h2>
+    <div class="grid cs-brief">
+      <p class="lab rv">Website</p>
+      <div class="copy rv">
+        <p>Three pages: Home, How it works and Built by Operators. As you scroll, the product rises out of the orange, the benefits stack like cards and a glowing light walks you through how the pricing works.</p>
+        <p>We built it on Squarespace with custom code for the motion, so Figtree's team can change the words themselves without calling us.</p>
+      </div>
+    </div>
+    <div class="grid fg-ed">
+      <div class="fg-browser x-full rv">
+        <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
+        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/site/hero.jpg" aria-label="The Figtree homepage: the product rises out of the orange as you scroll"><source src="/img/work/figtree/site/hero.mp4" type="video/mp4"></video>
+      </div>
+      <div class="fg-browser x-l6 rv">
+        <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
+        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/site/features.jpg" aria-label="Four benefit cards stacking as you scroll"><source src="/img/work/figtree/site/features.mp4" type="video/mp4"></video>
+      </div>
+      <div class="fg-browser x-r6 rv">
+        <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
+        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/site/bento.jpg" aria-label="The feature grid, each card with its own animated illustration"><source src="/img/work/figtree/site/bento.mp4" type="video/mp4"></video>
+      </div>
+      <span class="shot x-full rv"><img src="/img/work/figtree/comp/ph.jpg" alt="Three phones showing the Figtree homepage, the benefit cards and the feature grid" width="2400" height="1720" loading="lazy"><span class="credit">Mockup</span></span>
+      <div class="fg-browser x-l6 rv">
+        <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
+        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/site/how.jpg" aria-label="How it works: a glowing light follows the three steps"><source src="/img/work/figtree/site/how.mp4" type="video/mp4"></video>
+      </div>
+      <div class="fg-browser x-r6 rv">
+        <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
+        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/site/team.jpg" aria-label="Built by Operators: the founders' cards stack up"><source src="/img/work/figtree/site/team.mp4" type="video/mp4"></video>
+      </div>
+      <span class="shot x-l7 rv"><img src="/img/work/figtree/laptop.jpg" alt="Mockup: the Figtree dashboard on a laptop resting on an orange chair" width="2000" height="1500" loading="lazy"><span class="credit">Mockup</span></span>
+      <span class="shot x-r5 fg-tall rv"><img src="/img/work/figtree/comp/br.jpg" alt="The Figtree favicon in a browser tab at figtreetechnology.co.uk" width="2400" height="1400" loading="lazy"></span>
+    </div>
+  </section>
+
+  <section class="cs-sec">
+    <h2 class="sec-title"><span>Out in the world</span></h2>
+    <div class="grid cs-brief">
+      <p class="lab rv">Stationery</p>
+      <div class="copy rv">
+        <p>Business cards, a letterhead and a laptop sticker. The sticker carries the team's six principles on the back, from "Every detail matters" to "Build with people who understand the problem", so the brand's values travel with the people who wrote them.</p>
+      </div>
+    </div>
+    <div class="grid fg-ed">
+      <span class="shot x-full rv"><img src="/img/work/figtree/stationery.jpg" alt="Mockup: Figtree letterhead, business cards and a laptop sticker" width="2400" height="1500" loading="lazy"><span class="credit">Mockup</span></span>
+      <p class="cap x-l-cap rv">Six principles, printed small enough to stick on a laptop.</p>
+      <span class="shot x-r8 rv"><img src="/img/work/figtree/comp/stk.jpg" alt="The laptop sticker: Figtree on orange, with six principles on charcoal" width="2400" height="1640" loading="lazy"></span>
     </div>
   </section>
 
@@ -217,9 +288,10 @@
   </section>
 
   <footer class="cs-next">
-    <div><span class="lab">That's Figtree</span><a class="big" href="/work/" data-rot>All work ↘</a></div>
+    <div><span class="lab">Next project</span><a class="big" href="/work/bison/" data-rot>Bison Coffee ↘</a></div>
     <a class="lab" href="https://wa.me/447542068942" target="_blank" rel="noopener" data-rot>Want something like this? Say hello ↗</a>
   </footer>
+  <a class="fg-next rv" href="/work/bison/" aria-label="Next project: Bison Coffee"><img src="/img/work/bison/cup.jpg" alt="" width="2000" height="1092" loading="lazy"></a>
 </main>
 
 <footer class="foot" id="foot">
