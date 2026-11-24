@@ -418,6 +418,8 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 /* ---------- type scale: sub-pages (same six steps, same leading per step) ---------- */
 /* display */
 .ca-state,.wk-head h1,.hv-word{font-size:var(--fs-display);line-height:1.04;letter-spacing:-.055em}
+.ca-state{font-size:var(--fs-head);max-width:14em;margin:0 auto}   /* statements with pictures in the line: heading size and a short measure, like the home sentence */
+@media (max-width:760px){.ca-state{font-size:var(--fs-display);max-width:none}}   /* phones keep the bigger size: the heading size reads too small there */
 /* headline */
 .info-hero h1,.cs-hero h1,.hello .big-line,.cs-next a.big,.cats li button,.wd-row,.hv-txt{font-size:var(--fs-head);line-height:1.04;letter-spacing:-.055em}
 .wd-row{height:1.25em;line-height:1.25}
