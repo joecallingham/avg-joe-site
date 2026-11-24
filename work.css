@@ -1056,3 +1056,4 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 .info-top ~ .wk-list{background:transparent}
 @media (max-width:760px){.info-top{top:calc(3.4rem - var(--hero-h,0px))}}   /* phones: the film holds just under the Avg / Joe bar */
 @media (max-width:760px){.info-top.held .info-hero{visibility:hidden}}   /* the headline tail would peek above the held film */
+.info-label{will-change:transform}
