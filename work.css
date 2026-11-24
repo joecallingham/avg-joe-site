@@ -1048,3 +1048,4 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 .info-top .info-film .shot{position:relative;flex:1;height:auto!important;aspect-ratio:auto!important}
 .info-top .info-film video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none}
 .info-label{position:absolute;left:0;right:0;top:0;z-index:2;margin:0;padding:var(--title-t) var(--margin) var(--title-b);font-size:var(--small);font-weight:500;line-height:1.35;letter-spacing:-.02em;color:#fff;border-bottom:1px solid rgba(255,255,255,.85)}
+.info-top .info-hero{padding-bottom:calc(var(--s1) * 1.8)!important}   /* headline to film matches the space above the headline */

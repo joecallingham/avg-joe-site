@@ -6,22 +6,23 @@
 <title>Work — Avg Joe</title>
 <meta name="description" content="Selected work from Avg Joe: branding, art direction, packaging, digital and film.">
 <meta name="theme-color" content="#f1eee7">
-<link rel="stylesheet" href="/style.css?v=20261128o">
-<link rel="stylesheet" href="/work.css?v=20261128o">
+<link rel="stylesheet" href="/style.css?v=20261128r">
+<link rel="stylesheet" href="/work.css?v=20261128r">
 </head>
 <body>
 <div class="pt" aria-hidden="true"></div>
 
 <main>
-  <!-- opens on a full-screen reel of the work, framed like the home page film -->
-  <div class="wk-reel">
-    <span class="shot"><video data-auto data-src="/video/out-of-office.mp4" poster="/img/out-of-office.jpg" muted loop playsinline preload="auto" width="1600" height="900" aria-label="A reel of the studio's work"></video></span>
-  </div>
-
-  <!-- the line in headline type: it starts at the bottom of the first screen, rises over the reel and holds at the top while the projects stack beneath (page.js) -->
-  <header class="info-hero grid wk-intro">
+  <!-- first screen, as on Information: the line at the top, the reel fills the rest, the page title laid over the film -->
+  <div class="info-top">
+  <header class="info-hero grid">
     <h1 class="rv">Where <span class="craft" data-rot data-rot-auto>craft</span> and <span class="ai">AI</span> blend. Ideas made by hand, then built to keep on working.</h1>
   </header>
+  <div class="info-film">
+    <span class="shot"><h2 class="info-label"><span>Work</span></h2><video data-auto data-src="/video/out-of-office.mp4" poster="/img/out-of-office.jpg" muted loop playsinline preload="auto" width="1600" height="900" aria-label="A reel of the studio's work"></video></span>
+  </div>
+  </div>
+
 
   <!-- every project: full-screen panels that stack under each other; once stacked, hovering a row opens it a little (page.js) -->
   <div class="grid wk-list">
@@ -73,9 +74,9 @@
 </nav>
 
 <script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
-<script src="/page.js?v=20261128o"></script>
-<script src="/booking.js?v=20261128o"></script>
-<script src="/transition.js?v=20261128o"></script>
-<script src="/footer.js?v=20261128o"></script>
+<script src="/page.js?v=20261128r"></script>
+<script src="/booking.js?v=20261128r"></script>
+<script src="/transition.js?v=20261128r"></script>
+<script src="/footer.js?v=20261128r"></script>
 </body>
 </html>
