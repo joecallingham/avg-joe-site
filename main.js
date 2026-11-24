@@ -821,10 +821,7 @@
   };
   const tick = () => {
     raf = 0;
-    // every picture is the same height; the stack lets go the moment the last row lands (where it would pin), whatever the screen height
-    const last = rows[rows.length - 1], bh = +stack.dataset.bar || 36;
-    const landedBottom = (base + th - 1) + (rows.length - 1) * bh + (last ? last.getBoundingClientRect().height : 0);
-    const off = Math.min(0, stack.getBoundingClientRect().bottom - landedBottom);
+    const off = 0;   // the stack no longer lifts: it holds and the case studies slide up over it
     title.style.top = (base + off).toFixed(1) + 'px';
     stack.style.setProperty('--hf-off', off.toFixed(1) + 'px');
   };

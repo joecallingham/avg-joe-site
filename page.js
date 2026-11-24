@@ -294,25 +294,25 @@
         const nm = feats[0] && feats[0].querySelector('.wk-name');
         wlist.style.setProperty('--wk-bar', (nm ? nm.getBoundingClientRect().height : 36) + 'px');
         feats.forEach((w, i) => w.style.setProperty('--i', i));
-        // like the Clients: pictures a third of the screen tall; the last one runs to the foot of the screen so the stack lets go as it lands
-        const lastImg = feats.length && feats[feats.length - 1].querySelector('.wk-img');
-        if (lastImg) {
-          const barH = nm ? nm.getBoundingClientRect().height : 36, fr = parseFloat(getComputedStyle(lastImg).marginBottom) || 0;
-          lastImg.style.setProperty('height', Math.max(innerHeight / 3, innerHeight - base - th - ih - feats.length * barH - fr - 1) + 'px', 'important');
-        }
+        wlist.style.setProperty('--wk-n', feats.length);
+        wkBar = nm ? nm.getBoundingClientRect().height : 36; wkOff = null;
       };
+      // read first, then write only what changed; the lift starts as the last project lands where it pins (no screen-height maths,
+      // so the browser bar showing or hiding on a phone can't make it jump)
+      let wkBar = 36, wkOff = null, wkStuck = null;
       const tick = () => {
         raf = 0;
-        const H = innerHeight, ref = wlist.getBoundingClientRect().bottom;   // the stack holds until Selected Work has slid right over it
-        const off = Math.min(0, ref - H);
-        if (intro) { intro.style.top = (base + th + off).toFixed(1) + 'px'; intro.classList.toggle('stuck', intro.getBoundingClientRect().top <= base + 0.5); }
-        if (wtitle) wtitle.style.top = (base + off).toFixed(1) + 'px';
-        wlist.style.setProperty('--wk-off', off.toFixed(1) + 'px');
-        // once the first project is held at the top, the reel behind is hidden: cover the strip under Avg / Joe and pause the film
-        const covered = feats.length && feats[0].getBoundingClientRect().top <= base + th + ih + 2;
-        wlist.classList.toggle('stuck', !!covered);
-        const rv = $('.wk-reel video');
-        if (rv && rv.src) { if (covered) { if (!rv.paused) rv.pause(); } else if (rv.paused) rv.play().catch(() => {}); }
+        const last = feats[feats.length - 1];
+        const landed = base + th + ih + (feats.length - 1) * wkBar + (last ? last.offsetHeight : 0);
+        const off = Math.min(0, Math.round((wlist.getBoundingClientRect().bottom - landed) * 2) / 2);
+        const covered = !!feats.length && feats[0].getBoundingClientRect().top <= base + th + ih + 2;
+        if (off !== wkOff) {
+          wkOff = off;
+          if (intro) intro.style.top = (base + th + off) + 'px';
+          if (wtitle) wtitle.style.top = (base + off) + 'px';
+          wlist.style.setProperty('--wk-off', off + 'px');
+        }
+        if (covered !== wkStuck) { wkStuck = covered; wlist.classList.toggle('stuck', covered); }
       };
       const ask = () => { if (!raf) raf = requestAnimationFrame(tick); };
       addEventListener('scroll', ask, { passive: true });
@@ -462,27 +462,12 @@
   const vio = new IntersectionObserver(es => es.forEach(en => { const v = en.target; if (en.isIntersecting) { if (!v.src && v.dataset.src) v.src = v.dataset.src; v.play().catch(() => {}); } else v.pause(); }), { threshold: 0.2 });
   $$('video[data-auto]').forEach(v => { v.muted = true; v.playsInline = true; vio.observe(v); });
 
-  /* ---------- the opening film holds still while the page moves over it (Information, Work) ---------- */
-  const itop = $('.info-top');
-  if (itop) {
-    const ihero = $('.info-hero', itop), ifilm = $('.info-film video', itop), after = itop.nextElementSibling;
-    const setH = () => itop.style.setProperty('--hero-h', (ihero ? ihero.getBoundingClientRect().height : 0) + 'px');
-    let iraf = 0;
-    // once the next part has covered the film, pause it; play again when it comes back into view
-    const ilabel = $('.info-label', itop), ishot = $('.info-film .shot', itop);
-    // the film's picture never moves. The frame's top edge (and the title on it) rises with the headline, opening up more
-    // of the picture, until it meets the top of the screen; the next part then slides over it all
-    const iframe = () => {
-      if (!after) return;
-      const y = Math.min(0, after.getBoundingClientRect().top - itop.getBoundingClientRect().bottom);
-      const hh = ihero ? ihero.getBoundingClientRect().height : 0, ft = Math.max(0, hh + y);
-      if (ihero) ihero.style.transform = y ? `translate3d(0,${y.toFixed(1)}px,0)` : '';
-      if (ishot) ishot.style.setProperty('--clip-t', ft.toFixed(1) + 'px');
-      if (ilabel) ilabel.style.transform = `translate3d(0,${(hh + y).toFixed(1)}px,0)`;
-    };
-    const icheck = () => { iraf = 0; iframe(); if (!ifilm || !after || !ifilm.src) return; const hid = after.getBoundingClientRect().top <= 1; if (hid && !ifilm.paused) ifilm.pause(); else if (!hid && ifilm.paused) ifilm.play().catch(() => {}); };
-    addEventListener('scroll', () => { if (!iraf) iraf = requestAnimationFrame(icheck); }, { passive: true });
-    addEventListener('resize', () => { setH(); iframe(); }); document.fonts && document.fonts.ready.then(() => { setH(); iframe(); }); setH(); iframe();
+  /* ---------- the opening film (Information, Work): held by CSS; pause it once the page has covered it ---------- */
+  const ifv = $('.if-film video'), ifn = $('.if-front') && $('.if-front').nextElementSibling;
+  if (ifv && ifn) {
+    let fr = 0;
+    const fcheck = () => { fr = 0; if (!ifv.src) return; const hid = ifn.getBoundingClientRect().top <= 1; if (hid && !ifv.paused) ifv.pause(); else if (!hid && ifv.paused) ifv.play().catch(() => {}); };
+    addEventListener('scroll', () => { if (!fr) fr = requestAnimationFrame(fcheck); }, { passive: true });
   }
 
   /* ---------- start ---------- */

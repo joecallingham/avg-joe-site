@@ -87,28 +87,27 @@
   // once the last client has landed, the title and the stack move up together (as on the Work page)
   let base = 0, th = 0, raf = 0;
   const pin = () => {
-    title.style.top = ''; base = parseFloat(getComputedStyle(title).top) || 0; th = title.getBoundingClientRect().height;
+    lastOff = null; title.style.top = ''; base = parseFloat(getComputedStyle(title).top) || 0; th = title.getBoundingClientRect().height;
     stack.style.setProperty('--cl-top', (base + th - 1).toFixed(2) + 'px');
     // each panel pins one bar lower than the last, so the bars collect one under another as the panels come up
     const bar = stack.querySelector('.clp-bar');
     stack.style.setProperty('--cl-bar', (bar ? bar.getBoundingClientRect().height : 36).toFixed(2) + 'px');
     const ps = stack.querySelectorAll('.clp');
     ps.forEach((p, i) => p.style.setProperty('--i', i));
-    // the last client's picture runs down to the bottom of the screen, so the stack lets go exactly as it lands (no early lift, no gap)
-    const last = ps[ps.length - 1], barH = bar ? bar.getBoundingClientRect().height : 36;
-    if (last) {
-      const img = last.querySelector('.clp-img'), frame = parseFloat(getComputedStyle(img).marginBottom) || 0;
-      img.style.height = Math.max(innerHeight / 3, innerHeight - (base + th - 1) - (ps.length - 1) * barH - barH - frame - 1) + 'px';
-    }
+    stack.style.setProperty('--cl-n', ps.length);
+    barPx = bar ? bar.getBoundingClientRect().height : 36; n = ps.length; lastEl = ps[ps.length - 1];
     tick();
   };
+  // read first, then write only what changed. The lift starts the moment the last client lands where it pins, so it never
+  // depends on the screen height (which changes on phones as the browser bar shows and hides)
+  let lastOff = null, lastStuck = null, barPx = 36, n = 0, lastEl = null;
   const tick = () => {
     raf = 0;
-    const off = Math.min(0, stack.getBoundingClientRect().bottom - innerHeight);
-    title.style.top = (base + off).toFixed(1) + 'px';
-    stack.style.setProperty('--cl-off', off.toFixed(1) + 'px');
-    // phones: the title's cream cover only once it is held at the top, so the rule above Clients shows until then
-    title.classList.toggle('stuck', sec.getBoundingClientRect().top < base - 0.5);
+    const landed = (base + th - 1) + (n - 1) * barPx + (lastEl ? lastEl.offsetHeight : 0);
+    const off = Math.min(0, Math.round((stack.getBoundingClientRect().bottom - landed) * 2) / 2);
+    const stuck = sec.getBoundingClientRect().top < base - 0.5;
+    if (off !== lastOff) { lastOff = off; title.style.top = (base + off) + 'px'; stack.style.setProperty('--cl-off', off + 'px'); }
+    if (stuck !== lastStuck) { lastStuck = stuck; title.classList.toggle('stuck', stuck); }
   };
   addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(tick); }, { passive: true });
   pin(); addEventListener('resize', pin); document.fonts && document.fonts.ready.then(pin);

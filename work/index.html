@@ -6,21 +6,21 @@
 <title>Work — Avg Joe</title>
 <meta name="description" content="Selected work from Avg Joe: branding, art direction, packaging, digital and film.">
 <meta name="theme-color" content="#f1eee7">
-<link rel="stylesheet" href="/style.css?v=20261129a">
-<link rel="stylesheet" href="/work.css?v=20261129a">
+<link rel="stylesheet" href="/style.css?v=20261129d">
+<link rel="stylesheet" href="/work.css?v=20261129d">
 </head>
 <body>
 <div class="pt" aria-hidden="true"></div>
 
 <main>
-  <!-- first screen, as on Information: the line at the top, the reel fills the rest, the page title laid over the film -->
-  <div class="info-top">
-  <header class="info-hero grid">
-    <h1 class="rv">Where <span class="craft" data-rot data-rot-auto>craft</span> and <span class="ai">AI</span> blend. Ideas made by hand, then built to keep on working.</h1>
-  </header>
-  <div class="info-film">
-    <span class="shot"><h2 class="info-label"><span>Work</span></h2><video data-auto data-src="/video/out-of-office.mp4" poster="/img/out-of-office.jpg" muted loop playsinline preload="auto" width="1600" height="900" aria-label="A reel of the studio's work"></video></span>
-  </div>
+  <!-- first screen: the film is held still by CSS from the start; the cream headline block scrolls up over it, so the frame's
+       top edge rises with the headline and title; everything after slides over the film. No scroll scripts. -->
+  <div class="if-film"><span class="shot"><video data-auto data-src="/video/out-of-office.mp4" poster="/img/out-of-office.jpg" muted loop playsinline preload="auto" width="1600" height="900" aria-label="A reel of the studio's work"></video></span></div>
+  <div class="if-front">
+    <header class="info-hero grid">
+      <h1 class="rv">Where <span class="craft" data-rot data-rot-auto>craft</span> and <span class="ai">AI</span> blend. Ideas made by hand, then built to keep on working.</h1>
+    </header>
+    <div class="if-win"><h2 class="info-label"><span>Work</span></h2></div>
   </div>
 
 
@@ -74,9 +74,9 @@
 </nav>
 
 <script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
-<script src="/page.js?v=20261129a"></script>
-<script src="/booking.js?v=20261129a"></script>
-<script src="/transition.js?v=20261129a"></script>
-<script src="/footer.js?v=20261129a"></script>
+<script src="/page.js?v=20261129d"></script>
+<script src="/booking.js?v=20261129d"></script>
+<script src="/transition.js?v=20261129d"></script>
+<script src="/footer.js?v=20261129d"></script>
 </body>
 </html>
