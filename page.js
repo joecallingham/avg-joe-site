@@ -286,8 +286,7 @@
           const mn = reel.parentElement, cm = getComputedStyle(mn), cr = getComputedStyle(reel);
           const natTop = mn.getBoundingClientRect().top + scrollY + parseFloat(cm.paddingTop) + parseFloat(cr.marginTop);
           const frame = parseFloat(cr.paddingLeft) || 0;
-          // phones: the foot sits just above the nav bar, so the last line isn't hidden behind it
-          const nav = document.getElementById('nav'), foot = (base && nav) ? Math.min(innerHeight - frame, nav.getBoundingClientRect().top) : innerHeight - frame;
+          const foot = innerHeight;   // its rule sits under the bottom frame bar, so no line shows at first
           intro.style.marginTop = ((foot - ih) - (natTop + reel.offsetHeight)).toFixed(2) + 'px';
         }
         wlist.style.setProperty('--wk-ih', (th + ih) + 'px'); wlist.style.setProperty('--wk-base', base + 'px');
