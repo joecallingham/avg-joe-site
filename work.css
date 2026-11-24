@@ -1057,3 +1057,7 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 @media (max-width:760px){.info-top{top:calc(3.4rem - var(--hero-h,0px))}}   /* phones: the film holds just under the Avg / Joe bar */
 @media (max-width:760px){.info-top.held .info-hero{visibility:hidden}}   /* the headline tail would peek above the held film */
 .info-label{will-change:transform}
+/* the film never moves: the whole first screen holds from the start; headline and title scroll away (page.js) */
+.info-top{top:0!important}
+@media (max-width:760px){.info-top{top:3.4rem!important}}
+.info-top .info-hero{will-change:transform;position:relative;z-index:1}

@@ -473,7 +473,10 @@
     // the page title rides with the page, not the held film: it moves up and away as the next part comes over
     const ilab = () => { if (!ilabel || !ishot || !after) return; const sr = ishot.getBoundingClientRect(), fr = parseFloat(getComputedStyle(ishot.parentElement).paddingBottom) || 0;
       const y = Math.min(0, after.getBoundingClientRect().top - sr.height - fr - sr.top); ilabel.style.transform = y ? `translate3d(0,${y.toFixed(1)}px,0)` : ''; };
-    const icheck = () => { iraf = 0; ilab(); if (ihero) itop.classList.toggle('held', ihero.getBoundingClientRect().bottom <= parseFloat(getComputedStyle(itop).top) + ihero.getBoundingClientRect().height + 1 && scrollY > 2); if (!ifilm || !after || !ifilm.src) return; const hid = after.getBoundingClientRect().top <= 1; if (hid && !ifilm.paused) ifilm.pause(); else if (!hid && ifilm.paused) ifilm.play().catch(() => {}); };
+    // the headline also scrolls away with the page while the film stays exactly where it started
+    const ihd = () => { if (!ihero || !ishot || !after) return; const sr = ishot.getBoundingClientRect(), fr = parseFloat(getComputedStyle(ishot.parentElement).paddingBottom) || 0;
+      const y = Math.min(0, after.getBoundingClientRect().top - sr.height - fr - sr.top); ihero.style.transform = y ? `translate3d(0,${y.toFixed(1)}px,0)` : ''; };
+    const icheck = () => { iraf = 0; ilab(); ihd(); if (!ifilm || !after || !ifilm.src) return; const hid = after.getBoundingClientRect().top <= 1; if (hid && !ifilm.paused) ifilm.pause(); else if (!hid && ifilm.paused) ifilm.play().catch(() => {}); };
     addEventListener('scroll', () => { if (!iraf) iraf = requestAnimationFrame(icheck); }, { passive: true });
     addEventListener('resize', setH); document.fonts && document.fonts.ready.then(setH); setH();
   }
