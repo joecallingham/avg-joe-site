@@ -269,7 +269,7 @@
     [...feats, ...sel].forEach(w => {
       const box = w.querySelector('a, div') || w, m = document.createElement('span');
       const live = box.tagName === 'A';
-      m.className = 'wk-more' + (live ? '' : ' soon'); m.textContent = live ? 'View more ↘' : 'Coming soon';
+      m.className = 'wk-more' + (live ? '' : ' soon'); m.textContent = live ? 'View case study ↘' : 'Coming soon';
       box.appendChild(m);
     });
     // the Work title and the intro hold at the top while the panels stack beneath; when Selected Work arrives, they all move up together
