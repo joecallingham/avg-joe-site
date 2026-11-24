@@ -816,13 +816,15 @@
     stack.style.setProperty('--hf-top', (base + th - 1).toFixed(2) + 'px');
     stack.style.setProperty('--hf-bar', bh.toFixed(2) + 'px');
     rows.forEach((r, i) => r.style.setProperty('--i', i));
-    const last = rows[rows.length - 1], img = last && last.querySelector('.hf-img');
-    if (img) { const fr = parseFloat(getComputedStyle(img).marginBottom) || 0; img.style.height = Math.max(innerHeight / 3, innerHeight - (base + th - 1) - rows.length * bh - fr - 1) + 'px'; }
+    stack.dataset.bar = bh;
     tick();
   };
   const tick = () => {
     raf = 0;
-    const off = Math.min(0, stack.getBoundingClientRect().bottom - innerHeight);
+    // every picture is the same height; the stack lets go the moment the last row lands (where it would pin), whatever the screen height
+    const last = rows[rows.length - 1], bh = +stack.dataset.bar || 36;
+    const landedBottom = (base + th - 1) + (rows.length - 1) * bh + (last ? last.getBoundingClientRect().height : 0);
+    const off = Math.min(0, stack.getBoundingClientRect().bottom - landedBottom);
     title.style.top = (base + off).toFixed(1) + 'px';
     stack.style.setProperty('--hf-off', off.toFixed(1) + 'px');
   };
