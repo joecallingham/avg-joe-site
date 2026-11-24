@@ -288,11 +288,16 @@
       };
       const tick = () => {
         raf = 0;
-        const H = innerHeight, ref = selSec ? selSec.getBoundingClientRect().top : wlist.getBoundingClientRect().bottom;
+        const H = innerHeight, ref = wlist.getBoundingClientRect().bottom;   // the stack holds until Selected Work has slid right over it
         const off = Math.min(0, ref - H);
         if (intro) intro.style.top = (base + th + off).toFixed(1) + 'px';
         if (wtitle) wtitle.style.top = (base + off).toFixed(1) + 'px';
         wlist.style.setProperty('--wk-off', off.toFixed(1) + 'px');
+        // once the first project is held at the top, the reel behind is hidden: cover the strip under Avg / Joe and pause the film
+        const covered = feats.length && feats[0].getBoundingClientRect().top <= base + 2;
+        wlist.classList.toggle('stuck', !!covered);
+        const rv = $('.wk-reel video');
+        if (rv && rv.src) { if (covered) { if (!rv.paused) rv.pause(); } else if (rv.paused) rv.play().catch(() => {}); }
       };
       const ask = () => { if (!raf) raf = requestAnimationFrame(tick); };
       addEventListener('scroll', ask, { passive: true });

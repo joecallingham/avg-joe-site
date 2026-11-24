@@ -996,3 +996,13 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 .wk-reel video{width:100%;height:100%;object-fit:cover;display:block;max-width:none}
 .wk-reel + .wk-list{margin-top:var(--frame)}
 .wk-list .wk.wk-feat:first-child{border-top-color:var(--ink)}   /* no intro above now, so the first row keeps its own rule */
+/* Work: the reel holds still and the projects slide up over it */
+.wk-reel{position:sticky;top:0;z-index:0}
+.wk-reel ~ *{position:relative;z-index:1}
+.wk-reel + .wk-list{margin-top:0}
+.wk-sel{background:var(--cream)}
+.wk-list.stuck .wk.wk-feat:first-child::before{content:'';position:absolute;left:0;right:0;bottom:100%;height:var(--wk-base,0px);background:var(--cream)}
+/* Work: Selected Work slides up over the held featured stack (the list runs a screen longer so the rows stay pinned underneath) */
+.wk-list{margin-bottom:-100vh;margin-bottom:-100svh;border-bottom:0!important}
+.wk-hold{grid-column:1/-1;height:100vh;height:100svh}
+.wk-sel{position:relative;z-index:2!important;background:var(--cream);border-top:1px solid var(--ink)}
