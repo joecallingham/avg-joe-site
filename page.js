@@ -462,6 +462,18 @@
   const vio = new IntersectionObserver(es => es.forEach(en => { const v = en.target; if (en.isIntersecting) { if (!v.src && v.dataset.src) v.src = v.dataset.src; v.play().catch(() => {}); } else v.pause(); }), { threshold: 0.2 });
   $$('video[data-auto]').forEach(v => { v.muted = true; v.playsInline = true; vio.observe(v); });
 
+  /* ---------- the opening film holds still while the page moves over it (Information, Work) ---------- */
+  const itop = $('.info-top');
+  if (itop) {
+    const ihero = $('.info-hero', itop), ifilm = $('.info-film video', itop), after = itop.nextElementSibling;
+    const setH = () => itop.style.setProperty('--hero-h', (ihero ? ihero.getBoundingClientRect().height : 0) + 'px');
+    let iraf = 0;
+    // once the next part has covered the film, pause it; play again when it comes back into view
+    const icheck = () => { iraf = 0; if (ihero) itop.classList.toggle('held', ihero.getBoundingClientRect().bottom <= parseFloat(getComputedStyle(itop).top) + ihero.getBoundingClientRect().height + 1 && scrollY > 2); if (!ifilm || !after || !ifilm.src) return; const hid = after.getBoundingClientRect().top <= 1; if (hid && !ifilm.paused) ifilm.pause(); else if (!hid && ifilm.paused) ifilm.play().catch(() => {}); };
+    addEventListener('scroll', () => { if (!iraf) iraf = requestAnimationFrame(icheck); }, { passive: true });
+    addEventListener('resize', setH); document.fonts && document.fonts.ready.then(setH); setH();
+  }
+
   /* ---------- start ---------- */
   // a case study opens on its hero alone: it runs to the bottom of the first screen, so nothing peeks out under Avg or Joe
   const hero = $('.cs-hero');
