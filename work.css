@@ -1041,3 +1041,10 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 .wk.wk-feat .wk-img{height:33.333vh!important;height:33.333svh!important;position:relative}
 .wk.wk-feat .wk-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 @media (max-width:760px){.wk-reel ~ .wk-intro{padding-bottom:calc(var(--s3) + 2.4rem)}}   /* phones: the text clears the nav bar at the foot of the first screen */
+/* Information first screen: the line at the top, the film fills the rest (inside the frame), the page title laid over the film in white */
+.info-top{display:flex;flex-direction:column;height:100vh;height:100svh}
+.info-top .info-hero{flex:0 0 auto}
+.info-top .info-film{flex:1 1 auto;min-height:40vh;padding:0 var(--frame) var(--frame);display:flex}
+.info-top .info-film .shot{position:relative;flex:1;height:auto!important;aspect-ratio:auto!important}
+.info-top .info-film video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none}
+.info-label{position:absolute;left:0;right:0;top:0;z-index:2;margin:0;padding:var(--title-t) var(--margin) var(--title-b);font-size:var(--small);font-weight:500;line-height:1.35;letter-spacing:-.02em;color:#fff;border-bottom:1px solid rgba(255,255,255,.85)}
