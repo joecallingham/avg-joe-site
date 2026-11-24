@@ -470,15 +470,19 @@
     let iraf = 0;
     // once the next part has covered the film, pause it; play again when it comes back into view
     const ilabel = $('.info-label', itop), ishot = $('.info-film .shot', itop);
-    // the page title rides with the page, not the held film: it moves up and away as the next part comes over
-    const ilab = () => { if (!ilabel || !ishot || !after) return; const sr = ishot.getBoundingClientRect(), fr = parseFloat(getComputedStyle(ishot.parentElement).paddingBottom) || 0;
-      const y = Math.min(0, after.getBoundingClientRect().top - sr.height - fr - sr.top); ilabel.style.transform = y ? `translate3d(0,${y.toFixed(1)}px,0)` : ''; };
-    // the headline also scrolls away with the page while the film stays exactly where it started
-    const ihd = () => { if (!ihero || !ishot || !after) return; const sr = ishot.getBoundingClientRect(), fr = parseFloat(getComputedStyle(ishot.parentElement).paddingBottom) || 0;
-      const y = Math.min(0, after.getBoundingClientRect().top - sr.height - fr - sr.top); ihero.style.transform = y ? `translate3d(0,${y.toFixed(1)}px,0)` : ''; };
-    const icheck = () => { iraf = 0; ilab(); ihd(); if (!ifilm || !after || !ifilm.src) return; const hid = after.getBoundingClientRect().top <= 1; if (hid && !ifilm.paused) ifilm.pause(); else if (!hid && ifilm.paused) ifilm.play().catch(() => {}); };
+    // the film's picture never moves. The frame's top edge (and the title on it) rises with the headline, opening up more
+    // of the picture, until it meets the top of the screen; the next part then slides over it all
+    const iframe = () => {
+      if (!after) return;
+      const y = Math.min(0, after.getBoundingClientRect().top - itop.getBoundingClientRect().bottom);
+      const hh = ihero ? ihero.getBoundingClientRect().height : 0, ft = Math.max(0, hh + y);
+      if (ihero) ihero.style.transform = y ? `translate3d(0,${y.toFixed(1)}px,0)` : '';
+      if (ishot) ishot.style.setProperty('--clip-t', ft.toFixed(1) + 'px');
+      if (ilabel) ilabel.style.transform = `translate3d(0,${(hh + y).toFixed(1)}px,0)`;
+    };
+    const icheck = () => { iraf = 0; iframe(); if (!ifilm || !after || !ifilm.src) return; const hid = after.getBoundingClientRect().top <= 1; if (hid && !ifilm.paused) ifilm.pause(); else if (!hid && ifilm.paused) ifilm.play().catch(() => {}); };
     addEventListener('scroll', () => { if (!iraf) iraf = requestAnimationFrame(icheck); }, { passive: true });
-    addEventListener('resize', setH); document.fonts && document.fonts.ready.then(setH); setH();
+    addEventListener('resize', () => { setH(); iframe(); }); document.fonts && document.fonts.ready.then(() => { setH(); iframe(); }); setH(); iframe();
   }
 
   /* ---------- start ---------- */

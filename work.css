@@ -1061,3 +1061,10 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 .info-top{top:0!important}
 @media (max-width:760px){.info-top{top:3.4rem!important}}
 .info-top .info-hero{will-change:transform;position:relative;z-index:1}
+
+/* the film's picture covers the whole first screen and never moves; only its frame's top edge rises (clip), with the headline */
+.info-top{height:100vh;height:100svh;position:sticky}
+.info-top .info-film{position:absolute;left:0;right:0;top:0;bottom:0;min-height:0;padding:0 var(--frame) var(--frame)}
+.info-top .info-film .shot{clip-path:inset(var(--clip-t,100%) 0 0 0 round .25rem)}
+.info-top .info-label{top:0}
+@media (max-width:760px){.info-top .info-film{bottom:3.4rem}}
