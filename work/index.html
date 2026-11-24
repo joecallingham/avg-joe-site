@@ -8,20 +8,22 @@
 <meta name="theme-color" content="#f1eee7">
 <link rel="stylesheet" href="/style.css?v=20261129l">
 <link rel="stylesheet" href="/work.css?v=20261129l">
+<style>
+.wk-say{border-top:0!important;min-height:100vh!important;min-height:100svh!important}   /* the statement alone fills the first screen */
+.wk-say-img{aspect-ratio:440/322;object-fit:cover;border-radius:.06em}
+.wk-title{margin:0}
+.wk-title + .wk-list{border-top:0!important}   /* the title already draws the rule */
+</style>
 </head>
 <body>
 <div class="pt" aria-hidden="true"></div>
 
 <main>
-  <!-- first screen: the film is held still by CSS from the start; the cream headline block scrolls up over it, so the frame's
-       top edge rises with the headline and title; everything after slides over the film. No scroll scripts. -->
-  <div class="if-film"><span class="shot"><video data-auto data-src="/video/out-of-office.mp4" poster="/img/out-of-office.jpg" muted loop playsinline preload="auto" width="1600" height="900" aria-label="A reel of the studio's work"></video></span></div>
-  <div class="if-front">
-    <header class="info-hero grid">
-      <h1 class="rv">Where <span class="craft" data-rot data-rot-auto>craft</span> and <span class="ai">AI</span> blend. Ideas made by hand, then built to keep on working.</h1>
-    </header>
-    <div class="if-win"><h2 class="info-label"><span>Work</span></h2></div>
-  </div>
+  <!-- first screen: one centred statement with pictures set in the line, like Information's "final say" -->
+  <section class="ca-say wk-say" aria-label="Where craft and AI blend">
+    <p class="ca-state" data-lines>Where <span class="craft" data-rot data-rot-auto>craft</span> <img class="ca-cow wk-say-img" src="/img/work/bison/cup.jpg" alt="" width="2000" height="1092"> and <span class="ai">AI</span> blend. Ideas made by hand, <span class="ca-blob" aria-hidden="true"></span> then built to keep on working.</p>
+  </section>
+  <h2 class="sec-title wk-title"><span>Work</span></h2>
 
 
   <!-- every project: full-screen panels that stack under each other; once stacked, hovering a row opens it a little (page.js) -->
