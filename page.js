@@ -280,6 +280,16 @@
         base = matchMedia('(max-width: 760px)').matches ? 3.4 * parseFloat(getComputedStyle(document.documentElement).fontSize) : 0;
         th = wtitle ? wtitle.getBoundingClientRect().height : 0;
         ih = intro ? intro.getBoundingClientRect().height : 0;
+        // the line starts with its foot on the bottom of the first screen (inside the frame), over the reel
+        const reel = $('.wk-reel');
+        if (intro && reel) {
+          const mn = reel.parentElement, cm = getComputedStyle(mn), cr = getComputedStyle(reel);
+          const natTop = mn.getBoundingClientRect().top + scrollY + parseFloat(cm.paddingTop) + parseFloat(cr.marginTop);
+          const frame = parseFloat(cr.paddingLeft) || 0;
+          // phones: the foot sits just above the nav bar, so the last line isn't hidden behind it
+          const nav = document.getElementById('nav'), foot = (base && nav) ? Math.min(innerHeight - frame, nav.getBoundingClientRect().top) : innerHeight - frame;
+          intro.style.marginTop = ((foot - ih) - (natTop + reel.offsetHeight)).toFixed(2) + 'px';
+        }
         wlist.style.setProperty('--wk-ih', (th + ih) + 'px'); wlist.style.setProperty('--wk-base', base + 'px');
         // each panel pins one bar lower than the last, so the rows stack under each other
         const nm = feats[0] && feats[0].querySelector('.wk-name');
@@ -290,11 +300,11 @@
         raf = 0;
         const H = innerHeight, ref = wlist.getBoundingClientRect().bottom;   // the stack holds until Selected Work has slid right over it
         const off = Math.min(0, ref - H);
-        if (intro) intro.style.top = (base + th + off).toFixed(1) + 'px';
+        if (intro) { intro.style.top = (base + th + off).toFixed(1) + 'px'; intro.classList.toggle('stuck', intro.getBoundingClientRect().top <= base + 0.5); }
         if (wtitle) wtitle.style.top = (base + off).toFixed(1) + 'px';
         wlist.style.setProperty('--wk-off', off.toFixed(1) + 'px');
         // once the first project is held at the top, the reel behind is hidden: cover the strip under Avg / Joe and pause the film
-        const covered = feats.length && feats[0].getBoundingClientRect().top <= base + 2;
+        const covered = feats.length && feats[0].getBoundingClientRect().top <= base + th + ih + 2;
         wlist.classList.toggle('stuck', !!covered);
         const rv = $('.wk-reel video');
         if (rv && rv.src) { if (covered) { if (!rv.paused) rv.pause(); } else if (rv.paused) rv.play().catch(() => {}); }

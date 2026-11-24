@@ -1027,3 +1027,9 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
   .wk-sel.wk-h .wk-grid3:not(.is-list) .wk.wk-thumb.wk-big{width:calc(100vw - 2 * var(--margin) - 3rem)}
 }
 .wk-sel{min-height:100vh;min-height:100svh}   /* a short list still covers the held stack beneath */
+/* Work intro over the reel: cream, above the film, holds at the top; on phones a cream strip fills under Avg / Joe once it holds */
+.wk-reel ~ .wk-intro{z-index:3;background:var(--cream)}
+@media (max-width:760px){.wk-intro.stuck::before{content:'';position:absolute;left:0;right:0;bottom:100%;height:3.5rem;background:var(--cream)}}
+.wk-intro + .wk-list .wk.wk-feat:first-child::before{display:none}
+.wk-reel ~ .wk-intro{position:sticky!important}
+.wk-reel ~ .wk-sel{z-index:4!important}   /* Selected Work rides over the held line and stack */
