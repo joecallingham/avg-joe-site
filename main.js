@@ -803,3 +803,32 @@
     get t() { return tl && tl.time(); }, get target() { return tOf(lenis.targetScroll); }, pxOf: t => pxOf(t),
   };
 })();
+
+// Home Featured Work: rows stack under the held title like the Work page; the last picture runs to the foot of the screen
+(() => {
+  const sec = document.querySelector('.featured'), title = sec && sec.querySelector('.sec-title'), stack = sec && sec.querySelector('.hf-stack');
+  if (!title || !stack) return;
+  const rows = [...stack.querySelectorAll('.hf')], scroller = document.getElementById('s-cases');
+  let base = 0, th = 0, raf = 0;
+  const pin = () => {
+    title.style.top = ''; base = parseFloat(getComputedStyle(title).top) || 0; th = title.getBoundingClientRect().height;
+    const bar = stack.querySelector('.hf-bar'), bh = bar ? bar.getBoundingClientRect().height : 36;
+    stack.style.setProperty('--hf-top', (base + th - 1).toFixed(2) + 'px');
+    stack.style.setProperty('--hf-bar', bh.toFixed(2) + 'px');
+    rows.forEach((r, i) => r.style.setProperty('--i', i));
+    const last = rows[rows.length - 1], img = last && last.querySelector('.hf-img');
+    if (img) { const fr = parseFloat(getComputedStyle(img).marginBottom) || 0; img.style.height = Math.max(innerHeight / 3, innerHeight - (base + th - 1) - rows.length * bh - fr - 1) + 'px'; }
+    tick();
+  };
+  const tick = () => {
+    raf = 0;
+    const off = Math.min(0, stack.getBoundingClientRect().bottom - innerHeight);
+    title.style.top = (base + off).toFixed(1) + 'px';
+    stack.style.setProperty('--hf-off', off.toFixed(1) + 'px');
+  };
+  const ask = () => { if (!raf) raf = requestAnimationFrame(tick); };
+  addEventListener('scroll', ask, { passive: true });
+  scroller && scroller.addEventListener('scroll', ask, { passive: true });
+  addEventListener('resize', pin); document.fonts && document.fonts.ready.then(pin);
+  pin();
+})();
