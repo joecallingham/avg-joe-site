@@ -1013,3 +1013,17 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 .wk.wk-feat .wk.soon .wk-name::after,.wk.wk-feat.soon .wk-name::after{content:none!important}
 .wk.wk-feat .wk-more{grid-column:9/span 4!important;border-left:0!important;justify-content:flex-end!important;padding:0 var(--margin) 0 0!important;font-size:var(--small);white-space:nowrap}
 .wk.wk-feat .wk-more.soon{color:#8e8b86}
+/* Selected Work, image view: the section holds at the top and the thumbnails travel sideways (work/hs.js) */
+.wk-sel.wk-h .wk-pin{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;padding-top:var(--wk-pt,0px);background:var(--cream)}
+.wk-sel.wk-h .wk-pin > .sec-title{position:relative!important;top:auto!important}
+.wk-sel.wk-h .wk-pin > .sec-title::before{display:none}
+.wk-sel.wk-h .wk-grid3:not(.is-list){display:flex!important;flex-wrap:nowrap;align-items:flex-start;gap:var(--gutter);width:max-content;padding:0 var(--margin)!important;will-change:transform}
+.wk-sel.wk-h .wk-grid3:not(.is-list) .wk.wk-thumb{flex:0 0 auto;width:calc(var(--wk-ih) * .8)}
+.wk-sel.wk-h .wk-grid3:not(.is-list) .wk.wk-thumb.wk-big{width:calc(var(--wk-ih) * 1.4)}
+.wk-sel.wk-h .wk-grid3:not(.is-list) .wk.wk-thumb .wk-img{aspect-ratio:auto!important;height:var(--wk-ih)!important}
+.wk-sel.wk-h .wk-grid3:not(.is-list) .wk.wk-thumb .wk-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+@media (max-width:760px){
+  .wk-sel.wk-h .wk-grid3:not(.is-list) .wk.wk-thumb{width:calc(100vw - 2 * var(--margin) - 3rem)}
+  .wk-sel.wk-h .wk-grid3:not(.is-list) .wk.wk-thumb.wk-big{width:calc(100vw - 2 * var(--margin) - 3rem)}
+}
+.wk-sel{min-height:100vh;min-height:100svh}   /* a short list still covers the held stack beneath */
