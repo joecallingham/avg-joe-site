@@ -6,7 +6,7 @@
   if (!wc) return;
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const all = $$('.wc-card', wc), track = $('.wc-track', wc), slot = $('.wc-slot', wc);
-  const fil = $('.wc-filters', wc), cap = $('.wc-cap', wc);
+  const fil = $('.wc-filters', wc), cap = $('.wc-cap', wc), edges = $$('.wc-edge', wc);
   const nowEl = $('.wc-now', wc), prevEl = $('.wc-prev', wc), nextEl = $('.wc-next', wc), typeEl = $('.wc-type', wc);
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const FILTERS = { All: /./, Branding: /Branding/, Web: /Website|App Build|Web/, Motion: /Motion|Film|Direction/ };
@@ -28,11 +28,12 @@
     const cy = m ? vh * 0.48 : vh / 2;
     const B0 = m ? vw * 0.05 : vw * 0.05;            // how far the strip bends out at the screen's edge, at rest
     G = { vw, vh, m, W, H, gap: m ? 12 : Math.max(12, vw * 0.0104), cx: vw / 2, cy, T: cy - H / 2,
-          B0, Bmax: B0 * 2.4, R: m ? vw * 0.24 : vw * 0.16, r: Math.max(8, W * 0.03) };
+          B0, Bmax: B0 * 2.4, R: m ? vw * 0.1 : vw * 0.06, r: Math.max(8, W * 0.03) };
     all.forEach(c => { c.style.width = G.W + 'px'; c.style.height = (G.H + 2 * G.Bmax) + 'px'; });
     const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
-    fil.style.top = (G.T - (m ? 3.6 : 3.4) * rem) + 'px';
-    cap.style.top = (G.T + G.H + (m ? 1.8 : 2.4) * rem) + 'px';
+    fil.style.top = (G.T - (m ? 3.2 : 3.15) * rem) + 'px';
+    cap.style.top = (G.T + G.H + (m ? 1.8 : 2.7) * rem) + 'px';
+    edges.forEach(e => { e.style.top = (G.T - G.Bmax) + 'px'; e.style.height = (G.H + 2 * G.Bmax) + 'px'; });
   }
 
   // how far the strip's top (and bottom) edge bends out at screen x: flat in the middle, a quarter-ellipse into each edge
@@ -83,6 +84,9 @@
     const want = RM ? 0 : Math.min(Math.abs(vel) * 9, 1.4) * G.B0;
     bend += (want - bend) * 0.12 * dt;
     const B = G.B0 * eC + bend;
+    const mv = Math.min(1, bend / (G.B0 * 1.4)) * eS;   // how hard it's moving: the edge blur strengthens with it
+    if (Math.abs(mv - (frame.mv || 0)) > 0.01) { frame.mv = mv; wc.style.setProperty('--wc-move', mv.toFixed(2)); }
+    edges.forEach(e => { e.style.visibility = eS > 0 ? '' : 'hidden'; });
 
     const s = slot.getBoundingClientRect();
     vis.forEach((c, k) => {
