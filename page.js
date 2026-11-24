@@ -295,6 +295,12 @@
         const nm = feats[0] && feats[0].querySelector('.wk-name');
         wlist.style.setProperty('--wk-bar', (nm ? nm.getBoundingClientRect().height : 36) + 'px');
         feats.forEach((w, i) => w.style.setProperty('--i', i));
+        // like the Clients: pictures a third of the screen tall; the last one runs to the foot of the screen so the stack lets go as it lands
+        const lastImg = feats.length && feats[feats.length - 1].querySelector('.wk-img');
+        if (lastImg) {
+          const barH = nm ? nm.getBoundingClientRect().height : 36, fr = parseFloat(getComputedStyle(lastImg).marginBottom) || 0;
+          lastImg.style.setProperty('height', Math.max(innerHeight / 3, innerHeight - base - th - ih - feats.length * barH - fr - 1) + 'px', 'important');
+        }
       };
       const tick = () => {
         raf = 0;
