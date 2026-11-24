@@ -1091,3 +1091,11 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 
 /* placeholder projects: abstract graphics fill the picture slot like a photo */
 .wk-img.wk-art svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* opening film: held at the very top with the same thin border all round (Avg / Joe sit over it, as on the home page);
+   sized to the full screen so no cream gap shows under it when a phone's browser bar shrinks */
+.if-film{top:0!important;padding-top:var(--frame);height:100vh;height:100lvh;margin-bottom:-100vh;margin-bottom:-100lvh}
+@media (max-width:760px){
+  .if-film{margin-top:-3.4rem;height:100vh!important;height:100lvh!important;margin-bottom:calc(-100vh + 3.4rem)!important;margin-bottom:calc(-100lvh + 3.4rem)!important}
+  /* until you scroll, cream covers the strip under Avg / Joe; it rides up with the headline, opening the film's top edge */
+  .if-front::before{content:'';position:absolute;left:0;right:0;bottom:100%;height:3.5rem;background:var(--cream)}
+}
