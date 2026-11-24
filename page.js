@@ -466,7 +466,7 @@
   const ifv = $('.if-film video'), ifn = $('.if-front') && $('.if-front').nextElementSibling;
   if (ifv && ifn) {
     let fr = 0;
-    const fcheck = () => { fr = 0; if (!ifv.src) return; const hid = ifn.getBoundingClientRect().top <= 1; if (hid && !ifv.paused) ifv.pause(); else if (!hid && ifv.paused) ifv.play().catch(() => {}); };
+    const fcheck = () => { fr = 0; if (!ifv.src) return; const hid = ifn.getBoundingClientRect().top <= ifv.parentElement.getBoundingClientRect().top + 1; if (hid && !ifv.paused) ifv.pause(); else if (!hid && ifv.paused) ifv.play().catch(() => {}); };
     addEventListener('scroll', () => { if (!fr) fr = requestAnimationFrame(fcheck); }, { passive: true });
   }
 
