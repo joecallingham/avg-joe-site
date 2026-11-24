@@ -1,0 +1,47 @@
+/* Work: the line, then a strip of projects that bends out at the screen's edges (work/carousel.js) */
+html.wc-page,html.wc-page body{height:100%;overflow:hidden;overscroll-behavior:none}
+.wc-page .foot{display:none}
+.wc{position:fixed;inset:0;background:var(--cream);touch-action:none;user-select:none;-webkit-user-select:none}
+
+/* the line: small and centred; its picture is where the first project opens from */
+.wc-say{position:absolute;left:0;right:0;top:50%;margin:0;transform:translateY(-50%);display:flex;justify-content:center;align-items:center;gap:.28em;
+  font-size:var(--fs-body);font-weight:500;line-height:1;letter-spacing:-.04em;white-space:nowrap;pointer-events:none}
+.wc-w{display:inline-block;transition:opacity .5s cubic-bezier(.33,1,.68,1),transform .9s cubic-bezier(.65,0,.35,1)}
+.wc-w .craft{display:inline-block}
+.wc-slot{display:inline-block;width:1.5em;height:1em;border-radius:.12em;overflow:hidden;flex:none}
+.wc-slot img{display:block;width:100%;height:100%;object-fit:cover}
+.wc.go .wc-w{opacity:0}
+.wc.go .wc-w1{transform:translateX(-4em)}
+.wc.go .wc-w2{transform:translateX(4em)}
+
+/* the strip */
+.wc-track{position:absolute;inset:0}
+.wc-card{position:absolute;left:0;top:0;display:block;visibility:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.wc-card.on{visibility:visible}
+.wc-media{display:block;width:100%;height:100%;background:#d9d4c8}
+.wc-media img,.wc-media svg{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-user-drag:none}
+.wc-card[hidden]{display:none}
+.wc.swap .wc-track{opacity:0;transition:opacity .2s}
+.wc-track{transition:opacity .35s}
+
+/* filters above, the name below: they arrive once the strip has opened */
+.wc-filters,.wc-cap{position:absolute;left:0;right:0;text-align:center;opacity:0;transform:translateY(.6rem);transition:opacity .6s cubic-bezier(.33,1,.68,1),transform .6s cubic-bezier(.33,1,.68,1)}
+.wc.open .wc-filters,.wc.open .wc-cap{opacity:1;transform:none}
+.wc-filters{display:flex;justify-content:center;gap:1.6rem}
+.wc-filters button{appearance:none;border:0;background:none;padding:.3rem 0;margin:0;font:inherit;font-size:var(--small);font-weight:500;letter-spacing:-.02em;color:rgba(11,11,11,.4);cursor:pointer;transition:color .25s}
+.wc-filters button:hover,.wc-filters button.on{color:var(--ink)}
+.wc-names{margin:0;display:grid;grid-template-columns:1fr auto 1fr;align-items:baseline;column-gap:.9em;font-size:var(--fs-title);font-weight:500;line-height:1.1;letter-spacing:-.04em}
+.wc-prev,.wc-next{color:rgba(11,11,11,.35);filter:blur(3px);white-space:nowrap;overflow:hidden;max-width:7em}
+.wc-prev{justify-self:end;-webkit-mask-image:linear-gradient(90deg,transparent,#000 70%);mask-image:linear-gradient(90deg,transparent,#000 70%)}
+.wc-next{justify-self:start;-webkit-mask-image:linear-gradient(270deg,transparent,#000 70%);mask-image:linear-gradient(270deg,transparent,#000 70%)}
+.wc-now{white-space:nowrap}
+.wc-type{margin:.45rem 0 0;font-size:var(--small);letter-spacing:-.02em;color:rgba(11,11,11,.55);min-height:1.35em}
+.wc-names span{transition:opacity .25s}
+.wc-cap.flip .wc-names span,.wc-cap.flip .wc-type{opacity:0}
+
+@media (max-width:760px){
+  .wc-say{font-size:1.75rem}
+  .wc-names{font-size:2.2rem}
+  .wc-filters{gap:1.2rem}
+}
+@media (prefers-reduced-motion:reduce){.wc-w,.wc-filters,.wc-cap{transition:none}}
