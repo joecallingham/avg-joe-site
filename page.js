@@ -305,25 +305,10 @@
         wlist.style.setProperty('--wk-off', off.toFixed(1) + 'px');
         // once the first project is held at the top, the reel behind is hidden: cover the strip under Avg / Joe and pause the film
         const covered = feats.length && feats[0].getBoundingClientRect().top <= base + th + ih + 2;
-        // every row has landed: the stack is a list of bars, and hovering one opens it a little (below)
-        const last = feats[feats.length - 1], barH = parseFloat(wlist.style.getPropertyValue('--wk-bar')) || 36;
-        const landed = !!last && off > -1 && last.getBoundingClientRect().top <= base + th + ih + (feats.length - 1) * barH + 2;
-        if (wlist.classList.contains('landed') !== landed) { wlist.classList.toggle('landed', landed); if (!landed) openRow(-1); }
         wlist.classList.toggle('stuck', !!covered);
         const rv = $('.wk-reel video');
         if (rv && rv.src) { if (covered) { if (!rv.paused) rv.pause(); } else if (rv.paused) rv.play().catch(() => {}); }
       };
-      // hover to open: the rows under the hovered one slide down a little, showing a strip of its picture; each opens and closes on its own
-      let openI = -1;
-      function openRow(i) {
-        if (i === openI) return; openI = i;
-        const gap = Math.round(innerHeight * 0.16);
-        feats.forEach((w, j) => w.style.setProperty('--wk-push', (i >= 0 && j > i ? gap : 0) + 'px'));
-      }
-      if (matchMedia('(hover: hover)').matches) {
-        feats.forEach((w, i) => w.addEventListener('pointerenter', () => { if (wlist.classList.contains('landed')) openRow(i); }));
-        wlist.addEventListener('pointerleave', () => openRow(-1));
-      }
       const ask = () => { if (!raf) raf = requestAnimationFrame(tick); };
       addEventListener('scroll', ask, { passive: true });
       addEventListener('resize', () => { measure(); ask(); });
