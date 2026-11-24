@@ -8,50 +8,20 @@
 <meta name="theme-color" content="#f1eee7">
 <link rel="stylesheet" href="/style.css?v=20261129m">
 <link rel="stylesheet" href="/work.css?v=20261129m">
-<style>
-/* first screen: the line set across the full width, a picture of the work between the words (after brief.co) */
-.wk-fill{height:100vh;height:100svh;display:flex;flex-direction:column;justify-content:center;padding:1.6rem var(--margin) 4.2rem;box-sizing:border-box}
-.wk-fill p{margin:0;font-weight:500;letter-spacing:-.05em;line-height:1;font-size:min(10vw,calc((100svh - 6.4rem) / 6.3))}
-.wk-fill .l{display:flex;justify-content:space-between;align-items:center;gap:.2em;white-space:nowrap}
-.wk-fill .l + .l{margin-top:.06em}
-.wk-fill img{display:block;flex:1 1 0;height:.78em;min-width:.9em;max-width:3.4em;object-fit:cover;border-radius:.09em}   /* the pictures stretch to fill the line */
-.wk-fill .ph{display:none}
-.wk-fill .craft{display:inline-block}
-.wk-fill em{font-family:"Riccione",Georgia,serif;font-weight:300;font-style:italic;letter-spacing:-.03em}
-@media (max-width:760px){.wk-fill{padding:4.4rem var(--margin) 4.6rem}.wk-fill .dt{display:none}.wk-fill .ph{display:block}.wk-fill p{font-size:min(15.5vw,calc((100svh - 9rem) / 11.6))}}
-.wk-title{margin:0}
-.wk-title + .wk-list{border-top:0!important}   /* the title already draws the rule */
-</style>
 </head>
 <body>
 <div class="pt" aria-hidden="true"></div>
 
 <main>
-  <!-- first screen: one centred statement with pictures set in the line, like Information's "final say" -->
-  <section class="wk-fill" aria-label="Where craft and AI blend. Ideas made by hand, then built to keep on working.">
-    <p class="dt" aria-hidden="true">
-      <span class="l">Where <img src="/img/work/bison/cup.jpg" alt="" style="--ar:2.6;object-position:50% 50%"> <span class="craft" data-rot data-rot-auto>craft</span></span>
-      <span class="l"><img src="/img/620.jpg" alt="" style="--ar:1.35;object-position:50% 40%"> and <span class="ai">AI</span> <img src="/img/boon-sign.jpg" alt="" style="--ar:1.9;object-position:42% 50%"> blend.</span>
-      <span class="l">Ideas <img src="/img/work/figtree/card.jpg" alt="" style="--ar:1.7;object-position:50% 50%"> made by</span>
-      <span class="l">hand, <img src="/img/the-hunna-hero.jpg" alt="" style="--ar:1.5;object-position:50% 62%"> then built</span>
-      <span class="l">to <img src="/img/work/figtree/stationery.jpg" alt=""> keep on <img src="/img/download-hero.jpg" alt="" style="object-position:50% 38%"></span>
-      <span class="l"><img src="/img/boon-van.jpg" alt="" style="--ar:1.5;object-position:50% 50%"> <img src="/img/work/bison/bag.jpg" alt=""> <em>working.</em></span>
-    </p>
-    <p class="ph" aria-hidden="true">
-      <span class="l">Where <img loading="lazy" src="/img/work/bison/cup.jpg" alt="" style="object-position:50% 50%"></span>
-      <span class="l"><span class="craft" data-rot data-rot-auto>craft</span> <img loading="lazy" src="/img/620.jpg" alt="" style="object-position:50% 40%"></span>
-      <span class="l"><img loading="lazy" src="/img/boon-sign.jpg" alt="" style="object-position:42% 50%"> and <span class="ai">AI</span></span>
-      <span class="l">blend. <img loading="lazy" src="/img/work/figtree/card.jpg" alt="" style="object-position:50% 50%"></span>
-      <span class="l">Ideas <img loading="lazy" src="/img/the-hunna-hero.jpg" alt="" style="object-position:50% 20%"></span>
-      <span class="l">made <img loading="lazy" src="/img/work/bison/bag.jpg" alt="" style="object-position:50% 50%"> by</span>
-      <span class="l"><img loading="lazy" src="/img/download-hero.jpg" alt="" style="object-position:50% 38%"> hand,</span>
-      <span class="l">then <img loading="lazy" src="/img/work/figtree/stationery.jpg" alt="" style="object-position:50% 50%"></span>
-      <span class="l">built <img loading="lazy" src="/img/boon-van.jpg" alt="" style="object-position:50% 50%"> to</span>
-      <span class="l">keep on <img loading="lazy" src="/img/work/figtree/laptop.jpg" alt="" style="object-position:50% 50%"></span>
-      <span class="l"><img loading="lazy" src="/img/bison.jpg" alt="" style="object-position:50% 50%"> <em>working.</em></span>
-    </p>
-  </section>
-  <h2 class="sec-title wk-title"><span>Work</span></h2>
+  <!-- first screen: the film is held still by CSS from the start; the cream headline block scrolls up over it, so the frame's
+       top edge rises with the headline and title; everything after slides over the film. No scroll scripts. -->
+  <div class="if-film"><span class="shot"><video data-auto data-src="/video/out-of-office.mp4" poster="/img/out-of-office.jpg" muted loop playsinline preload="auto" width="1600" height="900" aria-label="A reel of the studio's work"></video></span></div>
+  <div class="if-front">
+    <header class="info-hero grid">
+      <h1 class="rv">Where <span class="craft" data-rot data-rot-auto>craft</span> and <span class="ai">AI</span> blend. Ideas made by hand, then built to keep on working.</h1>
+    </header>
+    <div class="if-win"><h2 class="info-label"><span>Work</span></h2></div>
+  </div>
 
 
   <!-- every project: full-screen panels that stack under each other; once stacked, hovering a row opens it a little (page.js) -->
