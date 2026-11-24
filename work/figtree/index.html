@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en" class="page cs-page" style="--panel:#f15a24;--panel-ink:#ffffff">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Figtree — Avg Joe</title>
+<meta name="description" content="Figtree: a brand and website for build-to-rent pricing software. Branding, art direction, motion and web by Avg Joe.">
+<meta name="theme-color" content="#f1eee7">
+<link rel="stylesheet" href="/style.css?v=20261129l">
+<link rel="stylesheet" href="/work.css?v=20261129l">
+<style>
+/* Figtree only: the hero film with the glowing icon over it, framed site clips, the product illustrations */
+.fg-hero{position:relative;overflow:hidden;background:#f0662a}
+.fg-hero video,.fg-hero>img.poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cs-hero figure img.fg-icon,.fg-icon{position:absolute;inset:auto;left:50%;top:50%;height:auto;object-fit:contain;width:clamp(11rem,46%,30rem);transform:translate(-50%,-50%);pointer-events:none;animation:fg-breathe 6s ease-in-out infinite}
+@keyframes fg-breathe{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-51.5%) scale(1.03)}}
+.fg-wide{grid-column:1/-1}
+.fg-browser{background:#efe9e3;border-radius:.5rem;overflow:hidden}
+.fg-browser .bar{display:flex;gap:.4rem;padding:.7rem .9rem;background:#e4ddd5}
+.fg-browser .bar i{width:.6rem;height:.6rem;border-radius:50%;background:#cdc3b8}
+.fg-browser video,.fg-browser img{display:block;width:100%;height:auto;aspect-ratio:1280/800;object-fit:cover}
+.fg-half{grid-column:span 6}
+.fg-phone{grid-column:1/span 4;display:grid;place-items:center;background:#f7e6da;padding:var(--s3) 0}
+.fg-phone .dev{width:min(17rem,70%);border-radius:2.2rem;padding:.55rem;background:#191816;box-shadow:0 30px 60px -30px rgba(90,40,15,.5)}
+.fg-phone video,.fg-phone img{display:block;width:100%;height:auto;aspect-ratio:390/844;object-fit:cover;border-radius:1.7rem}
+.fg-side{grid-column:5/span 8;display:flex;flex-direction:column;justify-content:space-between}
+.fg-side .shot{flex:1;min-height:0}
+.fg-ui{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--gutter)}
+.fg-ui figure{margin:0;background:#fff;display:flex;flex-direction:column}
+.fg-ui video{display:block;width:100%;aspect-ratio:1/1;object-fit:contain;padding:8%;background:#fff}
+.fg-ui figcaption{font-size:var(--small);letter-spacing:-.02em;padding:.7rem .9rem;border-top:var(--line)}
+.fg-art{grid-column:1/span 8;display:grid;grid-template-columns:1fr 1fr;gap:var(--gutter);align-items:start}
+.fg-art video,.fg-art img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
+.fg-leaf{grid-column:9/span 4;display:flex;flex-direction:column;gap:var(--gutter)}
+.fg-leaf video{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#fff}
+.fg-type{grid-column:1/span 8;aspect-ratio:16/10;display:grid;place-items:center;background:var(--panel);transition:background .6s cubic-bezier(.2,.7,.2,1)}
+.fg-type i{display:block;width:88%;aspect-ratio:2400/1500;background:var(--panel-ink);-webkit-mask:url(/img/work/figtree/type-specimen.png) center/contain no-repeat;mask:url(/img/work/figtree/type-specimen.png) center/contain no-repeat;transition:background .6s cubic-bezier(.2,.7,.2,1)}
+.cs-page .fg-type+.cap,.cs-page .fg-leaf .cap{border-left:var(--line);padding:var(--in) var(--margin);max-width:none;align-self:stretch;grid-column:9/span 4}
+.cs-page .fg-leaf .cap{border-left:0;padding:0;grid-column:auto}
+@media (max-width:760px){
+  .fg-half,.fg-phone,.fg-side,.fg-art,.fg-leaf,.fg-type{grid-column:1/-1}
+  .fg-ui{grid-template-columns:1fr 1fr}
+  .fg-art{grid-template-columns:1fr}
+  .cs-page .fg-type+.cap{grid-column:1/-1;border-left:0;border-top:var(--line)}
+  .cs-hero figure .fg-hero{aspect-ratio:4/5}
+}
+@media (prefers-reduced-motion:reduce){.fg-icon{animation:none}}
+</style>
+</head>
+<body>
+<div class="pt" aria-hidden="true"></div>
+
+<!-- the colour picked in the notch sets the panels (and the ink the brand pairs with it) on <html>; the page stays cream -->
+<main data-palette-stage style="--logo:url(/img/work/figtree/logo-wordmark.png);--logo-ar:3.1528">
+
+  <h2 class="sec-title"><a href="/work/" data-rot>Work</a><span class="hint">Figtree, 2026</span></h2>
+
+  <header class="cs-hero grid">
+    <div class="txt">
+      <h1 class="rv">Figtree was built by people who ran rental homes for a decade. We gave their pricing software a brand and a website that feel like a home, not a spreadsheet.</h1>
+      <dl class="facts rv">
+        <div><dt>Client</dt><dd>Figtree Technology</dd></div>
+        <div><dt>Year</dt><dd>2026</dd></div>
+        <div><dt>What we did</dt><dd>Branding, Art Direction, Motion, Website</dd></div>
+      </dl>
+    </div>
+    <figure>
+      <span class="shot fg-hero">
+        <img class="poster" src="/img/work/figtree/bg.jpg" alt="" width="1600" height="788">
+        <video data-auto muted loop playsinline preload="auto" poster="/img/work/figtree/bg.jpg"><source src="/img/work/figtree/bg.mp4" type="video/mp4"></video>
+        <img class="fg-icon" src="/img/work/figtree/icon-glow.png" alt="The Figtree icon glowing over the moving orange background from the website" width="1100" height="1100">
+        <span class="credit rv">Figtree</span>
+      </span>
+    </figure>
+  </header>
+
+  <section class="cs-sec">
+    <h2 class="sec-title"><span>The Brief</span></h2>
+    <div class="grid cs-brief">
+      <p class="lab rv">Revenue management for build-to-rent</p>
+      <div class="copy rv">
+        <p>Figtree recommends a rent for every home in a build-to-rent portfolio, using machine learning and rules the operator sets. Its founders spent more than ten years running these buildings before they wrote a line of code.</p>
+        <p>They had a name and a product, but no brand. They needed one that asset managers and investors would trust with their pricing, and that didn't look like every other grey property dashboard. We started from scratch: logo, type, colour, art direction and the website.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cs-sec cs-did">
+    <h2 class="sec-title"><span>What We Did</span></h2>
+    <ol class="steps4" aria-label="What we did">
+      <li class="st"><span class="st-no">01</span><h3 class="st-word">Identity</h3><p class="st-txt">A wordmark whose i is dotted with a leaf, and an icon that still reads as a favicon.</p></li>
+      <li class="st"><span class="st-no">02</span><h3 class="st-word">Colour &amp; Type</h3><p class="st-txt">One warm orange, soft peach and near-black. Gilroy for the mark, Circular for the rest.</p></li>
+      <li class="st"><span class="st-no">03</span><h3 class="st-word">Art Direction</h3><p class="st-txt">Moving textured gradients, a glowing icon and product illustrations that animate.</p></li>
+      <li class="st"><span class="st-no">04</span><h3 class="st-word">Website</h3><p class="st-txt">Three pages with custom scroll motion, built so the team can edit it themselves.</p></li>
+    </ol>
+  </section>
+
+  <section class="cs-sec">
+    <h2 class="sec-title"><span>Logo &amp; Colour</span></h2>
+    <div class="grid">
+      <div class="panel pal-stage rv">
+        <div class="pal-logo" role="img" aria-label="Figtree logo in the colours you picked"></div>
+        <span class="pal-hex"><span data-hex="--panel-ink">#FFFFFF</span> on <span data-hex="--panel">#F15A24</span></span>
+      </div>
+      <div class="ctl pal-ctl rv">
+        <div class="chips" role="group" aria-label="Logo version">
+          <button class="chip" data-logo="/img/work/figtree/logo-wordmark.png" data-ar="3.1528" aria-pressed="true">Wordmark</button>
+          <button class="chip" data-logo="/img/work/figtree/logo-icon.png" data-ar="1" aria-pressed="false">Icon</button>
+          <button class="chip" data-logo="/img/work/figtree/logo-leaf.png" data-ar="0.8125" aria-pressed="false">Leaf</button>
+        </div>
+        <p class="cap">The leaf on the i grows into everything else: the icon, the favicon and the glow on the website. Pick a colour from the brand in the notch below.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cs-sec">
+    <h2 class="sec-title"><span>Type</span></h2>
+    <div class="grid">
+      <div class="panel fg-type rv" role="img" aria-label="Type specimen: Gilroy Bold for the wordmark, Circular Std Light for headlines and body copy"><i></i></div>
+      <p class="cap rv">Gilroy Bold is kept for the wordmark. Everything else is set in Circular Light, large and loosely spaced, so the copy reads calm next to the bright colour.</p>
+    </div>
+  </section>
+
+  <section class="cs-sec">
+    <h2 class="sec-title"><span>Art Direction</span></h2>
+    <div class="grid">
+      <div class="fg-art rv">
+        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/bg.jpg" aria-label="The moving textured gradient behind the website"><source src="/img/work/figtree/bg.mp4" type="video/mp4"></video>
+        <img src="/img/work/figtree/art/wordmark.jpg" alt="The Figtree wordmark in white on the textured orange" width="1600" height="900" loading="lazy">
+        <img src="/img/work/figtree/art/light.jpg" alt="Light streaks: an orange gradient study" width="1600" height="900" loading="lazy">
+        <img src="/img/work/figtree/art/gradient.jpg" alt="A soft orange gradient with a white glow" width="1600" height="900" loading="lazy">
+      </div>
+      <div class="fg-leaf rv">
+        <video data-auto muted loop playsinline preload="none" aria-label="The Figtree icon turning into a spark and back"><source src="/img/work/figtree/ui/figtree-icon.mp4" type="video/mp4"></video>
+        <p class="cap">Fine lines drawn over soft gradients, so the orange has texture without needing photography. The icon turns into a spark wherever Figtree's assistant is working.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cs-sec">
+    <h2 class="sec-title"><span>The Website</span></h2>
+    <div class="grid">
+      <div class="fg-browser fg-wide rv">
+        <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
+        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/site/hero.jpg" aria-label="The Figtree homepage: the product rises out of the orange as you scroll"><source src="/img/work/figtree/site/hero.mp4" type="video/mp4"></video>
+      </div>
+      <div class="fg-browser fg-half rv">
+        <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
+        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/site/features.jpg" aria-label="Four benefit cards stacking as you scroll"><source src="/img/work/figtree/site/features.mp4" type="video/mp4"></video>
+      </div>
+      <div class="fg-browser fg-half rv">
+        <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
+        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/site/bento.jpg" aria-label="The feature grid, each card with its own animated illustration"><source src="/img/work/figtree/site/bento.mp4" type="video/mp4"></video>
+      </div>
+      <div class="fg-browser fg-half rv">
+        <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
+        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/site/how.jpg" aria-label="How it works: a glowing light follows the three steps"><source src="/img/work/figtree/site/how.mp4" type="video/mp4"></video>
+      </div>
+      <div class="fg-browser fg-half rv">
+        <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
+        <video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/site/team.jpg" aria-label="Built by Operators: the founders' cards stack up"><source src="/img/work/figtree/site/team.mp4" type="video/mp4"></video>
+      </div>
+      <div class="fg-phone rv">
+        <div class="dev"><video data-auto muted loop playsinline preload="none" poster="/img/work/figtree/site/phone.jpg" aria-label="The Figtree homepage on a phone"><source src="/img/work/figtree/site/phone.mp4" type="video/mp4"></video></div>
+      </div>
+      <div class="fg-side rv">
+        <span class="shot"><img src="/img/work/figtree/laptop.jpg" alt="Mockup: the Figtree dashboard on a laptop resting on an orange chair" width="2000" height="1500" loading="lazy"><span class="credit">Mockup</span></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="cs-sec">
+    <h2 class="sec-title"><span>Product Illustrations</span></h2>
+    <div class="grid">
+      <div class="fg-ui rv">
+        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-dashboard.mp4" type="video/mp4"></video><figcaption>Performance dashboard</figcaption></figure>
+        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-insights.mp4" type="video/mp4"></video><figcaption>Market insight</figcaption></figure>
+        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-availability-2.mp4" type="video/mp4"></video><figcaption>Availability &amp; pricing</figcaption></figure>
+        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-approvals.mp4" type="video/mp4"></video><figcaption>Approval workflows</figcaption></figure>
+        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-pricing-rules-2.mp4" type="video/mp4"></video><figcaption>Pricing strategies &amp; rules</figcaption></figure>
+        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-rent-review-support.mp4" type="video/mp4"></video><figcaption>Rent review tracking</figcaption></figure>
+        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/features-custom-report.mp4" type="video/mp4"></video><figcaption>Custom reports</figcaption></figure>
+        <figure><video data-auto muted loop playsinline preload="none" aria-hidden="true"><source src="/img/work/figtree/ui/figtree-icon.mp4" type="video/mp4"></video><figcaption>Digital assistant</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="cs-sec">
+    <h2 class="sec-title"><span>Stationery</span></h2>
+    <div class="grid">
+      <span class="shot fg-wide rv"><img src="/img/work/figtree/stationery.jpg" alt="Mockup: Figtree letterhead, business cards and a laptop sticker listing the company's principles" width="2400" height="1500" loading="lazy"><span class="credit">Mockup</span></span>
+    </div>
+  </section>
+
+  <section class="cs-sec">
+    <h2 class="sec-title"><span>Routes We Explored</span></h2>
+    <div class="grid routes">
+      <div class="fader-wrap rv">
+        <div class="fader" data-fader="2400" role="img" aria-label="Eight early directions for Figtree, cross-fading">
+          <img src="/img/work/figtree/routes/b1.jpg" alt="" width="1600" height="900" loading="lazy">
+          <img src="/img/work/figtree/routes/b2.jpg" alt="" width="1600" height="900" loading="lazy">
+          <img src="/img/work/figtree/routes/b3.jpg" alt="" width="1600" height="900" loading="lazy">
+          <img src="/img/work/figtree/routes/b4.jpg" alt="" width="1600" height="900" loading="lazy">
+          <img src="/img/work/figtree/routes/b5.jpg" alt="" width="1600" height="900" loading="lazy">
+          <img src="/img/work/figtree/routes/b6.jpg" alt="" width="1600" height="900" loading="lazy">
+          <img src="/img/work/figtree/routes/b7.jpg" alt="" width="1600" height="900" loading="lazy">
+          <img src="/img/work/figtree/routes/b8.jpg" alt="" width="1600" height="900" loading="lazy">
+        </div>
+        <span class="fader-count"></span>
+      </div>
+      <p class="cap rv">We tried electric blues, then golds and greens with a family of sub-brands: Rent, Build, Tech, Home. The leaf survived every round. The colour settled on one warm orange, because the product is about homes.</p>
+    </div>
+  </section>
+
+  <section class="ca-say cs-say" aria-label="In short">
+    <p class="ca-state" data-lines>Warm enough for a home. Sharp enough for a spreadsheet.</p>
+  </section>
+
+  <footer class="cs-next">
+    <div><span class="lab">That's Figtree</span><a class="big" href="/work/" data-rot>All work ↘</a></div>
+    <a class="lab" href="https://wa.me/447542068942" target="_blank" rel="noopener" data-rot>Want something like this? Say hello ↗</a>
+  </footer>
+</main>
+
+<footer class="foot" id="foot">
+  <p class="foot-mark" aria-label="Extra ordinary"><span class="fm-avg" aria-hidden="true">Extra</span><span class="fm-joe" aria-hidden="true">Ordinary</span></p>
+  <div class="foot-cols">
+    <div class="fc"><h3>Studio</h3><p>Based in the UK</p><p><time class="foot-time">--:--</time> here right now</p></div>
+    <div class="fc"><h3>Say hello</h3><p><a href="mailto:letschat@joecallingham.com">letschat@joecallingham.com</a><br><a href="https://wa.me/447542068942" target="_blank" rel="noopener">WhatsApp ↗</a><br><a href="https://www.instagram.com/avgjoe.studio/" target="_blank" rel="noopener">Instagram ↗</a></p></div>
+    <div class="fc"><h3>Pages</h3><p><a href="/work/">Work</a><br><a href="/information/">Information</a><br><a href="/">Studio</a></p></div>
+    <div class="fc fc-side"><h3>Good to know</h3><p>We tell you where AI was used.<br>Your data stays yours.<br>If it's better by hand, it's done by hand.</p></div>
+    <div class="foot-base"><p class="foot-tag">Avg Joe never lets the robot have the last word.</p><p class="foot-c">© 2026 Avg Joe</p></div>
+  </div>
+</footer>
+
+<a id="logo-avg" class="logo" href="/" aria-label="Avg Joe, home">Avg</a>
+<a id="logo-joe" class="logo" href="/" aria-hidden="true" tabindex="-1">Joe</a>
+<div id="frame-bottom" aria-hidden="true"></div>
+<nav id="nav" aria-label="Main">
+  <div class="themes" role="group" aria-label="Panel colour">
+    <button class="sw" style="--sw:#f15a24" data-theme="--panel:#f15a24;--panel-ink:#ffffff" aria-pressed="true" aria-label="Orange"></button>
+    <button class="sw" style="--sw:#212121" data-theme="--panel:#212121;--panel-ink:#ffd9c0" aria-pressed="false" aria-label="Charcoal"></button>
+    <button class="sw" style="--sw:#fbb03b" data-theme="--panel:#fbb03b;--panel-ink:#212121" aria-pressed="false" aria-label="Amber"></button>
+    <button class="sw" style="--sw:#ffd9c0" data-theme="--panel:#ffd9c0;--panel-ink:#f15a24" aria-pressed="false" aria-label="Peach"></button>
+  </div>
+  <div class="notch">
+    <a class="nb here" href="/work/" data-k="work" data-rot>Work</a>
+    <a class="nb on" href="#book" data-k="studio" data-say="Book call" aria-haspopup="dialog" aria-controls="book" aria-expanded="false" data-rot><span class="say">Book call</span></a>
+    <a class="nb" href="/information/" data-k="info" data-rot>Info</a>
+  </div>
+</nav>
+
+<script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
+<script src="/page.js?v=20261129l"></script>
+<script src="/booking.js?v=20261129l"></script>
+<script src="/transition.js?v=20261129l"></script>
+<script src="/footer.js?v=20261129l"></script>
+<script src="/credits.js?v=20261129l"></script>
+</body>
+</html>
