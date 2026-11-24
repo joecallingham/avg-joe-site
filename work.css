@@ -1006,3 +1006,4 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 .wk-list{margin-bottom:-100vh;margin-bottom:-100svh;border-bottom:0!important}
 .wk-hold{grid-column:1/-1;height:100vh;height:100svh}
 .wk-sel{position:relative;z-index:2!important;background:var(--cream);border-top:1px solid var(--ink)}
+.wk-list .wk.wk-feat:first-child{border-top-color:transparent!important}   /* no rule above the first project */
