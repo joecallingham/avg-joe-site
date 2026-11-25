@@ -29,7 +29,7 @@
   const home = $('.bk-home');   // the home page's own section under the case studies
   if (home) home.querySelector('.bk-body').insertAdjacentHTML('beforeend', FORM);
   const root = document.documentElement;
-  let opener = null, isOpen = false;
+  let opener = null, isOpen = false, settled = false;
 
   // each blank grows with what's typed in it (or its placeholder)
   const meas = el('span', 'bk-meas'); panel.appendChild(meas);
@@ -41,7 +41,7 @@
   const inputs = [...panel.querySelectorAll('.bk-in input')];
 
   // the notch and the bottom bar lift by the form's height, and the form slides up under them
-  const size = () => { fitAll(); root.style.setProperty('--bk-h', panel.offsetHeight + 'px'); };
+  const size = () => { fitAll(); if (isOpen && settled) requestAnimationFrame(snap); else root.style.setProperty('--bk-h', panel.offsetHeight + 'px'); };
   const open = (on, from) => {
     if (on === isOpen) return;
     isOpen = on; if (on) size();
@@ -129,6 +129,26 @@
     $('.bk-done-txt', d).textContent = emailed ? `Joe will be in touch on ${contact} to fix a time.` : 'Your email app has opened with the details: hit send and Joe will be in touch.';
     size(); dispatchEvent(new Event('resize'));   // the home section changed height: let the page re-measure
   }));
+
+  /* ---------- keep the lid on the strip ----------
+     The notch and the strip are pinned to the bottom of the screen separately, and iPhone browsers can move one against the
+     other when their toolbar hides or shows. So while the form is open the page behind doesn't scroll, and once the strip
+     has settled, the lift is re-measured from where the strip really is. */
+  const barEl = $('#frame-bottom');
+  const snap = () => {
+    if (!isOpen || !settled || !barEl || root.classList.contains('bk-drag')) return;
+    const gap = panel.getBoundingClientRect().top - barEl.getBoundingClientRect().bottom;
+    if (Math.abs(gap) < 0.5) return;
+    const h = parseFloat(getComputedStyle(root).getPropertyValue('--bk-h')) || panel.offsetHeight;
+    root.classList.add('bk-drag'); root.style.setProperty('--bk-h', (h - gap) + 'px');
+    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('bk-drag')));
+  };
+  panel.addEventListener('transitionend', e => { if (e.target === panel && e.propertyName === 'transform') { settled = isOpen; snap(); } });
+  addEventListener('avgbook', e => { if (!e.detail) settled = false; });
+  ['resize', 'scroll'].forEach(t => { addEventListener(t, () => requestAnimationFrame(snap), { passive: true }); window.visualViewport?.addEventListener(t, () => requestAnimationFrame(snap)); });
+  veil.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+  veil.addEventListener('wheel', e => e.preventDefault(), { passive: false });
+  panel.addEventListener('touchmove', e => { if (panel.scrollHeight <= panel.clientHeight + 1 && !e.target.closest('input')) e.preventDefault(); }, { passive: false });
 
   window.AvgBook = { open: from => open(true, from), close: () => open(false) };
 })();
