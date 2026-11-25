@@ -113,22 +113,37 @@
     };
     let ready = null, seen = false, shown = false;
     const g = cv.getContext('2d'), put = () => { g.imageSmoothingQuality = 'high'; g.drawImage(ready, x0 * d, y0 * d, rw * d, rh * d); };
-    const reveal = () => {   /* sprayed on along each stroke, eyes first, slow start and a quick finish */
+    const reveal = () => {   /* built up as paint is: a few quick passes along each stroke, a wide mist first, then denser,
+                                narrower coats, each through a soft round nozzle so there is never a hard edge; eyes first */
       if (shown) return; shown = true;
       if (RM) return put();
-      const m = mk(), mg = m.getContext('2d'), tmp = mk(), tg = tmp.getContext('2d'), durs = [380, 380, 950];
-      let si = 0, st = 0, done = 0;
+      const m = mk(), mg = m.getContext('2d'), tmp = mk(), tg = tmp.getContext('2d');
+      const nz = document.createElement('canvas'); nz.width = nz.height = 64;   /* the nozzle: dense in the middle, fading to nothing */
+      { const x = nz.getContext('2d'), gr = x.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(0.45, 'rgba(0,0,0,.65)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = gr; x.fillRect(0, 0, 64, 64); }
+      const PASS = [[2.7, 0.22, 0.4], [2.0, 0.5, 0.33], [1.55, 0.85, 0.27]];   /* [nozzle width x stroke, coverage the pass adds, share of the time] */
+      const time = [560, 560, 1400], gap = 2;
+      let si = 0, pi = 0, st = 0, done = 0, fade = 0;
+      const draw = () => { tg.globalCompositeOperation = 'copy'; tg.drawImage(ready, 0, 0); tg.globalCompositeOperation = 'destination-in'; tg.drawImage(m, 0, 0);
+        g.clearRect(0, 0, cv.width, cv.height); g.imageSmoothingQuality = 'high'; g.drawImage(tmp, x0 * d, y0 * d, rw * d, rh * d); };
       const step = now => {
+        if (si >= strokes.length) {   /* last, settle into the finished picture */
+          if (!fade) fade = now; const f = Math.min(1, (now - fade) / 450);
+          draw(); g.globalAlpha = f * f; g.drawImage(ready, x0 * d, y0 * d, rw * d, rh * d); g.globalAlpha = 1;
+          return f < 1 ? requestAnimationFrame(step) : (g.clearRect(0, 0, cv.width, cv.height), put());
+        }
         if (!st) st = now;
-        const s = strokes[si], p = Math.min(1, (now - st) / durs[si]), e = p * p * (1.6 - 0.6 * p), upto = Math.round(e * (s.length - 1));
-        mg.fillStyle = '#000';
-        for (; done <= upto; done += 2) { const [x, y] = s[done]; mg.beginPath(); mg.arc(x, y, reach[si] * 2.4, 0, 6.283); mg.fill(); }
-        tg.globalCompositeOperation = 'copy'; tg.drawImage(ready, 0, 0); tg.globalCompositeOperation = 'destination-in'; tg.drawImage(m, 0, 0);
-        g.clearRect(0, 0, cv.width, cv.height); g.imageSmoothingQuality = 'high'; g.drawImage(tmp, x0 * d, y0 * d, rw * d, rh * d);
+        const s = strokes[si], [wx, cover, share] = PASS[pi], dur = time[si] * share, p = Math.min(1, (now - st) / dur), e = p * p * (1.6 - 0.6 * p);
+        const back = pi % 2 === 1, n = s.length - 1, upto = Math.round(e * n), rad = reach[si] * wx, size = rad * 2;
+        const over = Math.max(1, size / (gap * 1.5 * K) * 0.6), a = 1 - Math.pow(1 - cover, 1 / over);   /* so each pass adds about its coverage, however many dabs overlap */
+        mg.globalAlpha = a;
+        for (; done <= upto; done += gap) { const [x, y] = s[back ? n - done : done]; mg.drawImage(nz, x - rad, y - rad, size, size); }
+        draw();
         if (p < 1) return requestAnimationFrame(step);
-        si++; st = 0; done = 0;
-        if (si < strokes.length) return setTimeout(() => requestAnimationFrame(step), 160 + Math.random() * 120);
-        g.clearRect(0, 0, cv.width, cv.height); put();
+        st = 0; done = 0; pi++;
+        if (pi < PASS.length) return requestAnimationFrame(step);
+        pi = 0; si++;
+        if (si < strokes.length) return setTimeout(() => requestAnimationFrame(step), 120 + Math.random() * 100);
+        requestAnimationFrame(step);
       };
       requestAnimationFrame(step);
     };
