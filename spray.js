@@ -38,7 +38,9 @@
     out.push(pts[pts.length - 1]);
     return out;
   };
-  const wob = () => { const a = Math.random() * 6, b = Math.random() * 6; return t => 0.5 + 0.3 * Math.sin(t * 0.011 + a) + 0.2 * Math.sin(t * 0.037 + b); };
+  const wob = () => { const a = Math.random() * 6, b = Math.random() * 6, c = Math.random() * 6;
+    // the hand's pressure: slow swells plus the odd dip where the paint thins right out, so a line is never even
+    return t => Math.max(0.04, Math.min(1, 0.55 + 0.32 * Math.sin(t * 0.011 + a) + 0.22 * Math.sin(t * 0.037 + b) - 0.45 * Math.max(0, Math.sin(t * 0.006 + c)) ** 6)); };
   const rgb = hex => { const n = parseInt(hex.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
   // one soft puff of paint (white = density)
   const PUFF = (() => { const b = document.createElement('canvas'); b.width = b.height = 128; const x = b.getContext('2d');
@@ -77,25 +79,29 @@
       for (let yy = 0; yy < h; yy++) for (let xx = 0; xx < w; xx++) {
         const i = (yy * w + xx) * 4, dv = dd[i + 3] / 255; if (!dv) continue;
         const n = grain[(y0 + yy) * W + x0 + xx];
-        let a = (dv * 1.25 - n * 0.62) * 2.4; if (a > 1) a = 1;
-        const mist = (dv - n * 0.3) * 0.6; if (mist > a) a = mist;   // the blowout: thin paint carried wide of the line
+        let a = (dv * (s.solid ? 1.9 : 1.25) - n * 0.62) * 2.4; if (a > 1) a = 1;
+        const mist = (dv - n * 0.32) * 0.42; if (mist > a) a = mist;   // the blowout: thin paint carried wide of the line
         if (a <= 0) continue;
         const sh = 0.9 + n * 0.2;
-        o[i] = r * sh; o[i + 1] = gg * sh; o[i + 2] = b * sh; o[i + 3] = a * 222;   // never quite opaque, so passes that cross build up on each other
+        o[i] = r * sh; o[i + 1] = gg * sh; o[i + 2] = b * sh; o[i + 3] = a * (s.solid ? 252 : 222);   // never quite opaque, so passes that cross build up on each other
       }
       lg.putImageData(out, x0, y0);
     };
     const step = () => {
       const s = strokes[si]; if (!s) return done && done();
       if (!s.rgb) s.rgb = rgb(s.c);
-      const n = s.path.length, adv = RM ? n : Math.max(4, Math.round(s.speed * (0.45 + 1.1 * sp(at))));
+      const n = s.path.length, u = at / n, ease = 0.3 + 2.2 * u * u;   // each pass starts slow and finishes quick, like a confident hand
+      const adv = RM ? n : Math.max(3, Math.round(s.speed * ease * (0.6 + 0.8 * sp(at))));
       let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
       for (let e = Math.min(n - 1, at + adv); at <= e; at += 3) {
-        const [x, y] = s.path[at], f = Math.min(1, at / 24, (n - at) / 24), p = pr(at) * (0.35 + 0.65 * f);
+        const [x, y] = s.path[at], f = Math.min(1, at / 24, (n - at) / 24), p = pr(at) * (0.35 + 0.65 * f) * Math.min(1, 1.25 / Math.sqrt(0.3 + 2.2 * (at / n) ** 2));   // and thins out as it speeds up
         const R = s.w * FAT * 0.5 * (0.8 + 0.45 * (1 - p));
         dg.globalAlpha = Math.min(0.5, (1 - Math.pow(0.08, 3 / R)) * (0.4 + p) * 1.05); dg.drawImage(PUFF, x - R, y - R, 2 * R, 2 * R);
         const B = R * (2 + 0.8 * p); dg.globalAlpha = Math.min(0.08, (1 - Math.pow(0.6, 3 / B)) * (0.3 + p)); dg.drawImage(PUFF, x - B, y - B, 2 * B, 2 * B);   // the wider mist round the nozzle   // as strong per puff as it takes for any width of line to build to the same body
-        if (Math.random() < 0.04) { dg.globalAlpha = 0.12; const a = Math.random() * 6.283, d = R * (0.9 + Math.random()), rr = R * 0.25; dg.drawImage(PUFF, x + Math.cos(a) * d - rr, y + Math.sin(a) * d - rr, 2 * rr, 2 * rr); }   // a stray spit of paint
+        if (Math.random() < 0.12) {   // stray spits of paint, some well clear of the line
+          dg.globalAlpha = 0.1 + Math.random() * 0.25; const a = Math.random() * 6.283, d = R * (0.8 + Math.random() * Math.random() * 3.5), rr = R * (0.08 + Math.random() * 0.3);
+          dg.drawImage(PUFF, x + Math.cos(a) * d - rr, y + Math.sin(a) * d - rr, 2 * rr, 2 * rr);
+        }
         x0 = Math.min(x0, x - 3.2 * R); y0 = Math.min(y0, y - 3.2 * R); x1 = Math.max(x1, x + 3.2 * R); y1 = Math.max(y1, y + 3.2 * R);
       }
       ink(s, x0, y0, x1, y1); show();
@@ -132,7 +138,7 @@
     let strike = null;
     if (word) {   // and a bold strike through "never"
       const b = word.getBoundingClientRect(), [x0, y0] = C(b.left - b.width * 0.12, b.top + b.height * 0.62), [x1, y1] = C(b.right + b.width * 0.12, b.top + b.height * 0.48);
-      strike = { c: '#ff2f7a', w: b.height * r * 0.36, speed: 18 * r, path: curve([[x0, y0], [(x0 + x1) / 2, (y0 + y1) / 2 + b.height * r * 0.04], [x1, y1]]) };
+      strike = { solid: true, c: '#ff2f7a', w: b.height * r * 0.3, speed: 18 * r, path: curve([[x0, y0], [(x0 + x1) / 2, (y0 + y1) / 2 + b.height * r * 0.04], [x1, y1]]) };
     }
     // the squiggle sits into the type; the strike goes over the word, on a layer of its own
     run(cv, W, H, null, strokes, 120, strike && (() => { const c2 = cv.cloneNode(); c2.className = 'spray-over spray-strike'; cv.after(c2); c2.width = W; c2.height = H; setTimeout(() => run(c2, W, H, null, [strike], 0), 200); }));
@@ -167,8 +173,14 @@
     const box = cv.getBoundingClientRect(), m = svg.getScreenCTM(); if (!box.width || !m) return false;
     const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.round(box.width * r), H = cv.height = Math.round(box.height * r);
     const vb = svg.viewBox.baseVal, vy = vb.y, vH = vb.height || 1000;
-    const map = ([x, y]) => { const uy = vy + (0.1 + 0.8 * y / 1000) * vH; return [(m.a * x + m.e - box.left) * r, (m.d * uy + m.f - box.top) * r]; };   // the art sits in the middle of whatever band of the picture shows
-    const strokes = art.map(([c, w, pts]) => ({ c, w: w * m.a * r * Math.min(1, vH / 800), speed: 32 * r, path: curve(pts.map(map)) }));
+    // cropped in and tilted a different way each time, with a little wobble in the hand, so no two sit square
+    const rot = (Math.random() - 0.5) * 0.5, zoom = 1.15 + Math.random() * 0.2, ox = (Math.random() - 0.5) * 120, oy = (Math.random() - 0.5) * 120;
+    const map = ([x0, y0]) => {
+      const dx = (x0 - 500) * zoom, dy = (y0 - 500) * zoom, x = 500 + ox + dx * Math.cos(rot) - dy * Math.sin(rot), y = 500 + oy + dx * Math.sin(rot) + dy * Math.cos(rot);
+      const uy = vy + (0.1 + 0.8 * y / 1000) * vH; return [(m.a * x + m.e - box.left) * r, (m.d * uy + m.f - box.top) * r];
+    };
+    const jig = pts => pts.map(([x, y]) => [x + (Math.random() - 0.5) * 50, y + (Math.random() - 0.5) * 50]);
+    const strokes = art.map(([c, w, pts]) => ({ c, w: w * zoom * (0.85 + Math.random() * 0.3) * m.a * r * Math.min(1, vH / 800), speed: 32 * r, path: curve(jig(pts).map(map)) }));
     run(cv, W, H, null, strokes, 160, done && (() => done({ url: cv.toDataURL('image/png'), x: (box.left - m.e) / m.a, y: (box.top - m.f) / m.d, w: box.width / m.a, h: box.height / m.d })));
     return true;
   };
