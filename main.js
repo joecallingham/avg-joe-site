@@ -209,9 +209,9 @@
     const t = tl ? tl.time() : 0;
     const past = cur - endPx - room;
     const where = past > VH() * 0.4 ? 'end' : t >= WE + 0.5 ? 'work' : t >= 3.6 ? 'wheel' : t >= 2.6 ? 'big' : 'top';
-    say(beatOpen ? SAYS.beat : SAYS[hoverSay && (hoverSay !== 'pick' || where === 'wheel') && (hoverSay !== 'play' || where !== 'top') ? hoverSay : where]);
-    const down = where === 'top' && !beatOpen;   // on the opening film the middle button points on down, with a chevron
-    const film = down && t >= 1 + EXPAND - 0.02;   // the image fills the frame: show the chevron over it
+    const down = where === 'top' && !beatOpen && cur <= 2;   // before any scrolling the middle button says Scroll down; Book call as soon as they scroll
+    say(beatOpen ? SAYS.beat : down ? 'Scroll down' : SAYS[hoverSay && (hoverSay !== 'pick' || where === 'wheel') ? hoverSay : where === 'top' ? 'big' : where]);
+    const film = where === 'top' && !beatOpen && t >= 1 + EXPAND - 0.02;   // the image fills the frame: show the chevron over it
     if (filmOn !== film) { filmOn = film; document.documentElement.classList.toggle('nb-film', film); }
     if (downOn !== down) { downOn = down; document.documentElement.classList.toggle('nb-down', down); el.say.parentNode.setAttribute('aria-label', down ? 'Scroll down' : 'Book a call'); }
     if (workBtn._on !== (where === 'work')) { workBtn._on = where === 'work'; workBtn.classList.toggle('on', workBtn._on); }
