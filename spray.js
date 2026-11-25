@@ -47,6 +47,14 @@
     for (let t = 0; t <= T; t += 0.06) { const u = t / T, rr = rad * (0.12 + 0.88 * u) * (1 + 0.14 * Math.sin(t * 9 + ph)), a = t * 6.283 + ph;
       p.push([x + Math.cos(dir) * rad * 0.35 * u + Math.cos(a) * rr, y + Math.sin(dir) * rad * 0.35 * u + Math.sin(a) * rr]); }
     return p; };
+  // a splat: a drop of paint that hit and spread a little unevenly, with a few tiny flecks thrown off it
+  const splat = (g, x, y, size, col) => {
+    g.fillStyle = col; const a0 = Math.random() * 6.283;
+    for (let k = 0; k < 4; k++) { const a = a0 + k * 1.7, d = size * 0.3 * Math.random(); g.globalAlpha = 0.85 + Math.random() * 0.15; g.beginPath(); g.arc(x + Math.cos(a) * d, y + Math.sin(a) * d, size * (0.45 + Math.random() * 0.35), 0, 6.283); g.fill(); }
+    for (let k = 0; k < 2 + (Math.random() * 6 | 0); k++) { const a = Math.random() * 6.283, d = size * (1 + Math.random() * 2.5); g.globalAlpha = 0.7 + Math.random() * 0.3; g.beginPath(); g.arc(x + Math.cos(a) * d, y + Math.sin(a) * d, size * (0.06 + Math.random() * 0.18), 0, 6.283); g.fill(); }
+    if (Math.random() < 0.35) { const a = Math.random() * 6.283; g.globalAlpha = 0.9; g.beginPath(); g.ellipse(x + Math.cos(a) * size, y + Math.sin(a) * size, size * 0.9, size * 0.16, a, 0, 6.283); g.fill(); }   // sometimes a short streak
+    g.globalAlpha = 1;
+  };
   // a line as a hand sprays it: it settles at the start, drifts and wobbles off its course, and overshoots at the end
   const human = (path, w) => {
     if (path.length < 6) return path;
@@ -331,11 +339,15 @@
   }
   const aiPat = document.querySelector('.hv-half[data-k=ai] .hv-grad');
   if (aiPat) {
-    const cv = document.createElement('canvas'); cv.className = 'hv-air'; cv.setAttribute('aria-hidden', 'true'); aiPat.appendChild(cv); aiPat.classList.add('sprayed');
+    const cv = document.createElement('canvas'); cv.className = 'hv-air'; cv.setAttribute('aria-hidden', 'true'); aiPat.appendChild(cv);   // the clean gradient stays; only a few splats go over it
     onPick(aiPat.closest('.hv-half'), () => setTimeout(() => {
       const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.round(cv.clientWidth * r), H = cv.height = Math.round(cv.clientHeight * r), u = Math.min(W, H);
       const at = (x, y, size, c, rim) => ({ c, rim, soft: true, w: size * u, speed: 10 * r, path: curve(spiral(x * W + (Math.random() - 0.5) * W * 0.12, y * H + (Math.random() - 0.5) * H * 0.12, size * u * 0.14)) });
-      run(cv, W, H, null, [at(0.36, 0.4, 0.42, '#ff5200', '#ff2f7a'), at(0.52, 0.24, 0.26, '#ff6e32', '#ffb000'), at(0.7, 0.5, 0.24, '#fa5c8c', '#ffc2d4'), at(0.6, 0.76, 0.3, '#ffb3c4', '#fff0f3'), at(0.3, 0.72, 0.14, '#2f63ff', '#22c55e')], 60, null, !ANIM);
+      const g = cv.getContext('2d'), R1 = (a, b) => a + Math.random() * (b - a);
+      for (let k = 0; k < 3 + (Math.random() * 3 | 0); k++) {   // small clusters of splats, mostly towards the edges
+        const edge = Math.random() < 0.75, x0 = edge ? (Math.random() < 0.5 ? R1(0.03, 0.2) : R1(0.8, 0.97)) * W : R1(0.3, 0.7) * W, y0 = R1(0.08, 0.92) * H, col = ['#ff5200', '#ff2f7a', '#2f63ff', '#1f2a4d'][Math.random() * 4 | 0];
+        for (let d = 0; d < 1 + (Math.random() * 4 | 0); d++) splat(g, x0 + R1(-0.05, 0.05) * W, y0 + R1(-0.05, 0.05) * H, u * R1(0.004, 0.014), col);
+      }
     }, 150));
   }
 
@@ -354,7 +366,7 @@
     const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.round(cv.clientWidth * r), H = cv.height = Math.round(cv.clientHeight * r), u = Math.min(W, H);
     const pick = a => a[Math.random() * a.length | 0], R1 = (a, b) => a + Math.random() * (b - a), strokes = [];
     const c = lime ? '#d6ffa3' : pick(BRIGHT), c2 = pick(BRIGHT.filter(x => x !== c));
-    const corner = () => [Math.random() < 0.5 ? 0 : 1, Math.random() < 0.5 ? 0 : 1];
+    const corner = () => [Math.random() < 0.5 ? 0 : 1, Math.random() < 0.5 ? 0 : 1], after = [];
     const sweep = () => {   // in from one edge, round the corner, out through the other
       const [cx, cy] = corner(), X = v => (cx ? 1 - v : v) * W, Y = v => (cy ? 1 - v : v) * H;
       strokes.push({ c, rim: RIM[c], w: u * R1(0.04, 0.07), speed: 40 * r, drops: Math.random() < 0.5 ? c2 : null,
@@ -365,12 +377,12 @@
       const side = Math.random() * 4 | 0, n = 3 + (Math.random() * 6 | 0), t0 = R1(0.1, 0.7), col = Math.random() < 0.6 ? c : c2;
       for (let k = 0; k < n; k++) {
         const t = t0 + R1(0, 0.25), d = R1(0, 0.08), x = side === 0 ? t * W : side === 1 ? W - d * W : side === 2 ? t * W : d * W, y = side === 0 ? d * H : side === 1 ? t * H : side === 2 ? H - d * H : t * H;
-        strokes.push({ c: col, exact: true, w: u * R1(0.008, 0.03), speed: 99, path: [[x, y], [x + 1, y + 1], [x + 2, y + 1]] });
+        after.push([x, y, u * R1(0.004, 0.013), col]);
       }
     };
     const kinds = [sweep, puff, splats]; kinds.sort(() => Math.random() - 0.5);
     kinds[0](); if (Math.random() < 0.55) kinds[1]();
-    run(cv, W, H, null, strokes, 140, null, true);   // on photography the paint is simply there
+    run(cv, W, H, null, strokes, 140, () => { const g = cv.getContext('2d'); after.forEach(([x, y, z, col]) => splat(g, x, y, z, col)); }, true);   // on photography the paint is simply there
   }
   const imgs = [...document.querySelectorAll('img')].filter(img => {
     if (img.closest('.logo, #intro, .wc-slot, .wd-pic, header, nav') || /swallow|portrait|cow/.test(img.src)) return false;

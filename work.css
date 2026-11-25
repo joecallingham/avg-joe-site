@@ -1115,5 +1115,5 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 .hv-spray{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity .5s ease}
 .hv-half.dim .hv-spray{opacity:1}
 .hv-grad.sprayed::before{display:none}
-.hv-air{position:absolute;inset:-12%;width:124%;height:124%;animation:hv-drift 16s ease-in-out infinite alternate;will-change:transform}
+.hv-air{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 @media (prefers-reduced-motion:reduce){.hv-air{animation:none}}
