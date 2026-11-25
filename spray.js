@@ -180,7 +180,16 @@
       const uy = vy + (0.1 + 0.8 * y / 1000) * vH; return [(m.a * x + m.e - box.left) * r, (m.d * uy + m.f - box.top) * r];
     };
     const jig = pts => pts.map(([x, y]) => [x + (Math.random() - 0.5) * 50, y + (Math.random() - 0.5) * 50]);
-    const strokes = art.map(([c, w, pts]) => ({ c, w: w * zoom * (0.85 + Math.random() * 0.3) * m.a * r * Math.min(1, vH / 800), speed: 32 * r, path: curve(jig(pts).map(map)) }));
+    // mixed technique, as on the Work thumbnails: the first pass fat and slow, the rest a mix of medium and thin quick ones,
+    // and a thin cream tag scrawled across a corner to finish
+    const k = m.a * r * zoom, strokes = art.map(([c, w, pts], i) => {
+      const t = (i === 0 ? 1.25 : [0.95, 0.7, 0.42][Math.random() * 3 | 0]) * Math.min(1.1, 900 / vH);
+      return { c, w: w * t * k, speed: (i === 0 ? 26 : 32 + (1.5 - t) * 30) * r, path: curve(jig(pts).map(map)) };
+    });
+    const n = 3 + (Math.random() * 4 | 0), a = Math.random() * 6.283, step = 40 + Math.random() * 50, amp = 30 + Math.random() * 80, tag = [];
+    let tx = 150 + Math.random() * 700, ty = 150 + Math.random() * 700;
+    for (let j = 0; j < n; j++) { const side = (j % 2 ? -1 : 1) * amp * (0.5 + Math.random()); tag.push([tx - Math.sin(a) * side, ty + Math.cos(a) * side]); tx += Math.cos(a) * step; ty += Math.sin(a) * step; }
+    strokes.push({ c: art.tag || '#f1eee7', w: (16 + Math.random() * 14) * k, speed: 60 * r, path: curve(tag.map(map)) });
     run(cv, W, H, null, strokes, 160, done && (() => done({ url: cv.toDataURL('image/png'), x: (box.left - m.e) / m.a, y: (box.top - m.f) / m.d, w: box.width / m.a, h: box.height / m.d })));
     return true;
   };
