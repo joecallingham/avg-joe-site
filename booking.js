@@ -94,6 +94,8 @@
       [nav, bar, panel].forEach(x => x && (x.style.transform = '')); panel.style.visibility = ''; veil.style.opacity = '';
     };
     addEventListener('pointerup', up); addEventListener('pointercancel', up);
+    // iPhone: a drag that starts on the notch must never scroll or bounce the page (that would cancel the drag)
+    nav.addEventListener('touchmove', e => { if (down) e.preventDefault(); }, { passive: false });
     nav.addEventListener('click', e => { if (eat) { e.preventDefault(); e.stopImmediatePropagation(); } }, true);   // a drag isn't a tap
   }
 
