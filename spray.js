@@ -26,7 +26,7 @@
     const im = document.createElement('img'); im.className = 'foot-draw'; im.alt = ''; im.setAttribute('aria-hidden', 'true'); im.loading = 'lazy'; im.decoding = 'async';
     im.src = '/img/spray/ft-' + (Math.random() * 18 | 0) + '.webp'; fm.appendChild(im);
     const place = () => {   /* from the layout, so it holds while the footer slides in */
-      const l = fa.offsetLeft + fa.offsetWidth, gap = Math.max(fj.offsetLeft - l, 0), w = Math.max(gap * 2.1, fm.clientWidth * 0.46), h = w * 0.625;
+      const l = fa.offsetLeft + fa.offsetWidth, gap = Math.max(fj.offsetLeft - l, 0), w = Math.max(gap * 1.6, fm.clientWidth * 0.36), h = w * 0.625;
       im.style.width = w + 'px'; im.style.height = h + 'px'; im.style.left = (l + gap / 2 - w / 2) + 'px'; im.style.top = (fa.offsetTop + fa.offsetHeight * 0.5 - h / 2) + 'px';
     };
     place(); addEventListener('resize', place); if (document.fonts) document.fonts.ready.then(place);
