@@ -214,9 +214,11 @@ html.intro-dark .notch-fill path{fill:#0b0b0b}
 .nb:hover,.nb.on{color:var(--ink)}
 .nb[data-k="studio"]{min-width:6.6rem;text-align:center;overflow:hidden}
 .say{display:inline-block;white-space:nowrap}
-/* on the opening film the middle button reads "Scroll down" with a chevron */
-.nb .chev{display:none;width:.7em;height:.7em;margin-left:.3em;vertical-align:.02em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-html.nb-down .nb .chev{display:inline-block}
+/* on the open film, a wide chevron sits on the image just above the notch */
+.down-chev{position:absolute;left:50%;bottom:100%;transform:translate(-50%,-.9rem);width:3.4rem;height:1.2rem;padding:0;border:0;background:none;color:#fff;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .4s}
+.down-chev svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+html.nb-film .down-chev{opacity:.9;pointer-events:auto}
+@media (max-width:760px){.down-chev{width:4.4rem;height:1.5rem;transform:translate(-50%,-1.1rem)}}
 .nbt{white-space:nowrap}
 .hw{white-space:nowrap}
 .hl{display:inline-block;text-align:center;line-height:0;vertical-align:baseline;white-space:nowrap}

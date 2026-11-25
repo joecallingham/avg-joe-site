@@ -211,10 +211,12 @@
     const where = past > VH() * 0.4 ? 'end' : t >= WE + 0.5 ? 'work' : t >= 3.6 ? 'wheel' : t >= 2.6 ? 'big' : 'top';
     say(beatOpen ? SAYS.beat : SAYS[hoverSay && (hoverSay !== 'pick' || where === 'wheel') && (hoverSay !== 'play' || where !== 'top') ? hoverSay : where]);
     const down = where === 'top' && !beatOpen;   // on the opening film the middle button points on down, with a chevron
+    const film = down && t >= 1 + EXPAND - 0.02;   // the image fills the frame: show the chevron over it
+    if (filmOn !== film) { filmOn = film; document.documentElement.classList.toggle('nb-film', film); }
     if (downOn !== down) { downOn = down; document.documentElement.classList.toggle('nb-down', down); el.say.parentNode.setAttribute('aria-label', down ? 'Scroll down' : 'Book a call'); }
     if (workBtn._on !== (where === 'work')) { workBtn._on = where === 'work'; workBtn.classList.toggle('on', workBtn._on); }
   }
-  let downOn = null;
+  let downOn = null, filmOn = null;
   const workBtn = $('.nb[data-k="work"]');
   function setNav() { navState(); }
 
@@ -589,10 +591,12 @@
   });
 
   addEventListener('avgbook', e => { if (e.detail) lenis.stop(); else lenis.start(); navState(); });
+  const goDown = () => { const f = tOf(lenis.targetScroll), next = f < 1.99 ? 2 : RESTS.find(s => s > Math.max(2, f) + 0.01); if (next !== undefined) goTo(next); };   // to the open film, then the big sentence
+  $('.down-chev').addEventListener('click', goDown);
   $$('.nb').forEach(a => a.addEventListener('click', e => {
     if (a.dataset.k === 'info' || a.dataset.k === 'work') return;   // Work and Info go to their pages
     e.preventDefault();
-    if (a.dataset.k === 'studio' && downOn) { const f = tOf(lenis.targetScroll), next = f < 1.99 ? 2 : RESTS.find(s => s > Math.max(2, f) + 0.01); /* to the open film, then the big sentence */ if (next !== undefined) goTo(next); return; }
+    if (a.dataset.k === 'studio' && downOn) { goDown(); return; }
     if (a.dataset.k === 'studio' && window.AvgBook) AvgBook.open(a);   // the middle button books a call
   }));
   const hov = (n, key) => { n.addEventListener('mouseenter', () => { hoverSay = key; navState(); }); n.addEventListener('mouseleave', () => { hoverSay = null; navState(); }); };
