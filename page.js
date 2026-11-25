@@ -15,8 +15,8 @@
   const cssPx = n => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n)) * rem();
 
   /* ---------- smooth scroll: same Lenis settings as the home page ---------- */
-  // phones scroll natively here (syncTouch off): the smoothing felt slow under a finger; desktop wheels keep the smooth glide
-  const lenis = new Lenis({ lerp: 0.055, wheelMultiplier: 1, syncTouch: false, autoRaf: false });
+  // wheel and trackpad: the browser's own scrolling; touch: Lenis at the feel Joe set on his iPhone (25 Nov)
+  const lenis = new Lenis({ smoothWheel: false, syncTouch: true, syncTouchLerp: 0.07, touchInertiaExponent: 1.7, touchMultiplier: 1.3, autoRaf: false });
   const raf = t => { lenis.raf(t); requestAnimationFrame(raf); };
   requestAnimationFrame(raf);
 
