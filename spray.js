@@ -339,7 +339,8 @@
     const W = cv.width = Math.max(2, Math.round(cv.clientWidth * sc)), H = cv.height = Math.max(2, Math.round(cv.clientHeight * sc));
     const g = cv.getContext('2d'), img = g.createImageData(W, H), d = img.data, R1 = (a, b) => a + Math.random() * (b - a), U = Math.max(W, H);
     const ss = (a, b, t) => { t = Math.min(1, Math.max(0, (t - a) / (b - a))); return t * t * (3 - 2 * t); };
-    const form = (x, y, s, a, r = R1(0.55, 1)) => { const t = Math.random() * 3.14; return { x, y, sx: s, sy: s * r, c: Math.cos(t), sn: Math.sin(t), a }; };
+    const form = (x, y, s, a, r = R1(0.55, 1)) => { const t = Math.random() * 3.14; return { x, y, sx: s, sy: s * r, c: Math.cos(t), sn: Math.sin(t), a,
+      h: [R1(0.2, 0.45), Math.random() * 6.28, R1(0.12, 0.3), Math.random() * 6.28, R1(0.04, 0.1), Math.random() * 6.28] }; };   // h: how unevenly it flares in each direction
     const groups = [
       { core: '#ff4a12', rim: '#ffc21f', heat: '#e8204f', x: R1(0.22, 0.34), y: R1(0.22, 0.38), pinch: true },
       { core: '#ff3d7f', rim: '#ffa17a', heat: '#ff7a1f', x: R1(0.66, 0.8), y: R1(0.62, 0.8) },
@@ -350,19 +351,28 @@
       forms.forEach(f => { if (heats.length < 2) heats.push(form(f.x + R1(-0.35, 0.35) * f.sx, f.y + R1(-0.35, 0.35) * f.sy, f.sx * R1(0.5, 0.75), 1, R1(0.7, 1))); });
       return { core: rgb(G.core), rim: rgb(G.rim), heat: rgb(G.heat), forms, heats, f: new Float32Array(W * H), F: new Float32Array(W * H), h: new Float32Array(W * H), m1: 0, m2: 0, m3: 0 };
     });
-    const wa = U * R1(0.03, 0.06), f1 = R1(2, 4) / U, f2 = R1(2, 4) / U, p1 = Math.random() * 6, p2 = Math.random() * 6;
-    const field = (o, X, Y, div) => { const dx = X - o.x, dy = Y - o.y, rx = dx * o.c + dy * o.sn, ry = -dx * o.sn + dy * o.c; return o.a * Math.exp(-(rx * rx / (o.sx * o.sx) + ry * ry / (o.sy * o.sy)) / div); };
+    const wa = U * R1(0.05, 0.09), f1 = R1(2, 4) / U, f2 = R1(2, 4) / U, f3 = R1(5, 8) / U, p1 = Math.random() * 6, p2 = Math.random() * 6;
+    // the outline is lumpy and flares further in some directions than others (wide), the core edge a little uneven too
+    const field = (o, X, Y, div, wide) => { const dx = X - o.x, dy = Y - o.y, rx = dx * o.c + dy * o.sn, ry = -dx * o.sn + dy * o.c, th = Math.atan2(ry, rx), h = o.h;
+      const k = wide ? 1 + h[0] * Math.sin(2 * th + h[1]) + h[2] * Math.sin(3 * th + h[3]) : 1 + h[4] * Math.sin(3 * th + h[5]) + h[4] * 0.6 * Math.sin(5 * th + h[1]);
+      return o.a * Math.exp(-(rx * rx / (o.sx * o.sx) + ry * ry / (o.sy * o.sy)) / (div * k * k)); };
+    // slow patches across the colour, so no shape is one flat colour inside
+    const nq = U / 5, nw = Math.ceil(W / nq) + 2, nv = Array.from({ length: nw * (Math.ceil(H / nq) + 2) }, Math.random);
+    const patch = (x, y) => { const fx = x / nq, ix = fx | 0, tx = fx - ix, fy = y / nq, iy = fy | 0, ty = fy - iy, i = iy * nw + ix, a = tx * tx * (3 - 2 * tx), b = ty * ty * (3 - 2 * ty);
+      return (nv[i] * (1 - a) + nv[i + 1] * a) * (1 - b) + (nv[i + nw] * (1 - a) + nv[i + nw + 1] * a) * b; };
+    const P = new Float32Array(W * H);
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-      const X = x + wa * Math.sin(y * f1 + p1), Y = y + wa * Math.sin(x * f2 + p2), i = y * W + x;
+      const X = x + wa * Math.sin(y * f1 + p1) + wa * 0.35 * Math.sin(y * f3 + p2), Y = y + wa * Math.sin(x * f2 + p2) + wa * 0.35 * Math.sin(x * f3 + p1), i = y * W + x;
+      P[i] = patch(x, y);
       for (const G of groups) {
-        let f = 0, F = 0, h = 0; for (const o of G.forms) { f += field(o, X, Y, 2); F += field(o, X, Y, 16); } for (const o of G.heats) h += field(o, X, Y, 3);
+        let f = 0, F = 0, h = 0; for (const o of G.forms) { f += field(o, X, Y, 2, false); F += field(o, X, Y, 16, true); } for (const o of G.heats) h += field(o, X, Y, 3, true);
         G.f[i] = f; G.F[i] = F; G.h[i] = h; if (f > G.m1) G.m1 = f; if (F > G.m2) G.m2 = F; if (h > G.m3) G.m3 = h;
       }
     }
     for (let i = 0, j = 0; i < W * H; i++, j += 4) {
       const n = Math.random(); let A = 0, R = 0, Gc = 0, B = 0;
       for (let gi = groups.length - 1; gi >= 0; gi--) {   // the second gradient under the first
-        const G = groups[gi], t = G.f[i] / G.m1, T = G.F[i] / G.m2, hh = ss(0.1, 1, G.h[i] / G.m3) * 0.5;   // a soft, low-key heat
+        const G = groups[gi], pv = P[i], t = G.f[i] / G.m1 * (0.7 + 0.6 * pv), T = G.F[i] / G.m2 * (0.75 + 0.5 * pv), hh = Math.min(0.75, ss(0.1, 1, G.h[i] / G.m3) * 0.5 + ss(0.55, 0.95, pv) * 0.3 * ss(0.2, 0.7, t));   // a soft, low-key heat
         let a = Math.max(Math.pow(ss(0, 0.95, T + (n - 0.5) * 0.08), 1.3) * 0.8, ss(0.05, 0.6, t) * 0.92);   // soft and a little see-through, like the first gradient
         const m = ss(0.08, 0.95, t + (n - 0.5) * 0.05);
         let r = G.rim[0] + (G.core[0] - G.rim[0]) * m, gg = G.rim[1] + (G.core[1] - G.rim[1]) * m, b = G.rim[2] + (G.core[2] - G.rim[2]) * m;
