@@ -1,9 +1,9 @@
 /* Spray paint on the site.
    Every sprayed picture is a flat image baked once, offline, in the halation spray Joe signed off (img/spray/, made by
    the bake page in the session scratchpad): placeholders, What We Do, How we work, Craft, the AI gradient, the wheel's
-   blue, and the marks on photo edges. The doodles over the statement and in the footer
-   are baked too, with their stroke paths (ft.json), and spray on along those paths as you arrive; only the strike
-   through "never" is worked out in the page. */
+   blue, and the marks on photo edges. The doodles over the statement and in the footer,
+   and the strike through "never", are baked too, with their stroke paths (ft.json, nv.json), and spray on along those
+   paths as you arrive. Nothing is painted in the page. */
 (() => {
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
   /* work queued for the browser's idle moments, one piece at a time, so it never freezes the page */
@@ -102,79 +102,36 @@
     img.after(o);
   });
 
-  /* ---------- the statement: a doodle sprayed over it, then a strike through "never" in another colour ----------
-     The strike is worked out in the page in the halation spray (signed off 25 Nov 2026): it thickens and thins, fades and
-     goes in and out of focus, a close-colour glow blooms off it in short stretches, in particles finer than a pixel. */
-  const PAIRS = [['#ff6a00', '#ffd23f'], ['#c6f000', '#2fae55'], ['#ff6a00', '#ffd23f'], ['#c6f000', '#2fae55'], ['#ff3f8e', '#ffab85'], ['#1f3dff', '#7cc3ff'], ['#8b45ff', '#c9a8ff'], ['#ff3a1a', '#ff8a5a']];   /* one colour family each; lime and orange lead */
+  /* ---------- the statement: a doodle sprayed over it, then a baked strike through "never" in another colour family ---------- */
+  let NVJ = null; const strikes = () => NVJ || (NVJ = fetch('/img/spray/nv.json?v=1').then(r => r.json()).catch(() => null));
   const hue = h => { const [r, g, b] = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255), M = Math.max(r, g, b), n = Math.min(r, g, b), c = M - n; if (!c) return 0;
     const x = M === r ? ((g - b) / c) % 6 : M === g ? (b - r) / c + 2 : (r - g) / c + 4; return (x * 60 + 360) % 360; };
-  /* the strike, worked out in idle slices: returns {ready, stroke, rect} via cb */
-  function strike(cv, wrap, pair, cb) {
-    const nvEl = wrap.querySelector('.ca-nv'); if (!nvEl || !nvEl.offsetWidth) return cb(null);
-    const rel = el => { let x = 0, y = 0; while (el && el !== wrap) { x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; } return [x, y]; };   /* from the layout: the lines may still be sliding in */
-    const [ex, ey] = rel(nvEl), [cx0, cy0] = rel(cv), nL = ex - cx0, nW = nvEl.offsetWidth, nH = nvEl.offsetHeight, nM = ey - cy0 + nH * 0.52;
-    const d = Math.min(devicePixelRatio || 1, 2), q = d * 2, pad = nH * 1.1, x0 = nL - nW * 0.14 - pad, y0 = nM - pad, rw = nW * 1.28 + pad * 2, rh = pad * 2;
-    const W = Math.round(rw * q), H = Math.round(rh * q), R = nH * 0.27 * q, K = R / 21.45;
-    const P = (x, y) => [(x - x0) * q, (y - y0) * q], dy = (Math.random() - 0.5) * nH * 0.12;
-    const key = [P(nL - nW * 0.14, nM + nH * 0.12 + dy), P(nL + nW * 0.3, nM + nH * 0.04), P(nL + nW * 0.7, nM - nH * 0.04 + dy), P(nL + nW * 1.14, nM - nH * 0.14)];
-    const sm = pts => pts.map((b, k) => { const a = pts[Math.max(0, k - 1)], c = pts[Math.min(pts.length - 1, k + 1)]; return [(a[0] + 2 * b[0] + c[0]) / 4, (a[1] + 2 * b[1] + c[1]) / 4]; });
-    const path = []; { const k2 = sm(sm(key)); for (let i = 0; i < k2.length - 1; i++) { const [ax, ay] = k2[i], [bx, by] = k2[i + 1], n = Math.ceil(Math.hypot(bx - ax, by - ay) / (1.5 * K)); for (let j = 0; j < n; j++) path.push([ax + (bx - ax) * j / n, ay + (by - ay) * j / n]); } }
-    const mk = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; };
-    const wob = () => { const a = Math.random() * 6, b = Math.random() * 6, c = Math.random() * 6; return t => 0.5 + 0.28 * Math.sin(t * 0.009 + a) + 0.16 * Math.sin(t * 0.027 + b) + 0.08 * Math.sin(t * 0.07 + c); };
-    const sharp = mk(), soft = mk(), gm = mk(), sg = sharp.getContext('2d'), fg = soft.getContext('2d'), gg = gm.getContext('2d'), width = wob(), dense = wob(), glow = wob(), bloomAt = 0.2 + Math.random() * 0.6;
-    [sg, fg, gg].forEach(x => x.fillStyle = '#000');
-    path.forEach(([x, y], k) => {
-      const t = k * 1.5, end = Math.min(1, k / 18, (path.length - k) / 18), r = 26 * K * (0.45 + 0.75 * width(t)) * (0.88 + 0.12 * end), a = Math.max(0.28, Math.min(1, 1.3 * dense(t) - 0.25)) * (0.7 + 0.3 * end);   /* as signed off, but never fading right out: thicker and thinner, denser and faded */
-      for (const x2 of [sg, fg]) { x2.globalAlpha = a * 0.24; x2.beginPath(); x2.arc(x, y, r, 0, 6.283); x2.fill(); }
-      const gw = Math.max(0, glow(t) * 1.7 - 0.85) ** 1.6 + 0.9 * Math.exp(-((((k / path.length) - bloomAt) / 0.12) ** 2));   /* blooms in a stretch or two, and always somewhere */
-      if (gw > 0.01) { gg.globalAlpha = Math.min(1, gw) * 0.28; gg.beginPath(); gg.arc(x + (Math.random() - 0.5) * 6 * K, y + (Math.random() - 0.5) * 6 * K, r * 0.95, 0, 6.283); gg.fill(); }
-    });
-    const blur = (c, px) => { const o = mk(), x = o.getContext('2d'); x.filter = 'blur(' + px * K + 'px)'; x.drawImage(c, 0, 0); return o; };
-    const core = [1, 3, 5].map(i => parseInt(pair[0].slice(i, i + 2), 16)), halo = [1, 3, 5].map(i => parseInt(pair[1].slice(i, i + 2), 16));
-    let S, Sf, Gm, out, o, fv, fw, fq, row = 0;
-    const focus = (x, y) => { const fx = x / fq, ix = fx | 0, tx = fx - ix, fy = y / fq, iy = fy | 0, ty = fy - iy, i = iy * fw + ix, a = tx * tx * (3 - 2 * tx), b = ty * ty * (3 - 2 * ty);
-      return (fv[i] * (1 - a) + fv[i + 1] * a) * (1 - b) + (fv[i + fw] * (1 - a) + fv[i + fw + 1] * a) * b; };
-    later(() => {
-      S = blur(sharp, 1.5).getContext('2d').getImageData(0, 0, W, H).data; Sf = blur(soft, 13).getContext('2d').getImageData(0, 0, W, H).data;
-      const ga = blur(gm, 16), gx = ga.getContext('2d'); gx.globalAlpha = 0.8; gx.drawImage(blur(gm, 7), 0, 0); Gm = gx.getImageData(0, 0, W, H).data;
-      fq = 130 * K; fw = Math.ceil(W / fq) + 2; fv = Array.from({ length: fw * (Math.ceil(H / fq) + 2) }, Math.random); out = new ImageData(W, H); o = out.data;
-      const slice = () => {
-        const end = Math.min(H, row + Math.max(40, Math.round(320000 / W)));
-        for (let y = row; y < end; y++) for (let x = 0; x < W; x++) {
-          const i = (y * W + x) * 4; if (S[i + 3] < 2 && Sf[i + 3] < 2 && Gm[i + 3] < 2) continue;
-          const f = focus(x, y) ** 1.3, body = Math.min(1, (S[i + 3] / 255 * f + Sf[i + 3] / 255 * (1 - f)) * 1.05), glw = Math.min(1, Gm[i + 3] / 255 * 1.2);
-          const pb = Math.random() < body ** 1.15, pg = Math.random() < glw * 0.95; if (!pb && !pg) continue;
-          let r, g2, b, a;
-          if (pb) { const bl = Math.min(0.85, glw * (1 - body) * 1.6); r = core[0] + (halo[0] - core[0]) * bl; g2 = core[1] + (halo[1] - core[1]) * bl; b = core[2] + (halo[2] - core[2]) * bl; a = 0.9 + Math.random() * 0.1; }
-          else { r = halo[0]; g2 = halo[1]; b = halo[2]; a = 0.55 + 0.45 * glw; }
-          const sh = 0.9 + Math.random() * 0.2; o[i] = r * sh; o[i + 1] = g2 * sh; o[i + 2] = b * sh; o[i + 3] = a * 255;
-        }
-        row = end; if (row < H) return later(slice);
-        const fin = mk(); fin.getContext('2d').putImageData(out, 0, 0); S = Sf = Gm = out = o = null;
-        cb({ ready: fin, stroke: { r: 26 * K, p: path.filter((_, i) => i % 3 === 0) }, rect: [x0 * d, y0 * d, rw * d, rh * d] });
-      };
-      later(slice);
-    });
-  }
   document.querySelectorAll('canvas.spray-over').forEach(cv => {
     const wrap = cv.parentElement; if (!wrap.querySelector('.ca-state') || !('IntersectionObserver' in window)) return;
     const cv2 = cv.cloneNode(); cv.after(cv2);   /* the strike on its own layer, so it goes over the doodle without wiping it */
     const di = pickD();
     let parts = null, inView = false, ran = false;
     const run = () => { if (ran || !parts || !inView) return; ran = true;
-      const [meta, img, sk] = parts, box = cv.getBoundingClientRect(), tb = wrap.querySelector('.ca-state').getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2);
+      const [meta, img, nmeta, nimg, ni] = parts, box = cv.getBoundingClientRect(), tb = wrap.querySelector('.ca-state').getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2);
       [cv, cv2].forEach(c => { c.width = Math.round(box.width * d); c.height = Math.round(box.height * d); });
       /* the doodle over the sentence: centred on it, about as tall as the text block */
       const w = Math.min(tb.width * 0.95, tb.height * 2.4), h = w * 0.625, x = (tb.left - box.left + tb.width / 2 - w / 2) * d, y = (tb.top - box.top + tb.height / 2 - h / 2) * d;
       const g = cv.getContext('2d'), g2 = cv2.getContext('2d');
-      const strikeOn = () => { if (!sk) return; const [rx, ry, rW, rH] = sk.rect; sprayOn(sk.ready, [sk.stroke], f => { g2.clearRect(0, 0, cv2.width, cv2.height); g2.imageSmoothingQuality = 'high'; g2.drawImage(f, rx, ry, rW, rH); }); };
+      const strikeOn = () => {
+        const nvEl = wrap.querySelector('.ca-nv'); if (!nvEl || !nimg) return;
+        const rel = el => { let a = 0, b = 0; while (el && el !== wrap) { a += el.offsetLeft; b += el.offsetTop; el = el.offsetParent; } return [a, b]; };   /* from the layout: the lines may still be sliding in */
+        const [ex, ey] = rel(nvEl), [cx0, cy0] = rel(cv), nW = nvEl.offsetWidth, nH = nvEl.offsetHeight;
+        const sw = nW * 1.85, sh = sw * 0.4, sx = (ex - cx0 + nW / 2 - sw / 2) * d, sy = (ey - cy0 + nH * 0.52 - sh * 0.5) * d;   /* the stroke runs a little past each end of the word */
+        sprayOn(nimg, nmeta ? pathsFor(nmeta[ni], nimg.width, nimg.height) : [], f => { g2.clearRect(0, 0, cv2.width, cv2.height); g2.drawImage(f, sx, sy, sw * d, sh * d); });
+      };
       sprayOn(img, meta ? pathsFor(meta[di], img.width, img.height) : [], f => { g.clearRect(0, 0, cv.width, cv.height); g.drawImage(f, x, y, w * d, h * d); }, () => setTimeout(strikeOn, 120));
     };
     const near = new IntersectionObserver(es => { if (!es.some(e => e.isIntersecting && cv.clientWidth)) return; near.disconnect();
-      (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => Promise.all([doodles(), loadImg('/img/spray/ft-' + di + '.webp?v=3')])).then(([meta, img]) => {
-        const c = meta && meta[di] ? meta[di].c : '#000000', pool = PAIRS.filter(([k]) => { const dh = Math.abs(hue(k) - hue(c)); return Math.min(dh, 360 - dh) > 70; });
-        const pair = (pool.length ? pool : PAIRS)[Math.random() * (pool.length || PAIRS.length) | 0];
-        strike(cv2, wrap, pair, sk => { parts = [meta, img, sk]; run(); });
+      (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => Promise.all([doodles(), loadImg('/img/spray/ft-' + di + '.webp?v=3'), strikes()])).then(([meta, img, nmeta]) => {
+        /* a strike from a colour family well away from the doodle's */
+        const c = meta && meta[di] ? meta[di].c : '#000000', far = (nmeta || []).map((m, i) => [m, i]).filter(([m]) => { const dh = Math.abs(hue(m.c) - hue(c)); return Math.min(dh, 360 - dh) > 70; });
+        const ni = far.length ? far[Math.random() * far.length | 0][1] : (Math.random() * 12 | 0);
+        return loadImg('/img/spray/nv-' + ni + '.webp?v=1').then(nimg => { parts = [meta, img, nmeta, nimg, ni]; run(); });
       }).catch(() => {}); }, { rootMargin: '80% 0px' });
     const vis = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { vis.disconnect(); setTimeout(() => { inView = true; run(); }, RM ? 0 : 250); } }, { threshold: 0.4 });
     near.observe(cv); vis.observe(cv);
