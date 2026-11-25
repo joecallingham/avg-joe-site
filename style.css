@@ -429,7 +429,6 @@ html.bk-drag #nav,html.bk-drag #frame-bottom,html.bk-drag .bk,html.bk-drag .bk-v
 .bk{position:fixed;left:0;right:0;bottom:0;z-index:48;background:var(--notch-bg);color:var(--ink);max-height:80vh;max-height:80svh;overflow:auto;overscroll-behavior:contain;
   transform:translateY(100%);visibility:hidden;transition:transform .7s cubic-bezier(.22,1,.36,1),visibility 0s .7s}
 html.bk-on .bk{transform:none;visibility:visible;transition:transform .7s cubic-bezier(.22,1,.36,1),visibility 0s}
-.bk-x{position:absolute;right:var(--margin);top:calc(var(--margin) + .4rem);appearance:none;border:0;background:none;font:inherit;font-size:var(--small);color:var(--ink);cursor:pointer;text-decoration:underline;text-underline-offset:.2em;z-index:1}
 .bk-body,.bk-done{display:grid;grid-template-columns:repeat(12,1fr);column-gap:var(--gutter);padding:calc(var(--margin) + 2.2rem) var(--margin) calc(var(--margin) + 1rem)}
 .bk-body[hidden],.bk-done[hidden]{display:none}
 .bk-big{grid-column:1/5;font-weight:500;font-size:var(--fs-head);line-height:1.04;letter-spacing:-.055em;margin:0}
@@ -453,7 +452,7 @@ html.bk-on .bk{transform:none;visibility:visible;transition:transform .7s cubic-
 .bk-go{appearance:none;border:0;background:none;padding:0;font:inherit;font-size:var(--fs-body);font-weight:500;letter-spacing:-.04em;color:var(--ink);cursor:pointer;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.15em}
 .bk-go:hover{text-decoration-color:transparent}
 .bk-go:disabled{color:rgba(11,11,11,.45);cursor:default}
-.bk-go:focus-visible,.bk-x:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.bk-go:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 /* the same form on the home page, under the case studies, on white */
 .bk-home{position:relative;background:#fff;color:var(--ink)}
 .bk-home .bk-body,.bk-home .bk-done{padding:var(--in) var(--margin) calc(var(--in) * 1.5 + 56px)}   /* the bottom clears the notch */
@@ -580,3 +579,5 @@ canvas.spray{position:absolute;inset:0;display:block;width:100%;height:100%}
 /* no shadow on the notch or the bar */
 .notch-fill{filter:none!important}
 #frame-bottom{box-shadow:none!important}
+html.bk-on .logo{opacity:0;pointer-events:none}   /* the corner logos step aside while the form is open, so they don't sit on it */
+.logo{transition:opacity .3s ease}

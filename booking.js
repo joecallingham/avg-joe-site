@@ -17,7 +17,6 @@
         <div class="bk-foot"><p class="bk-err" role="alert"></p><button type="submit" class="bk-go">Send ↘</button></div>
       </form>`;
   panel.innerHTML = `
-    <button type="button" class="bk-x">Close</button>
     <div class="bk-body">
       ${FORM}
     </div>
@@ -56,7 +55,6 @@
     if (on) { opener = from || document.activeElement; setTimeout(() => isOpen && inputs[0].focus({ preventScroll: true }), 700); }
     else if (wasIn) opener?.focus?.({ preventScroll: true });   // only hand focus back if they were in the form (no ring after a tap or swipe)
   };
-  $('.bk-x', panel).addEventListener('click', () => open(false));
   veil.addEventListener('click', () => open(false));
   addEventListener('keydown', e => { if (e.key === 'Escape' && isOpen) open(false); });
   addEventListener('resize', size);
@@ -150,5 +148,6 @@
   veil.addEventListener('wheel', e => e.preventDefault(), { passive: false });
   panel.addEventListener('touchmove', e => { if (panel.scrollHeight <= panel.clientHeight + 1 && !e.target.closest('input')) e.preventDefault(); }, { passive: false });
 
-  window.AvgBook = { open: from => open(true, from), close: () => open(false) };
+  // the notch's middle button opens the form, and while it is open it reads Close and closes it (no separate close button)
+  window.AvgBook = { open: from => open(!isOpen, from), close: () => open(false) };
 })();

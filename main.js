@@ -195,6 +195,7 @@
   const SAYS = { top: 'Book call', big: 'Book call', wheel: 'Book call', pick: 'Book call', work: 'Book call', end: 'Book call', soon: 'Book call', play: 'Pick a time', beat: 'Book call', info: 'Book call' };
   let saying = 'Studio', sayTl = null, hoverSay = null;
   function say(text) {
+    if (document.documentElement.classList.contains('bk-on')) text = 'Close';   // while the form is open, the middle button closes it
     if (text === saying) return;
     saying = text;
     if (sayTl) sayTl.kill();
@@ -584,7 +585,7 @@
     if (next !== undefined) goTo(next);
   });
 
-  addEventListener('avgbook', e => { if (e.detail) lenis.stop(); else lenis.start(); });
+  addEventListener('avgbook', e => { if (e.detail) lenis.stop(); else lenis.start(); navState(); });
   $$('.nb').forEach(a => a.addEventListener('click', e => {
     if (a.dataset.k === 'info' || a.dataset.k === 'work') return;   // Work and Info go to their pages
     e.preventDefault();
