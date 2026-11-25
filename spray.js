@@ -138,11 +138,12 @@
         if (a <= 0 && ha <= 0) continue;
         const sh = s.brush ? 1 : 0.9 + n * 0.2;
         let cr = r, cg = gg, cb = b;
-        if (rim) { const t = Math.min(1, dv * (s.soft ? 1.25 : 1.6)) ** 1.6; cr = rim[0] + (r - rim[0]) * t; cg = rim[1] + (gg - rim[1]) * t; cb = rim[2] + (b - rim[2]) * t; }
-        if (!s.brush && !s.solid) { const pale = (1 - pv) * 0.28, hot = rim ? Math.max(0, pv - 0.55) * 0.5 : 0;   // paler where it thins, towards the rim colour where it is hot
+        const J = Math.random() - 0.5;   // colours meet as interleaved dots, not a smooth blend (as real spray does)
+        if (rim) { const t = Math.min(1, Math.max(0, Math.min(1, dv * (s.soft ? 1.25 : 1.6)) ** 1.6 + J * 0.75)); cr = rim[0] + (r - rim[0]) * t; cg = rim[1] + (gg - rim[1]) * t; cb = rim[2] + (b - rim[2]) * t; }
+        if (!s.brush && !s.solid) { const pale = Math.max(0, (1 - pv) * 0.28 + J * 0.25), hot = rim ? Math.max(0, pv - 0.55 + J * 0.3) * 0.5 : 0;   // paler where it thins, towards the rim colour where it is hot
           cr += (tn[0] - cr) * pale; cg += (tn[1] - cg) * pale; cb += (tn[2] - cb) * pale;
           if (hot) { cr += (rim[0] - cr) * hot; cg += (rim[1] - cg) * hot; cb += (rim[2] - cb) * hot; } }
-        const A = a + ha * (1 - a), wa = a / A, wh = 1 - wa;   // the paint over its lighter bloom
+        const A = a + ha * (1 - a), wa = Math.min(1, Math.max(0, a / A + J * 0.5)), wh = 1 - wa;   // the paint over its lighter bloom, mixed through dots
         o[i] = (cr * wa + tn[0] * wh) * sh; o[i + 1] = (cg * wa + tn[1] * wh) * sh; o[i + 2] = (cb * wa + tn[2] * wh) * sh;
         o[i + 3] = A * (s.solid || s.brush ? 255 : 222);   // never quite opaque, so passes that cross build up on each other
       }
@@ -387,9 +388,10 @@
       for (let gi = groups.length - 1; gi >= 0; gi--) {   // the second gradient under the first
         const G = groups[gi], pv = P[i], t = G.f[i] / G.m1 * (0.7 + 0.6 * pv), T = G.F[i] / G.m2 * (0.75 + 0.5 * pv), hh = Math.min(0.75, ss(0.1, 1, G.h[i] / G.m3) * 0.5 + ss(0.55, 0.95, pv) * 0.3 * ss(0.2, 0.7, t));   // a soft, low-key heat
         let a = Math.max(Math.pow(ss(0, 0.95, T + (n - 0.5) * 0.08), 1.3) * 0.8, ss(0.05, 0.6, t) * 0.92);   // soft and a little see-through, like the first gradient
-        const m = ss(0.08, 0.95, t + (n - 0.5) * 0.05);
+        const J = Math.random() - 0.5, m = Math.min(1, Math.max(0, ss(0.08, 0.95, t) + J * 0.55));   // colours meet as interleaved dots
         let r = G.rim[0] + (G.core[0] - G.rim[0]) * m, gg = G.rim[1] + (G.core[1] - G.rim[1]) * m, b = G.rim[2] + (G.core[2] - G.rim[2]) * m;
-        r += (G.heat[0] - r) * hh; gg += (G.heat[1] - gg) * hh; b += (G.heat[2] - b) * hh;   // the hotter glow inside it
+        const hd = Math.min(1, Math.max(0, hh * (0.4 + Math.random() * 1.2)));
+        r += (G.heat[0] - r) * hd; gg += (G.heat[1] - gg) * hd; b += (G.heat[2] - b) * hd;   // the hotter glow inside it, dotted in
         const na = a + A * (1 - a); if (na > 0) { R = (r * a + R * A * (1 - a)) / na; Gc = (gg * a + Gc * A * (1 - a)) / na; B = (b * a + B * A * (1 - a)) / na; } A = na;
       }
       const sh = 0.94 + n * 0.12;
@@ -513,7 +515,22 @@
     draw(1);   // drawn once; the build-up is a fade and grow in CSS
     requestAnimationFrame(() => cv.classList.add('on'));
   }
-  watch('canvas.ca-glow', cv => glow(cv, { bleed: true, fill: 0.5 }), 400);
+  /* ---------- the statement: a smiley face sprayed over it with a round brush ---------- */
+  function smile(cv) {
+    const wrap = cv.parentElement, tb = wrap.querySelector('.ca-state').getBoundingClientRect(), box = cv.getBoundingClientRect();
+    const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.round(box.width * r), H = cv.height = Math.round(box.height * r);
+    const P = (x, y) => [(x - box.left) * r, (y - box.top) * r], R1 = (a, b) => a + Math.random() * (b - a);
+    const cx = tb.left + tb.width / 2, cy = tb.top + tb.height / 2, rx = Math.min(tb.width * 0.5, box.width * 0.44), ry = Math.min(tb.height * 0.95, box.height * 0.42), th = tb.height * r;
+    const c = ['#2f63ff', '#ff2f7a', '#ff6a1f'][Math.random() * 3 | 0], w = th * R1(0.13, 0.16);
+    const ring = [], a0 = R1(-2.2, -1.6);   // the face, a hand-drawn loop that overlaps itself a little
+    for (let t = 0; t <= 6.283 + 0.45; t += 0.2) { const k = 1 + 0.05 * Math.sin(t * 2 + a0); ring.push(P(cx + Math.cos(t + a0) * rx * k, cy + Math.sin(t + a0) * ry * k)); }
+    const eye = sx => [P(cx + sx * rx * 0.3, cy - ry * 0.42), P(cx + sx * rx * 0.31, cy - ry * 0.18)];
+    const grin = [P(cx - rx * 0.52, cy + ry * 0.12), P(cx - rx * 0.22, cy + ry * 0.52), P(cx + rx * 0.2, cy + ry * 0.55), P(cx + rx * 0.5, cy + ry * 0.1)];
+    const S = (pts, ww, sp) => ({ c, rim: RIM[c], exact: true, w: ww, speed: sp * r, path: curve(pts) });   // round brush: no taper, no flick
+    const eyes = [S(eye(-1), w * 1.5, 12), S(eye(1), w * 1.5, 12)], g2 = S(grin, w * 1.2, 30); eyes.forEach(e => e.solid = true); g2.solid = true;   // the eyes and smile denser, so they read through the type
+    run(cv, W, H, null, [S(ring, w, 44), ...eyes, g2], 160);
+  }
+  watch('canvas.spray-over', smile, 700);
 
   watch('canvas.spray', picture, 0, ANIM ? null : '60% 0px');
 })();
