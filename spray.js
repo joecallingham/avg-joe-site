@@ -6,6 +6,7 @@
    Each draws itself the first time it comes into view. */
 (() => {
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const FAT = 1.8;   // how fat every line is, over the widths set below
   const ART = {
     re: { bg: '#1f2a4d', strokes: [
       { c: '#ff6a1f', w: 150, pts: [[170, 260], [430, 170], [700, 250], [770, 500], [580, 700], [330, 650], [290, 460], [470, 370], [640, 460], [610, 600], [470, 620], [560, 760], [870, 860]] },
@@ -76,9 +77,11 @@
       for (let yy = 0; yy < h; yy++) for (let xx = 0; xx < w; xx++) {
         const i = (yy * w + xx) * 4, dv = dd[i + 3] / 255; if (!dv) continue;
         const n = grain[(y0 + yy) * W + x0 + xx];
-        let a = (dv * 1.25 - n * 0.62) * 2.4; if (a <= 0) continue; if (a > 1) a = 1;
+        let a = (dv * 1.25 - n * 0.62) * 2.4; if (a > 1) a = 1;
+        const mist = (dv - n * 0.3) * 0.6; if (mist > a) a = mist;   // the blowout: thin paint carried wide of the line
+        if (a <= 0) continue;
         const sh = 0.9 + n * 0.2;
-        o[i] = r * sh; o[i + 1] = gg * sh; o[i + 2] = b * sh; o[i + 3] = a * 240;
+        o[i] = r * sh; o[i + 1] = gg * sh; o[i + 2] = b * sh; o[i + 3] = a * 222;   // never quite opaque, so passes that cross build up on each other
       }
       lg.putImageData(out, x0, y0);
     };
@@ -89,10 +92,11 @@
       let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
       for (let e = Math.min(n - 1, at + adv); at <= e; at += 3) {
         const [x, y] = s.path[at], f = Math.min(1, at / 24, (n - at) / 24), p = pr(at) * (0.35 + 0.65 * f);
-        const R = s.w * 0.5 * (0.8 + 0.45 * (1 - p));
-        dg.globalAlpha = Math.min(0.5, (1 - Math.pow(0.08, 3 / R)) * (0.4 + p) * 1.05); dg.drawImage(PUFF, x - R, y - R, 2 * R, 2 * R);   // as strong per puff as it takes for any width of line to build to the same body
+        const R = s.w * FAT * 0.5 * (0.8 + 0.45 * (1 - p));
+        dg.globalAlpha = Math.min(0.5, (1 - Math.pow(0.08, 3 / R)) * (0.4 + p) * 1.05); dg.drawImage(PUFF, x - R, y - R, 2 * R, 2 * R);
+        const B = R * (2 + 0.8 * p); dg.globalAlpha = Math.min(0.08, (1 - Math.pow(0.6, 3 / B)) * (0.3 + p)); dg.drawImage(PUFF, x - B, y - B, 2 * B, 2 * B);   // the wider mist round the nozzle   // as strong per puff as it takes for any width of line to build to the same body
         if (Math.random() < 0.04) { dg.globalAlpha = 0.12; const a = Math.random() * 6.283, d = R * (0.9 + Math.random()), rr = R * 0.25; dg.drawImage(PUFF, x + Math.cos(a) * d - rr, y + Math.sin(a) * d - rr, 2 * rr, 2 * rr); }   // a stray spit of paint
-        x0 = Math.min(x0, x - 2 * R); y0 = Math.min(y0, y - 2 * R); x1 = Math.max(x1, x + 2 * R); y1 = Math.max(y1, y + 2 * R);
+        x0 = Math.min(x0, x - 3.2 * R); y0 = Math.min(y0, y - 3.2 * R); x1 = Math.max(x1, x + 3.2 * R); y1 = Math.max(y1, y + 3.2 * R);
       }
       ink(s, x0, y0, x1, y1); show();
       if (at >= n - 1) {   // this pass is done: fix it into the base and start the next on a clean density layer
@@ -121,20 +125,17 @@
     const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.round(cv.clientWidth * r), H = cv.height = Math.round(cv.clientHeight * r);
     const box = cv.getBoundingClientRect(), C = (x, y) => [(x - box.left) * r, (y - box.top) * r];
     const tb = txt.getBoundingClientRect(), h = Math.min(tb.height * 1.45, tb.width * 0.62) * r, [cx, cy] = C(tb.left + tb.width / 2, tb.top + tb.height / 2);
-    const rot = -0.08, place = ([u, v]) => { const x = (u - 0.62) * h, y = (v - 0.5) * h; return [cx + x * Math.cos(rot) - y * Math.sin(rot), cy + x * Math.sin(rot) + y * Math.cos(rot)]; };
-    const L = (c, w, pts) => ({ c, w: w * h, speed: 34 * r, path: curve(pts.map(place)) });
-    const strokes = [   // "AI", by hand
-      L('#2f63ff', 0.17, [[0.02, 1.02], [0.24, 0.5], [0.46, -0.02]]),
-      L('#2f63ff', 0.17, [[0.46, -0.02], [0.66, 0.5], [0.9, 1.03]]),
-      L('#2f63ff', 0.13, [[0.2, 0.66], [0.5, 0.63], [0.74, 0.62]]),
-      L('#2f63ff', 0.17, [[1.2, -0.03], [1.21, 0.5], [1.23, 1.03]]),
-    ];
-    if (word) {
-      const b = word.getBoundingClientRect(), [wx, wy] = C(b.left + b.width / 2, b.top + b.height * 0.55), rx = b.width * r * 0.66, ry = b.height * r * 0.7, pts = [];
-      for (let t = -0.5; t <= 6.283 + 0.8; t += 0.3) pts.push([wx + Math.cos(t) * rx * (1 + 0.05 * Math.sin(t * 3)), wy + Math.sin(t) * ry * (1 + 0.05 * Math.sin(t * 3)) - t * ry * 0.04]);
-      strokes.push({ c: '#ff2f7a', w: b.height * r * 0.32, speed: 22 * r, path: curve(pts) });
+    // one big squiggle across the whole statement
+    const tw = tb.width * r, th = tb.height * r, sq = [];
+    for (let k = 0; k <= 7; k++) { const u = k / 7; sq.push([cx + (u - 0.5) * Math.min(tw * 1.05, W * 0.8), cy + (k % 2 ? 0.42 : -0.42) * th * (0.8 + 0.3 * Math.sin(k * 1.7))]); }
+    const strokes = [{ c: '#2f63ff', w: th * 0.2, speed: 40 * r, path: curve(sq) }];
+    let strike = null;
+    if (word) {   // and a bold strike through "never"
+      const b = word.getBoundingClientRect(), [x0, y0] = C(b.left - b.width * 0.12, b.top + b.height * 0.62), [x1, y1] = C(b.right + b.width * 0.12, b.top + b.height * 0.48);
+      strike = { c: '#ff2f7a', w: b.height * r * 0.36, speed: 18 * r, path: curve([[x0, y0], [(x0 + x1) / 2, (y0 + y1) / 2 + b.height * r * 0.04], [x1, y1]]) };
     }
-    run(cv, W, H, null, strokes, 120);
+    // the squiggle sits into the type; the strike goes over the word, on a layer of its own
+    run(cv, W, H, null, strokes, 120, strike && (() => { const c2 = cv.cloneNode(); c2.className = 'spray-over spray-strike'; cv.after(c2); c2.width = W; c2.height = H; setTimeout(() => run(c2, W, H, null, [strike], 0), 200); }));
   }
 
   const watch = (sel, fn, delay) => {
