@@ -592,7 +592,7 @@
   $$('.nb').forEach(a => a.addEventListener('click', e => {
     if (a.dataset.k === 'info' || a.dataset.k === 'work') return;   // Work and Info go to their pages
     e.preventDefault();
-    if (a.dataset.k === 'studio' && downOn) { const f = Math.max(2, tOf(lenis.targetScroll)), next = RESTS.find(s => s > f + 0.01); /* on to the big sentence */ if (next !== undefined) goTo(next); return; }
+    if (a.dataset.k === 'studio' && downOn) { const f = tOf(lenis.targetScroll), next = f < 1.99 ? 2 : RESTS.find(s => s > Math.max(2, f) + 0.01); /* to the open film, then the big sentence */ if (next !== undefined) goTo(next); return; }
     if (a.dataset.k === 'studio' && window.AvgBook) AvgBook.open(a);   // the middle button books a call
   }));
   const hov = (n, key) => { n.addEventListener('mouseenter', () => { hoverSay = key; navState(); }); n.addEventListener('mouseleave', () => { hoverSay = null; navState(); }); };
@@ -798,12 +798,7 @@
     addEventListener('pointerdown', playFilm, { once: true }); addEventListener('wheel', playFilm, { once: true, passive: true });
     requestAnimationFrame(() => requestAnimationFrame(startReveal));
     gsap.fromTo('.logo', { opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0px)', duration: RM ? 0.01 : 1.2, ease: 'power2.out', stagger: 0.12, clearProps: 'filter' });
-    // on arrival, glide on down to the opening film: the image fully open and Avg and Joe settled
-    const OPEN_AT = 2;
-    if (cur <= 2 && !location.hash) {
-      if (RM) lenis.scrollTo(pxOf(OPEN_AT), { immediate: true, force: true });
-      else gsap.delayedCall(0.9, () => { if (cur <= 2) lenis.scrollTo(pxOf(OPEN_AT), { duration: 2.4, easing: inOut }); });
-    } else if (cur <= 2) gsap.delayedCall(RM ? 0 : 1.1, () => { if (cur <= 2) introStart(); });
+    if (cur <= 2) gsap.delayedCall(RM ? 0 : 1.1, () => { if (cur <= 2) introStart(); });
   });
 
   // for testing in the console
