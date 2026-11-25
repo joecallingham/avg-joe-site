@@ -497,24 +497,8 @@
   const lenis = new Lenis({
     // wheel and trackpad: the browser's own scrolling. Touch: Lenis drives it at its standard feel (no custom speeds),
     // so the iPhone Safari bar sliding in and out can't make it stick. Lenis also runs the glides for the buttons.
-    smoothWheel: false, syncTouch: true, syncTouchLerp: 0.14, autoRaf: false,   // a quicker glide after a flick, closer to the phone's own scrolling
+    smoothWheel: false, syncTouch: true, syncTouchLerp: 0.06, touchInertiaExponent: 1.75, touchMultiplier: 1.35, autoRaf: false,   // touch feel Joe set on his iPhone (25 Nov)
   });
-  // ?tune on the address: sliders for the touch feel, to set it on a real phone
-  if (/[?&]tune\b/.test(location.search)) {
-    const box = document.createElement('div'); box.setAttribute('data-lenis-prevent', '');   // dragging a slider mustn't scroll the page
-    box.style.cssText = 'position:fixed;left:8px;right:8px;top:8px;z-index:9999;background:rgba(11,11,11,.85);color:#fff;font:13px/1.3 system-ui;padding:10px 12px;border-radius:10px';
-    const row = (label, min, max, step, get, set) => {
-      const r = document.createElement('label'); r.style.cssText = 'display:flex;align-items:center;gap:8px;margin:4px 0';
-      const i = Object.assign(document.createElement('input'), { type: 'range', min, max, step, value: get() }); i.style.flex = '1';
-      const v = document.createElement('b'); v.style.minWidth = '3em'; v.textContent = (+get()).toFixed(2);
-      i.addEventListener('input', () => { set(+i.value); v.textContent = (+i.value).toFixed(2); });
-      r.append(label, i, v); box.append(r);
-    };
-    row('Glide', 0.04, 0.3, 0.01, () => lenis.options.syncTouchLerp, x => { lenis.options.syncTouchLerp = x; });
-    row('Flick', 1.2, 2.2, 0.05, () => lenis.options.touchInertiaExponent, x => { lenis.options.touchInertiaExponent = x; });
-    row('Drag', 0.8, 1.8, 0.05, () => lenis.virtualScroll.options.touchMultiplier, x => { lenis.virtualScroll.options.touchMultiplier = x; });
-    document.body.append(box);
-  }
   gsap.ticker.add(t => lenis.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
 
