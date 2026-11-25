@@ -62,7 +62,7 @@
     requestAnimationFrame(step);
   }
   /* the doodles: 18 baked pictures (1200 x 750) and their stroke paths, as fractions of the picture */
-  let FT = null; const doodles = () => FT || (FT = fetch('/img/spray/ft.json').then(r => r.json()).catch(() => null));
+  let FT = null; const doodles = () => FT || (FT = fetch('/img/spray/ft.json?v=2').then(r => r.json()).catch(() => null));
   const loadImg = src => new Promise((ok, no) => { const i = new Image(); i.decoding = 'async'; i.onload = () => ok(i); i.onerror = no; i.src = src; });
   const pickD = (() => { const used = []; return () => { let i; do i = Math.random() * 18 | 0; while (used.includes(i) && used.length < 18); used.push(i); return i; }; })();
   const pathsFor = (meta, w, h) => meta.strokes.map(({ r, p }) => ({ r: r * w, p: p.map(([x, y]) => [x * w, y * h]) }));
@@ -80,7 +80,7 @@
     };
     place(); addEventListener('resize', place); if (document.fonts) document.fonts.ready.then(place);
     const near = new IntersectionObserver(es => { if (!es.some(e => e.isIntersecting)) return; near.disconnect();
-      Promise.all([doodles(), loadImg('/img/spray/ft-' + di + '.webp')]).then(([meta, img]) => { pic = img;
+      Promise.all([doodles(), loadImg('/img/spray/ft-' + di + '.webp?v=2')]).then(([meta, img]) => { pic = img;
         onView(cv, () => { const g = cv.getContext('2d'), go = () => sprayOn(img, meta ? pathsFor(meta[di], img.width, img.height) : [], f => { g.clearRect(0, 0, cv.width, cv.height); g.drawImage(f, 0, 0, cv.width, cv.height); }, () => { shown = true; });
           if (!meta) { g.drawImage(img, 0, 0, cv.width, cv.height); shown = true; } else go(); }, 0.5);
       }).catch(() => {}); }, { rootMargin: '60% 0px' });
@@ -171,7 +171,7 @@
       sprayOn(img, meta ? pathsFor(meta[di], img.width, img.height) : [], f => { g.clearRect(0, 0, cv.width, cv.height); g.drawImage(f, x, y, w * d, h * d); }, () => setTimeout(strikeOn, 120));
     };
     const near = new IntersectionObserver(es => { if (!es.some(e => e.isIntersecting && cv.clientWidth)) return; near.disconnect();
-      (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => Promise.all([doodles(), loadImg('/img/spray/ft-' + di + '.webp')])).then(([meta, img]) => {
+      (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => Promise.all([doodles(), loadImg('/img/spray/ft-' + di + '.webp?v=2')])).then(([meta, img]) => {
         const c = meta && meta[di] ? meta[di].c : '#000000', pool = PAIRS.filter(([k]) => { const dh = Math.abs(hue(k) - hue(c)); return Math.min(dh, 360 - dh) > 70; });
         const pair = (pool.length ? pool : PAIRS)[Math.random() * (pool.length || PAIRS.length) | 0];
         strike(cv2, wrap, pair, sk => { parts = [meta, img, sk]; run(); });
