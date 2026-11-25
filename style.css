@@ -421,7 +421,8 @@ html.intro-dark .nb-ic{color:rgba(241,238,231,.5)}
 /* the lid: the notch and the bottom bar ride up by the form's height (--bk-h, set by booking.js) */
 #frame-bottom{transition:transform .7s cubic-bezier(.22,1,.36,1)}
 html.bk-on #frame-bottom{transform:translateY(calc(-1 * var(--bk-h,0px)))}
-html.bk-on #nav{transform:translate(-50%,calc(-1 * var(--bk-h,0px)));transition-timing-function:cubic-bezier(.22,1,.36,1);transition-duration:.7s}
+html.bk-on #nav{transform:translate(-50%,calc(-1 * var(--bk-h,0px)))}
+html.bk-on #nav,html.bk-shut #nav{transition:transform .7s cubic-bezier(.22,1,.36,1)}
 /* the form: its own dark strip right across the screen, under the lid */
 .bk{position:fixed;left:0;right:0;bottom:0;z-index:48;background:var(--notch-bg);color:var(--ink);max-height:80vh;max-height:80svh;overflow:auto;overscroll-behavior:contain;
   transform:translateY(100%);visibility:hidden;transition:transform .7s cubic-bezier(.22,1,.36,1),visibility 0s .7s}

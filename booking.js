@@ -40,6 +40,10 @@
   const open = (on, from) => {
     if (on === isOpen) return;
     isOpen = on; if (on) size();
+    if (!on) {   // drop the keyboard first, and let the notch fall on the same curve as the form, so they stay joined
+      if (panel.contains(document.activeElement)) document.activeElement.blur();
+      root.classList.add('bk-shut'); clearTimeout(open.t); open.t = setTimeout(() => root.classList.remove('bk-shut'), 800);
+    }
     root.classList.toggle('bk-on', on); panel.setAttribute('aria-hidden', String(!on)); veil.classList.toggle('open', on);
     document.querySelectorAll('.nb[data-k="studio"]').forEach(b => b.setAttribute('aria-expanded', String(on)));
     dispatchEvent(new CustomEvent('avgbook', { detail: on }));
