@@ -573,3 +573,4 @@ html.cases-off #s-cases{background:var(--cream)}
 .hf-hold{height:100vh;height:100svh}
 .featured{margin-bottom:-100vh;margin-bottom:-100svh}
 .cases-over{position:relative;z-index:6;background:var(--cream)}
+canvas.spray{position:absolute;inset:0;display:block;width:100%;height:100%}
