@@ -97,6 +97,10 @@
     const L1 = mk(7), L2 = mk(19), smp = ([q, w, a], x, y) => { const fx = x / q, ix = fx | 0, tx = fx - ix, fy = y / q, iy = fy | 0, ty = fy - iy, i = iy * w + ix;
       return (a[i] * (1 - tx) + a[i + 1] * tx) * (1 - ty) + (a[i + w] * (1 - tx) + a[i + w + 1] * tx) * ty; };
     if (strokes.some(s => s.brush)) for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) rough[y * W + x] = smp(L1, x, y) * 0.55 + smp(L2, x, y) * 0.45;
+    // slow patches through the paint (as in the AI background): some areas denser and hotter, others thinner and paler
+    const pq = Math.max(W, H) / 5, pw = Math.ceil(W / pq) + 2, pvv = Array.from({ length: pw * (Math.ceil(H / pq) + 2) }, Math.random);
+    const patchAt = (x, y) => { const fx = x / pq, ix = fx | 0, tx = fx - ix, fy = y / pq, iy = fy | 0, ty = fy - iy, i = iy * pw + ix, a = tx * tx * (3 - 2 * tx), b = ty * ty * (3 - 2 * ty);
+      return (pvv[i] * (1 - a) + pvv[i + 1] * a) * (1 - b) + (pvv[i + pw] * (1 - a) + pvv[i + pw + 1] * a) * b; };
     const base = document.createElement('canvas'); base.width = W; base.height = H; const bgc = base.getContext('2d');
     if (bg) {   // bright paper, with grain
       bgc.fillStyle = bg; bgc.fillRect(0, 0, W, H);
@@ -128,11 +132,16 @@
             const mist = (dv - n * 0.32) * 0.42; if (mist > a) a = mist; }   // the blowout: thin paint carried wide of the line
           if (a < 0) a = 0;
         }
+        const pv = s.brush || s.solid ? 0.5 : patchAt(x0 + xx, y0 + yy);
+        if (a > 0 && !s.brush && !s.solid) a *= 0.78 + 0.4 * pv;   // denser in some patches, thinner in others
         let ha = (hv * 1.7 - n * 0.35) * 0.6; if (ha < 0) ha = 0; if (ha > 0.6) ha = 0.6;
         if (a <= 0 && ha <= 0) continue;
         const sh = s.brush ? 1 : 0.9 + n * 0.2;
         let cr = r, cg = gg, cb = b;
         if (rim) { const t = Math.min(1, dv * (s.soft ? 1.25 : 1.6)) ** 1.6; cr = rim[0] + (r - rim[0]) * t; cg = rim[1] + (gg - rim[1]) * t; cb = rim[2] + (b - rim[2]) * t; }
+        if (!s.brush && !s.solid) { const pale = (1 - pv) * 0.28, hot = rim ? Math.max(0, pv - 0.55) * 0.5 : 0;   // paler where it thins, towards the rim colour where it is hot
+          cr += (tn[0] - cr) * pale; cg += (tn[1] - cg) * pale; cb += (tn[2] - cb) * pale;
+          if (hot) { cr += (rim[0] - cr) * hot; cg += (rim[1] - cg) * hot; cb += (rim[2] - cb) * hot; } }
         const A = a + ha * (1 - a), wa = a / A, wh = 1 - wa;   // the paint over its lighter bloom
         o[i] = (cr * wa + tn[0] * wh) * sh; o[i + 1] = (cg * wa + tn[1] * wh) * sh; o[i + 2] = (cb * wa + tn[2] * wh) * sh;
         o[i + 3] = A * (s.solid || s.brush ? 255 : 222);   // never quite opaque, so passes that cross build up on each other
@@ -334,18 +343,18 @@
   }
   // AI: full bleed, two airbrushed gradients overlapping (navy into green, magenta into orange), each with a couple of small
   // hotter glows in it, after Joe's references. Still.
-  function aiGlow(cv) {
+  function aiGlow(cv, spec, strength = 1, size = 1) {
     const px = cv.clientWidth * cv.clientHeight, sc = Math.min(Math.min(devicePixelRatio || 1, 1.5), Math.sqrt(2.6e6 / Math.max(1, px)));
     const W = cv.width = Math.max(2, Math.round(cv.clientWidth * sc)), H = cv.height = Math.max(2, Math.round(cv.clientHeight * sc));
     const g = cv.getContext('2d'), img = g.createImageData(W, H), d = img.data, R1 = (a, b) => a + Math.random() * (b - a), U = Math.max(W, H);
     const ss = (a, b, t) => { t = Math.min(1, Math.max(0, (t - a) / (b - a))); return t * t * (3 - 2 * t); };
     const form = (x, y, s, a, r = R1(0.55, 1)) => { const t = Math.random() * 3.14; return { x, y, sx: s, sy: s * r, c: Math.cos(t), sn: Math.sin(t), a,
       h: [R1(0.2, 0.45), Math.random() * 6.28, R1(0.12, 0.3), Math.random() * 6.28, R1(0.04, 0.1), Math.random() * 6.28] }; };   // h: how unevenly it flares in each direction
-    const groups = [
+    const groups = (spec || [
       { core: '#ff4a12', rim: '#ffc21f', heat: '#e8204f', x: R1(0.22, 0.34), y: R1(0.22, 0.38), pinch: true },
       { core: '#ff3d7f', rim: '#ffa17a', heat: '#ff7a1f', x: R1(0.66, 0.8), y: R1(0.62, 0.8) },
-    ].map(G => {
-      const s0 = U * R1(0.13, 0.17), cx = G.x * W, cy = G.y * H, forms = [], heats = [];
+    ]).map(G => {
+      const s0 = U * R1(0.13, 0.17) * size, cx = G.x * W, cy = G.y * H, forms = [], heats = [];
       if (G.pinch) { const a = R1(0.75, 1.05), dd = s0 * 1.9; forms.push(form(cx - Math.cos(a) * dd / 2, cy - Math.sin(a) * dd / 2, s0 * 0.85, 1), form(cx + Math.cos(a) * dd / 2, cy + Math.sin(a) * dd / 2, s0 * 0.8, 1)); }
       else { forms.push(form(cx, cy, s0, 1)); for (let k = 0; k < 2; k++) { const a = Math.random() * 6.283; forms.push(form(cx + Math.cos(a) * s0 * 1.4, cy + Math.sin(a) * s0 * 1.4, s0 * R1(0.45, 0.65), 0.85)); } }
       forms.forEach(f => { if (heats.length < 2) heats.push(form(f.x + R1(-0.35, 0.35) * f.sx, f.y + R1(-0.35, 0.35) * f.sy, f.sx * R1(0.5, 0.75), 1, R1(0.7, 1))); });
@@ -380,9 +389,16 @@
         const na = a + A * (1 - a); if (na > 0) { R = (r * a + R * A * (1 - a)) / na; Gc = (gg * a + Gc * A * (1 - a)) / na; B = (b * a + B * A * (1 - a)) / na; } A = na;
       }
       const sh = 0.94 + n * 0.12;
-      d[j] = R * sh; d[j + 1] = Gc * sh; d[j + 2] = B * sh; d[j + 3] = A * 255;
+      d[j] = R * sh; d[j + 1] = Gc * sh; d[j + 2] = B * sh; d[j + 3] = A * strength * 255;
     }
     g.putImageData(img, 0, 0);
+  }
+  // the home page's services wheel: a very faint airbrushed blue off the left, warm cream at the foot (was a CSS gradient)
+  const wheelBg = document.getElementById('wheel-bg');
+  if (wheelBg) {
+    const cv = document.createElement('canvas'); cv.className = 'wheel-air'; cv.setAttribute('aria-hidden', 'true'); wheelBg.appendChild(cv); wheelBg.classList.add('sprayed');
+    const paint = () => aiGlow(cv, [{ core: '#7fb4d4', rim: '#d3e6ec', heat: '#a8d2ea', x: 0.02, y: 0.45 }, { core: '#f5e3d6', rim: '#f8eee7', heat: '#f2d6c4', x: 0.52, y: 1.06 }], 0.55, 1.9);
+    (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(paint, 300));
   }
   const aiPat = document.querySelector('.hv-half[data-k=ai] .hv-grad');
   if (aiPat) {
@@ -448,7 +464,8 @@
     const g = cv.getContext('2d'), img = g.createImageData(W, H), d = img.data, R1 = (a, b) => a + Math.random() * (b - a);
     const [core, rim] = (opt.pair || GLOWS[Math.random() * GLOWS.length | 0]).map(rgb), u = Math.min(W * (opt.fill || 0.4), H * 0.55);
     // the forms: each stretched and tilted its own way; one large, off centre, others running into it (or two lobes pinched)
-    const form = (x, y, s, a) => { const r = R1(0.55, 1), t = Math.random() * 3.14; return { x, y, sx: s, sy: s * r, c: Math.cos(t), sn: Math.sin(t), a }; };
+    const form = (x, y, s, a) => { const r = R1(0.55, 1), t = Math.random() * 3.14; return { x, y, sx: s, sy: s * r, c: Math.cos(t), sn: Math.sin(t), a,
+      h: [R1(0.2, 0.45), Math.random() * 6.28, R1(0.12, 0.3), Math.random() * 6.28, R1(0.04, 0.1), Math.random() * 6.28] }; };
     const cx = W * (opt.pinch ? 0.5 + R1(-0.06, 0.06) : 0.5 + R1(0.08, 0.16) * (Math.random() < 0.5 ? -1 : 1)), cy = H * (opt.pinch ? 0.4 : 0.5 + R1(-0.06, 0.08)), s0 = u * R1(0.2, 0.26), forms = [form(cx, cy, s0, 1)];
     let sprayLine = null;
     if (!opt.pinch) {
@@ -464,18 +481,24 @@
       forms.push(form(forms[0].x + Math.cos(a) * dd, forms[0].y + Math.sin(a) * dd, s0 * R1(0.8, 1.05), 1));
     }
     // a gentle warp of the whole field, so no edge is a clean curve
-    const wa = u * R1(0.06, 0.12), f1 = R1(1.5, 3) / u, f2 = R1(1.5, 3) / u, p1 = Math.random() * 6, p2 = Math.random() * 6;
+    const wa = u * R1(0.09, 0.15), f1 = R1(1.5, 3) / u, f2 = R1(1.5, 3) / u, f3 = R1(4, 7) / u, p1 = Math.random() * 6, p2 = Math.random() * 6;
+    const nq = Math.max(W, H) / 5, nw = Math.ceil(W / nq) + 2, nv = Array.from({ length: nw * (Math.ceil(H / nq) + 2) }, Math.random);
+    const patch = (x, y) => { const fx = x / nq, ix = fx | 0, tx = fx - ix, fy = y / nq, iy = fy | 0, ty = fy - iy, i = iy * nw + ix, a = tx * tx * (3 - 2 * tx), b = ty * ty * (3 - 2 * ty);
+      return (nv[i] * (1 - a) + nv[i + 1] * a) * (1 - b) + (nv[i + nw] * (1 - a) + nv[i + nw + 1] * a) * b; };
+    const P = new Float32Array(W * H);
     const grain = new Float32Array(W * H); for (let i = 0; i < grain.length; i++) grain[i] = Math.random();
     const core2 = new Float32Array(W * H), wide = new Float32Array(W * H); let m1 = 0, m2 = 0;
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-      const X = x + wa * Math.sin(y * f1 + p1), Y = y + wa * Math.sin(x * f2 + p2); let f = 0, F = 0;
-      for (const o of forms) { const dx = X - o.x, dy = Y - o.y, rx = dx * o.c + dy * o.sn, ry = -dx * o.sn + dy * o.c, q = rx * rx / (o.sx * o.sx) + ry * ry / (o.sy * o.sy); f += o.a * Math.exp(-q / 2); F += o.a * Math.exp(-q / 13); /* the rim flare: very wide */ }
+      const X = x + wa * Math.sin(y * f1 + p1) + wa * 0.35 * Math.sin(y * f3 + p2), Y = y + wa * Math.sin(x * f2 + p2) + wa * 0.35 * Math.sin(x * f3 + p1); let f = 0, F = 0; P[y * W + x] = patch(x, y);
+      for (const o of forms) { const dx = X - o.x, dy = Y - o.y, rx = dx * o.c + dy * o.sn, ry = -dx * o.sn + dy * o.c, q = rx * rx / (o.sx * o.sx) + ry * ry / (o.sy * o.sy), th = Math.atan2(ry, rx), h = o.h || [0.25, 0, 0.15, 1, 0.06, 2];
+        const kw = 1 + h[0] * Math.sin(2 * th + h[1]) + h[2] * Math.sin(3 * th + h[3]), kc = 1 + h[4] * Math.sin(3 * th + h[5]) + h[4] * 0.6 * Math.sin(5 * th + h[1]);   /* flares unevenly; the core edge lumpy */
+        f += o.a * Math.exp(-q / (2 * kc * kc)); F += o.a * Math.exp(-q / (13 * kw * kw)); /* the rim flare: very wide */ }
       const i = y * W + x; core2[i] = f; wide[i] = F; if (f > m1) m1 = f; if (F > m2) m2 = F;
     }
     const ss = (a, b, t) => { t = Math.min(1, Math.max(0, (t - a) / (b - a))); return t * t * (3 - 2 * t); };
     const draw = k => {   // k: how far it has built up, 0 to 1
       for (let i = 0, j = 0; i < core2.length; i++, j += 4) {
-        const t = core2[i] / m1 * (0.3 + 0.7 * k), T = wide[i] / m2 * (0.3 + 0.7 * k), n = grain[i];
+        const pv = P[i], t = core2[i] / m1 * (0.3 + 0.7 * k) * (0.7 + 0.6 * pv), T = wide[i] / m2 * (0.3 + 0.7 * k) * (0.75 + 0.5 * pv), n = grain[i];   /* patchy, not one flat colour */
         const ex = (i % W) / W, ey = (i / W | 0) / H, edge = ss(0, 0.14, Math.min(ex, 1 - ex, ey, 1 - ey));   // fades out before the canvas's edge, so it is never cut
         const a = Math.max(Math.pow(ss(0, 0.9, T + (n - 0.5) * 0.1), 1.4) * 0.93, ss(0.05, 0.45, t)) * k * edge;   // fading out very gradually over a long way   // the rim colour flares out wide; the core sits inside it
         if (a <= 0.004) { d[j + 3] = 0; continue; }
