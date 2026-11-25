@@ -46,7 +46,17 @@
     const d = Math.min(devicePixelRatio || 1, 2), q = d * 2;   /* d: the canvas's pixels per CSS pixel; q: the working resolution */
     cv.width = Math.round(box.width * d); cv.height = Math.round(box.height * d);
     const sz = Math.min(tb.height * 1.55, tb.width * 0.42), mx = tb.left + tb.width / 2 - box.left, my = tb.top + tb.height / 2 - box.top + sz * 0.07;
-    const x0 = mx - sz * 1.25, y0 = my - sz * 1.0, rw = sz * 2.5, rh = sz * 2.05;   /* the patch the smiley and its glow sit in (CSS px) */
+    let x0 = mx - sz * 1.25, y0 = my - sz * 1.0, rw = sz * 2.5, rh = sz * 2.05;   /* the patch the smiley and its glow sit in (CSS px) */
+    const nvEl = wrap.querySelector('.ca-nv'), nv = nvEl && nvEl.getBoundingClientRect();   /* and a strike through "never", so the patch reaches it too */
+    let nL, nR, nM, nH;
+    if (nv && nv.width) {
+      /* measured from the layout, not the screen: the lines may still be sliding in as this runs */
+      const rel = el => { let x = 0, y = 0; while (el && el !== wrap) { x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; } return [x, y]; };
+      const [ex, ey] = rel(nvEl), [cx0, cy0] = rel(cv);
+      nL = ex - cx0; nR = nL + nvEl.offsetWidth; nH = nvEl.offsetHeight; nM = ey - cy0 + nH * 0.52;
+      const p = nH * 1.1, ax = Math.max(0, Math.min(x0, nL - p)), ay = Math.max(0, Math.min(y0, nM - p)), bx = Math.min(box.width, Math.max(x0 + rw, nR + p)), by = Math.min(box.height, Math.max(y0 + rh, nM + p));
+      x0 = ax; y0 = ay; rw = bx - ax; rh = by - ay;
+    }
     const W = Math.round(rw * q), H = Math.round(rh * q), K = sz * q / 210;   /* K: working pixels per pixel of the test, where sz was 210 */
     const [coreHex, haloHex] = PAIRS[Math.random() * PAIRS.length | 0], tilt = (0.15 + Math.random() * 0.12) * (Math.random() < 0.5 ? -1 : 1);
     const co = Math.cos(tilt), si = Math.sin(tilt), cx = (mx - x0) * q, cy = (my - y0) * q, SZ = sz * q;
@@ -56,8 +66,14 @@
       return out; };
     const sm = pts => pts.map((b, k) => { const a = pts[Math.max(0, k - 1)], c = pts[Math.min(pts.length - 1, k + 1)]; return [(a[0] + 2 * b[0] + c[0]) / 4, (a[1] + 2 * b[1] + c[1]) / 4]; });
     const j = () => (Math.random() - 0.5) * 0.04;   /* no two smileys quite the same */
+    const line = P => { const out = []; for (let k = 0; k < P.length - 1; k++) { const [ax, ay] = P[k], [bx, by] = P[k + 1], n = Math.ceil(Math.hypot(bx - ax, by - ay) / (1.5 * K)); for (let i = 0; i < n; i++) out.push([ax + (bx - ax) * i / n, ay + (by - ay) * i / n]); } return out; };
     const strokes = [along([[-0.32 + j(), -0.52], [-0.31 + j(), -0.35], [-0.3 + j(), -0.17]]), along([[0.32 + j(), -0.52], [0.33 + j(), -0.35], [0.34 + j(), -0.17]]),
                      along(sm(sm([[-0.64, 0.04 + j()], [-0.48, 0.3], [-0.25, 0.5 + j()], [0.02, 0.58], [0.28, 0.5 + j()], [0.5, 0.3], [0.66, 0.0 + j()]])))];
+    if (nL !== undefined) {   /* the strike: one bold pass through the word, a touch uphill, running past each end */
+      const w = nR - nL, P = (x, y) => [(x - x0) * q, (y - y0) * q], dy = (Math.random() - 0.5) * nH * 0.12;
+      const st = line(sm(sm([P(nL - w * 0.14, nM + nH * 0.12 + dy), P(nL + w * 0.3, nM + nH * 0.04), P(nL + w * 0.7, nM - nH * 0.04 + dy), P(nR + w * 0.14, nM - nH * 0.14)])));
+      st.firm = true; st.scale = nH * 0.27 * q / (21.45 * K); strokes.push(st);
+    }
     const mk = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; };
     const wob = () => { const a = Math.random() * 6, b = Math.random() * 6, c = Math.random() * 6; return t => 0.5 + 0.28 * Math.sin(t * 0.009 + a) + 0.16 * Math.sin(t * 0.027 + b) + 0.08 * Math.sin(t * 0.07 + c); };
     const sharp = mk(), soft = mk(), gm = mk(), sg = sharp.getContext('2d'), fg = soft.getContext('2d'), gg = gm.getContext('2d'), reach = [];
@@ -67,8 +83,8 @@
       const width = wob(), dense = wob(), glow = wob(); let big = 0;
       s.forEach(([x, y], k) => {
         const t = t0 + k * 1.5, end = Math.min(1, k / 18, (s.length - k) / 18);
-        const r = 26 * K * (0.45 + 0.75 * width(t)) * (0.88 + 0.12 * end);   /* thicker and thinner along it, round at the ends */
-        const a = Math.max(0.03, Math.min(1, 1.3 * dense(t) - 0.25)) * (0.7 + 0.3 * end);   /* denser and faded along it */
+        const r = 26 * K * (s.firm ? 0.8 + 0.35 * width(t) : 0.45 + 0.75 * width(t)) * (0.88 + 0.12 * end) * (s.scale || 1);   /* thicker and thinner along it, round at the ends */
+        const a = Math.max(s.firm ? 0.55 : 0.03, Math.min(1, 1.3 * dense(t) - 0.25)) * (0.7 + 0.3 * end);   /* denser and faded along it */
         for (const x2 of [sg, fg]) { x2.globalAlpha = a * 0.24; x2.beginPath(); x2.arc(x, y, r, 0, 6.283); x2.fill(); }
         const gw = Math.max(0, glow(t) * 1.7 - 0.85) ** 1.6;   /* the glow blooms in a few short stretches, not evenly */
         if (gw > 0.01) { gg.globalAlpha = Math.min(1, gw) * 0.28; gg.beginPath(); gg.arc(x + (Math.random() - 0.5) * 6 * K, y + (Math.random() - 0.5) * 6 * K, r * 0.95, 0, 6.283); gg.fill(); }
@@ -132,7 +148,7 @@
           return f < 1 ? requestAnimationFrame(step) : (g.clearRect(0, 0, cv.width, cv.height), put());
         }
         if (!st) st = now;
-        const s = strokes[si], [wx, cover, share] = PASS[pi], dur = time[si] * share, p = Math.min(1, (now - st) / dur), e = p * p * (1.6 - 0.6 * p);
+        const s = strokes[si], [wx, cover, share] = PASS[pi], dur = (time[si] || 700) * share, p = Math.min(1, (now - st) / dur), e = p * p * (1.6 - 0.6 * p);
         const back = pi % 2 === 1, n = s.length - 1, upto = Math.round(e * n), rad = reach[si] * wx, size = rad * 2;
         const over = Math.max(1, size / (gap * 1.5 * K) * 0.6), a = 1 - Math.pow(1 - cover, 1 / over);   /* so each pass adds about its coverage, however many dabs overlap */
         mg.globalAlpha = a;
