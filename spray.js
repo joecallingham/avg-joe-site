@@ -157,7 +157,7 @@
           const t = Math.min(1, Math.max(0, Math.min(1, dv * 1.25) + J * 0.6)), m2 = t > 0.5 ? (t - 0.5) * 2 : 0, m1 = t > 0.5 ? 1 : t * 2;
           const er = rim || tn; cr = er[0] + (mid[0] - er[0]) * m1; cg = er[1] + (mid[1] - er[1]) * m1; cb = er[2] + (mid[2] - er[2]) * m1;
           cr += (r - cr) * m2; cg += (gg - cg) * m2; cb += (b - cb) * m2;
-        } else if (rim) { const t = Math.min(1, Math.max(0, Math.min(1, dv * (s.soft ? 1.25 : 1.6)) ** 1.6 + J * 0.75)); cr = rim[0] + (r - rim[0]) * t; cg = rim[1] + (gg - rim[1]) * t; cb = rim[2] + (b - rim[2]) * t; }
+        } else if (rim) { let t = Math.min(1, Math.max(0, Math.min(1, dv * (s.soft ? 1.25 : 1.6)) ** 1.6 + J * 0.75)); if (s.aim !== undefined) t = 1 - (1 - t) * Math.min(1, hv * 3.2); /* the outer colour only shows where the flare landed */ cr = rim[0] + (r - rim[0]) * t; cg = rim[1] + (gg - rim[1]) * t; cb = rim[2] + (b - rim[2]) * t; }
         if (!s.brush && !s.solid) { const pale = Math.max(0, (1 - pv) * 0.28 + J * 0.25), hot = rim ? Math.max(0, pv - 0.55 + J * 0.3) * 0.5 : 0;   // paler where it thins, towards the rim colour where it is hot
           cr += (tn[0] - cr) * pale; cg += (tn[1] - cg) * pale; cb += (tn[2] - cb) * pale;
           if (hot) { cr += (rim[0] - cr) * hot; cg += (rim[1] - cg) * hot; cb += (rim[2] - cb) * hot; } }
@@ -198,8 +198,12 @@
         dg.drawImage(PUFF, x - R, y - R, 2 * R, 2 * R);   // (an airbrushed form builds to a full core over its few turns)
         const B = R * (2 + 0.8 * p); if (!s.brush) { dg.globalAlpha = Math.min(0.08, (1 - Math.pow(0.6, 3 / B)) * (0.3 + p)); dg.drawImage(PUFF, x - B, y - B, 2 * B, 2 * B); }   // the wider mist round the nozzle; build to the same body
         if (!s.brush && Math.random() < 0.12) {   // stray spits of paint, some well clear of the line
-          dg.globalAlpha = 0.1 + Math.random() * 0.25; const a = Math.random() * 6.283, d = R * (0.8 + Math.random() * Math.random() * 3.5), rr = R * (0.08 + Math.random() * 0.3);
+          dg.globalAlpha = 0.1 + Math.random() * 0.25; const a = Math.random() * 6.283, d = R * (0.8 + Math.random() * Math.random() * 3.5), rr = R * (0.03 + Math.random() * 0.1);   /* small: grains thrown off, not separate sprays */
           dg.drawImage(PUFF, x + Math.cos(a) * d - rr, y + Math.sin(a) * d - rr, 2 * rr, 2 * rr);
+        }
+        if (s.aim !== undefined) {   // sprayed at an angle: the colour flares out on one side, in patches along the stroke, and not at all elsewhere
+          const fl = Math.max(0, Math.sin(at * s.af + s.ap) + 0.25 * Math.sin(at * s.af * 3.1 + s.ap * 2)) ** 1.4;
+          if (fl > 0.04) { const off = R * (0.55 + 0.35 * fl), HR = R * (1.25 + 0.55 * fl); hg.globalAlpha = Math.min(0.2, 0.16 * fl); hg.drawImage(PUFF, x + Math.cos(s.aim) * off - HR, y + Math.sin(s.aim) * off - HR, 2 * HR, 2 * HR); }
         }
         if (!s.soft && !s.brush && !s.solid) {   // the lighter bloom: where the hand turns a corner or moves fast, not all the way round
           const pa = s.path[Math.max(0, at - 8)], pb = s.path[Math.min(n - 1, at + 8)], ax = x - pa[0], ay = y - pa[1], bx = pb[0] - x, by = pb[1] - y;
@@ -213,10 +217,10 @@
       if (at >= n - 1) {   // this pass is done: fix it into the base and start the next on a clean density layer
         bgc.drawImage(lay, 0, 0); pg.drawImage(lay, 0, 0); lg.clearRect(0, 0, W, H); dg.clearRect(0, 0, W, H); hg.clearRect(0, 0, W, H); dg.globalAlpha = 1;
         if (s.drops) {   // a few flecks of a second colour flicked off the can: soft, grainy, fading out at their edges
-          bgc.fillStyle = s.drops; const nd = 2 + (Math.random() * 5 | 0), sz = Math.max(3, s.w / 22), px = Math.max(1, Math.min(devicePixelRatio || 1, 1.5));
+          bgc.fillStyle = s.drops; const nd = 2 + (Math.random() * 5 | 0), sz = Math.max(1.2, s.w / 90),   /* just extra grains of paint, not sprays of their own */ px = Math.max(1, Math.min(devicePixelRatio || 1, 1.5));
           for (let d = 0; d < nd; d++) {
             const [px0, py0] = s.path[Math.random() * s.path.length | 0], an = Math.random() * 6.283, dist = s.w * (0.2 + Math.random() * 1.4);
-            const cx = px0 + Math.cos(an) * dist, cy = py0 + Math.sin(an) * dist, rr = sz * (0.7 + Math.random() * 1.2), dots = Math.round(rr * rr * 3);   // a soft dab: dense grainy middle, fading right out
+            const cx = px0 + Math.cos(an) * dist, cy = py0 + Math.sin(an) * dist, rr = sz * (0.6 + Math.random() * 1), dots = Math.max(3, Math.round(rr * rr * 3));   // a soft dab: dense grainy middle, fading right out
             for (let k = 0; k < dots; k++) {
               const r = rr * Math.abs((Math.random() + Math.random() + Math.random() - 1.5) / 1.5) * 1.6, a2 = Math.random() * 6.283, fall = Math.max(0, 1 - r / (rr * 1.7));
               bgc.globalAlpha = (0.08 + Math.random() * 0.3) * fall * fall; bgc.fillRect(cx + Math.cos(a2) * r, cy + Math.sin(a2) * r, px * (0.6 + Math.random() * 0.9), px * (0.6 + Math.random() * 0.9));
@@ -530,7 +534,8 @@
     // just two eyes and a smile, in a thick round brush, at a tilt over the text (no face outline, not stretched to the sentence)
     const sz = Math.min(tb.height * 1.55, tb.width * 0.42), tilt = R1(0.18, 0.32) * (Math.random() < 0.5 ? -1 : 1), co = Math.cos(tilt), si = Math.sin(tilt);
     const F = (u, v) => P(cx + (u * co - v * si) * sz, cy + (u * si + v * co) * sz);
-    const S = (pts, ww, sp) => ({ c, rim: RIM[c], exact: true, w: ww, speed: sp * r, path: curve(pts) });   // round brush: no taper, no flick
+    const aim = Math.random() * 6.283;   // the can is held at an angle, so its colour flares out on one side
+    const S = (pts, ww, sp) => ({ c, rim: RIM[c], exact: true, w: ww, speed: sp * r, path: curve(pts), aim: aim + R1(-0.5, 0.5), af: R1(0.006, 0.016), ap: Math.random() * 6.283 });   // round brush: no taper, no flick
     const W2 = Math.min(th * 0.25, sz * r * 0.2);   // a thick round brush, but the features still stand apart
     const eyeL = [F(-0.3, -0.4), F(-0.29, -0.2)], eyeR = [F(0.3, -0.4), F(0.31, -0.2)];
     const smileP = [F(-0.55, 0.1), F(-0.3, 0.42), F(0.02, 0.52), F(0.33, 0.4), F(0.56, 0.08)];
