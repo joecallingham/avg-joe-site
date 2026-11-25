@@ -40,21 +40,62 @@
   const open = (on, from) => {
     if (on === isOpen) return;
     isOpen = on; if (on) size();
+    let wasIn = false;
     if (!on) {   // drop the keyboard first, and let the notch fall on the same curve as the form, so they stay joined
-      if (panel.contains(document.activeElement)) document.activeElement.blur();
+      wasIn = panel.contains(document.activeElement); if (wasIn) document.activeElement.blur();
       root.classList.add('bk-shut'); clearTimeout(open.t); open.t = setTimeout(() => root.classList.remove('bk-shut'), 800);
     }
     root.classList.toggle('bk-on', on); panel.setAttribute('aria-hidden', String(!on)); veil.classList.toggle('open', on);
     document.querySelectorAll('.nb[data-k="studio"]').forEach(b => b.setAttribute('aria-expanded', String(on)));
     dispatchEvent(new CustomEvent('avgbook', { detail: on }));
     if (on) { opener = from || document.activeElement; setTimeout(() => isOpen && inputs[0].focus({ preventScroll: true }), 700); }
-    else opener?.focus?.({ preventScroll: true });
+    else if (wasIn) opener?.focus?.({ preventScroll: true });   // only hand focus back if they were in the form (no ring after a tap or swipe)
   };
   $('.bk-x', panel).addEventListener('click', () => open(false));
   veil.addEventListener('click', () => open(false));
   addEventListener('keydown', e => { if (e.key === 'Escape' && isOpen) open(false); });
   addEventListener('resize', size);
   (document.fonts?.ready || Promise.resolve()).then(size);
+
+  /* ---------- thumb control: drag the notch up to open, down to close; it follows the finger, then a flick or past halfway decides ---------- */
+  const nav = $('#nav'), bar = $('#frame-bottom');
+  if (nav) {
+    let d0 = 0, y0 = 0, H = 0, d = 0, dragging = false, down = false, hist = [], eat = false;
+    const rubber = (x, lim) => x < 0 ? -rubberband(-x) : x > lim ? lim + rubberband(x - lim) : x;
+    const rubberband = o => (o * 200 * 0.55) / (200 + 0.55 * o);
+    const place = () => {
+      nav.style.transform = `translate(-50%,${-d}px)`; if (bar) bar.style.transform = `translateY(${-d}px)`;
+      panel.style.transform = `translateY(${Math.max(0, H - d)}px)`; veil.style.opacity = Math.max(0, Math.min(1, d / H));
+    };
+    nav.addEventListener('pointerdown', e => {
+      if (e.button) return; down = true; dragging = false; y0 = e.clientY; hist = [[e.timeStamp, e.clientY]];
+    });
+    addEventListener('pointermove', e => {
+      if (!down) return;
+      const dy = y0 - e.clientY;
+      if (!dragging) {
+        if (Math.abs(dy) < 8) return;
+        dragging = true; size(); H = panel.offsetHeight; d0 = isOpen ? H : 0;
+        root.classList.add('bk-drag'); panel.style.visibility = 'visible';
+      }
+      hist.push([e.timeStamp, e.clientY]); if (hist.length > 12) hist.shift();
+      d = rubber(d0 + dy, H); place(); e.preventDefault();
+    }, { passive: false });
+    const up = e => {
+      if (!down) return; down = false;
+      if (!dragging) return;
+      dragging = false; eat = true; setTimeout(() => { eat = false; }, 50);
+      const b = hist[hist.length - 1], a = hist.find(h => h[0] >= b[0] - 100) || b, dt = b[0] - a[0];
+      const v = dt > 0 && e.timeStamp - b[0] < 100 ? (a[1] - b[1]) / dt * 1000 : 0;   // px/s over the last tenth of a second, upward positive
+      const proj = d + (v / 1000) * 0.99 / (1 - 0.99);                   // where the flick would carry it (snappy deceleration)
+      const want = proj > H / 2;
+      root.classList.remove('bk-drag');
+      if (want !== isOpen) open(want, nav.querySelector('.nb[data-k="studio"]'));
+      [nav, bar, panel].forEach(x => x && (x.style.transform = '')); panel.style.visibility = ''; veil.style.opacity = '';
+    };
+    addEventListener('pointerup', up); addEventListener('pointercancel', up);
+    nav.addEventListener('click', e => { if (eat) { e.preventDefault(); e.stopImmediatePropagation(); } }, true);   // a drag isn't a tap
+  }
 
   /* ---------- sending ---------- */
   const isEmail = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);

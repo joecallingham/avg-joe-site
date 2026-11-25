@@ -423,6 +423,8 @@ html.intro-dark .nb-ic{color:rgba(241,238,231,.5)}
 html.bk-on #frame-bottom{transform:translateY(calc(-1 * var(--bk-h,0px)))}
 html.bk-on #nav{transform:translate(-50%,calc(-1 * var(--bk-h,0px)))}
 html.bk-on #nav,html.bk-shut #nav{transition:transform .7s cubic-bezier(.22,1,.36,1)}
+#nav{touch-action:none}   /* the notch is a thumb handle: drag it up for the form, down to put it away */
+html.bk-drag #nav,html.bk-drag #frame-bottom,html.bk-drag .bk,html.bk-drag .bk-veil{transition:none!important}
 /* the form: its own dark strip right across the screen, under the lid */
 .bk{position:fixed;left:0;right:0;bottom:0;z-index:48;background:var(--notch-bg);color:var(--ink);max-height:80vh;max-height:80svh;overflow:auto;overscroll-behavior:contain;
   transform:translateY(100%);visibility:hidden;transition:transform .7s cubic-bezier(.22,1,.36,1),visibility 0s .7s}
