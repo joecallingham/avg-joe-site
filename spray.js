@@ -20,6 +20,18 @@
     else { const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); load(); } }, { rootMargin: '150% 0px' }); [...new Set(lazy)].forEach(el => el && io.observe(el)); }
   }
 
+  /* the footer: one sprayed doodle, picked at random each visit, between Extra and Ordinary */
+  const fm = document.querySelector('.foot-mark'), fa = fm && fm.querySelector('.fm-avg'), fj = fm && fm.querySelector('.fm-joe');
+  if (fa && fj) {
+    const im = document.createElement('img'); im.className = 'foot-draw'; im.alt = ''; im.setAttribute('aria-hidden', 'true'); im.loading = 'lazy'; im.decoding = 'async';
+    im.src = '/img/spray/ft-' + (Math.random() * 18 | 0) + '.webp'; fm.appendChild(im);
+    const place = () => {   /* from the layout, so it holds while the footer slides in */
+      const l = fa.offsetLeft + fa.offsetWidth, gap = Math.max(fj.offsetLeft - l, 0), w = Math.max(gap * 1.2, fm.clientWidth * 0.26), h = w * 0.625;
+      im.style.width = w + 'px'; im.style.height = h + 'px'; im.style.left = (l + gap / 2 - w / 2) + 'px'; im.style.top = (fa.offsetTop + fa.offsetHeight * 0.5 - h / 2) + 'px';
+    };
+    place(); addEventListener('resize', place); if (document.fonts) document.fonts.ready.then(place);
+  }
+
   /* odd bits of photography get a sprayed mark off one corner: a few at random each visit, the 620 picture always in lime */
   const imgs = [...document.querySelectorAll('img')].filter(img => {
     if (img.closest('.logo, #intro, .wc-slot, .wd-pic, header, nav') || img.classList.contains('spray') || /swallow|portrait|cow|mushroom/.test(img.src)) return false;

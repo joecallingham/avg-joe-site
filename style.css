@@ -576,6 +576,9 @@ canvas.spray{position:absolute;inset:0;display:block;width:100%;height:100%}
 .photo-spray{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;z-index:1}
 #wheel-bg.sprayed{background:url(/img/spray/wheel-d.webp) center/cover no-repeat}
 @media (max-width:760px){#wheel-bg.sprayed{background-image:url(/img/spray/wheel-m.webp)}}
+/* the footer's sprayed doodle sits between the two words, over the rule if it reaches */
+.foot-mark{position:relative}
+.foot-draw{position:absolute;pointer-events:none;z-index:2;object-fit:contain}
 img.spray{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .wheel-air{position:absolute;inset:0;width:100%;height:100%}
 /* no shadow on the notch or the bar */
