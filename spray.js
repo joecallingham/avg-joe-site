@@ -332,11 +332,52 @@
     const svg = craft.querySelector('svg.hv-pat'), cv = document.createElement('canvas'); cv.className = 'hv-spray'; cv.setAttribute('aria-hidden', 'true');
     if (svg) { svg.after(cv); svg.classList.add('sprayed'); onPick(craft, () => setTimeout(() => overSvg(svg, cv, CRAFT, null, !ANIM), ANIM ? 150 : 0)); }
   }
-  // AI: a flared airbrush glow, navy pinched into a wide green flare (Joe's reference), still
+  // AI: full bleed, two airbrushed gradients overlapping (navy into green, magenta into orange), each with a couple of small
+  // hotter glows in it, after Joe's references. Still.
+  function aiGlow(cv) {
+    const px = cv.clientWidth * cv.clientHeight, sc = Math.min(Math.min(devicePixelRatio || 1, 1.5), Math.sqrt(2.6e6 / Math.max(1, px)));
+    const W = cv.width = Math.max(2, Math.round(cv.clientWidth * sc)), H = cv.height = Math.max(2, Math.round(cv.clientHeight * sc));
+    const g = cv.getContext('2d'), img = g.createImageData(W, H), d = img.data, R1 = (a, b) => a + Math.random() * (b - a), U = Math.max(W, H);
+    const ss = (a, b, t) => { t = Math.min(1, Math.max(0, (t - a) / (b - a))); return t * t * (3 - 2 * t); };
+    const form = (x, y, s, a, r = R1(0.55, 1)) => { const t = Math.random() * 3.14; return { x, y, sx: s, sy: s * r, c: Math.cos(t), sn: Math.sin(t), a }; };
+    const groups = [
+      { core: '#ff5a10', rim: '#ffb48c', heat: '#ff3d1f', x: R1(0.22, 0.34), y: R1(0.22, 0.38), pinch: true },
+      { core: '#f77fa0', rim: '#ffd3de', heat: '#ff5c8a', x: R1(0.66, 0.8), y: R1(0.62, 0.8) },
+    ].map(G => {
+      const s0 = U * R1(0.13, 0.17), cx = G.x * W, cy = G.y * H, forms = [], heats = [];
+      if (G.pinch) { const a = R1(0.75, 1.05), dd = s0 * 1.9; forms.push(form(cx - Math.cos(a) * dd / 2, cy - Math.sin(a) * dd / 2, s0 * 0.85, 1), form(cx + Math.cos(a) * dd / 2, cy + Math.sin(a) * dd / 2, s0 * 0.8, 1)); }
+      else { forms.push(form(cx, cy, s0, 1)); for (let k = 0; k < 2; k++) { const a = Math.random() * 6.283; forms.push(form(cx + Math.cos(a) * s0 * 1.4, cy + Math.sin(a) * s0 * 1.4, s0 * R1(0.45, 0.65), 0.85)); } }
+      forms.forEach(f => { if (heats.length < 2) heats.push(form(f.x + R1(-0.35, 0.35) * f.sx, f.y + R1(-0.35, 0.35) * f.sy, f.sx * R1(0.5, 0.75), 1, R1(0.7, 1))); });
+      return { core: rgb(G.core), rim: rgb(G.rim), heat: rgb(G.heat), forms, heats, f: new Float32Array(W * H), F: new Float32Array(W * H), h: new Float32Array(W * H), m1: 0, m2: 0, m3: 0 };
+    });
+    const wa = U * R1(0.03, 0.06), f1 = R1(2, 4) / U, f2 = R1(2, 4) / U, p1 = Math.random() * 6, p2 = Math.random() * 6;
+    const field = (o, X, Y, div) => { const dx = X - o.x, dy = Y - o.y, rx = dx * o.c + dy * o.sn, ry = -dx * o.sn + dy * o.c; return o.a * Math.exp(-(rx * rx / (o.sx * o.sx) + ry * ry / (o.sy * o.sy)) / div); };
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const X = x + wa * Math.sin(y * f1 + p1), Y = y + wa * Math.sin(x * f2 + p2), i = y * W + x;
+      for (const G of groups) {
+        let f = 0, F = 0, h = 0; for (const o of G.forms) { f += field(o, X, Y, 2); F += field(o, X, Y, 16); } for (const o of G.heats) h += field(o, X, Y, 3);
+        G.f[i] = f; G.F[i] = F; G.h[i] = h; if (f > G.m1) G.m1 = f; if (F > G.m2) G.m2 = F; if (h > G.m3) G.m3 = h;
+      }
+    }
+    for (let i = 0, j = 0; i < W * H; i++, j += 4) {
+      const n = Math.random(); let A = 0, R = 0, Gc = 0, B = 0;
+      for (let gi = groups.length - 1; gi >= 0; gi--) {   // the second gradient under the first
+        const G = groups[gi], t = G.f[i] / G.m1, T = G.F[i] / G.m2, hh = ss(0.1, 1, G.h[i] / G.m3) * 0.25;   // a soft, low-key heat
+        let a = Math.max(Math.pow(ss(0, 0.95, T + (n - 0.5) * 0.08), 1.3) * 0.8, ss(0.05, 0.6, t) * 0.92);   // soft and a little see-through, like the first gradient
+        const m = ss(0.08, 0.95, t + (n - 0.5) * 0.05);
+        let r = G.rim[0] + (G.core[0] - G.rim[0]) * m, gg = G.rim[1] + (G.core[1] - G.rim[1]) * m, b = G.rim[2] + (G.core[2] - G.rim[2]) * m;
+        r += (G.heat[0] - r) * hh; gg += (G.heat[1] - gg) * hh; b += (G.heat[2] - b) * hh;   // the hotter glow inside it
+        const na = a + A * (1 - a); if (na > 0) { R = (r * a + R * A * (1 - a)) / na; Gc = (gg * a + Gc * A * (1 - a)) / na; B = (b * a + B * A * (1 - a)) / na; } A = na;
+      }
+      const sh = 0.94 + n * 0.12;
+      d[j] = R * sh; d[j + 1] = Gc * sh; d[j + 2] = B * sh; d[j + 3] = A * 255;
+    }
+    g.putImageData(img, 0, 0);
+  }
   const aiPat = document.querySelector('.hv-half[data-k=ai] .hv-grad');
   if (aiPat) {
     const cv = document.createElement('canvas'); cv.className = 'hv-air'; cv.setAttribute('aria-hidden', 'true'); aiPat.appendChild(cv); aiPat.classList.add('sprayed');
-    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); glow(cv, { pair: ['#2a2276', '#3fd13a'], pinch: true, fill: 0.36, still: true }); } }, { rootMargin: '60% 0px' });
+    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); aiGlow(cv); } }, { rootMargin: '60% 0px' });
     io.observe(aiPat);
   }
 
@@ -399,9 +440,15 @@
     // the forms: each stretched and tilted its own way; one large, off centre, others running into it (or two lobes pinched)
     const form = (x, y, s, a) => { const r = R1(0.55, 1), t = Math.random() * 3.14; return { x, y, sx: s, sy: s * r, c: Math.cos(t), sn: Math.sin(t), a }; };
     const cx = W * (opt.pinch ? 0.5 + R1(-0.06, 0.06) : 0.5 + R1(0.08, 0.16) * (Math.random() < 0.5 ? -1 : 1)), cy = H * (opt.pinch ? 0.4 : 0.5 + R1(-0.06, 0.08)), s0 = u * R1(0.2, 0.26), forms = [form(cx, cy, s0, 1)];
-    if (!opt.pinch && Math.random() < 0.6) { for (let k = 0, n = 2 + (Math.random() * 3 | 0); k < n; k++) { const a = Math.random() * 6.283, dd = s0 * R1(1.1, 2); forms.push(form(cx + Math.cos(a) * dd * 1.3, cy + Math.sin(a) * dd * 0.85, u * R1(0.08, 0.17), R1(0.7, 1))); } }
-    else {
-      const a = opt.pinch ? R1(0.75, 1.05) : R1(-0.9, 0.9) + Math.PI / 2, dd = s0 * R1(1.75, 2.1); forms[0].sx *= 0.85; forms[0].sy *= 0.85; /* two lobes with a pinch between them */
+    if (!opt.pinch) {
+      // a sprayed line: soft forms strung along a gentle curve, thinner at its ends, and a round form off one end
+      forms.length = 0;
+      const dir = Math.random() < 0.5 ? 1 : -1, x0 = W * R1(0.18, 0.3), x1 = W * R1(0.62, 0.78), y0 = H * (0.5 + dir * R1(0.04, 0.12)), y1 = H * (0.5 - dir * R1(0.02, 0.1)), bow = H * R1(-0.08, 0.08), N = 16;
+      for (let k = 0; k <= N; k++) { const t = k / N, tp = Math.sin(Math.PI * Math.min(1, t * 1.15 + 0.04)), x = x0 + (x1 - x0) * t, y = y0 + (y1 - y0) * t + bow * Math.sin(Math.PI * t);
+        forms.push({ x, y, sx: u * 0.075 * (0.45 + 0.55 * tp), sy: u * 0.075 * (0.45 + 0.55 * tp), c: 1, sn: 0, a: 0.55 + 0.45 * tp }); }
+      const end = Math.random() < 0.5, ex = end ? x1 : x0, ey = end ? y1 : y0, ca = Math.random() * 6.283, cd = u * R1(0.32, 0.46);
+      forms.push(form(ex + Math.cos(ca) * cd, ey + Math.sin(ca) * cd * 0.6, u * R1(0.2, 0.26), 1.15, R1(0.88, 1)));
+    } else {      const a = opt.pinch ? R1(0.75, 1.05) : R1(-0.9, 0.9) + Math.PI / 2, dd = s0 * R1(1.75, 2.1); forms[0].sx *= 0.85; forms[0].sy *= 0.85; /* two lobes with a pinch between them */
       if (opt.pinch) { forms[0].x = W * 0.5 - Math.cos(a) * dd / 2; forms[0].y = H * 0.5 - Math.sin(a) * dd / 2; }   // centred on the panel, top left to bottom right
       forms.push(form(forms[0].x + Math.cos(a) * dd, forms[0].y + Math.sin(a) * dd, s0 * R1(0.8, 1.05), 1));
     }
