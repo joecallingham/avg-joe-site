@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="page wc-page">
+<html lang="en" class="page">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -8,35 +8,62 @@
 <meta name="theme-color" content="#f1eee7">
 <link rel="stylesheet" href="/style.css?v=20261130v">
 <link rel="stylesheet" href="/work.css?v=20261130v">
-<link rel="stylesheet" href="/work/carousel.css?v=7">
 </head>
 <body>
 <div class="pt" aria-hidden="true"></div>
 
-<main class="wc" id="wc">
-  <!-- Work: the line first; its picture opens out into the first project and the rest slide in from the sides.
-       The strip bends out at the screen's edges (more while it moves), after pivenilya.com/portfolio. work-carousel.js -->
-  <h1 class="wc-say" aria-label="Where craft and AI blend."><span class="wc-w wc-w1" aria-hidden="true">Where <span class="craft" data-rot data-rot-auto>craft</span></span><span class="wc-slot" aria-hidden="true"><img src="/img/work/bison/cup.jpg" alt=""></span><span class="wc-w wc-w2" aria-hidden="true">and <span class="ai">AI</span> blend.</span></h1>
-  <div class="wc-filters" role="toolbar" aria-label="View">
-    <button type="button" class="on" data-v="grid" aria-pressed="true">Grid</button><button type="button" data-v="list" aria-pressed="false">List</button>
+<main>
+  <!-- first screen: the film is held still by CSS from the start; the cream headline block scrolls up over it, so the frame's
+       top edge rises with the headline and title; everything after slides over the film. No scroll scripts. -->
+  <div class="if-film"><span class="shot"><video data-auto data-src="/video/out-of-office.mp4" poster="/img/out-of-office.jpg" muted loop playsinline preload="auto" width="1600" height="900" aria-label="A reel of the studio's work"></video></span></div>
+  <div class="if-front">
+    <header class="info-hero grid">
+      <h1 class="rv">Where <span class="craft" data-rot data-rot-auto>craft</span> and <span class="ai">AI</span> blend. Ideas made by hand, then built to keep on working.</h1>
+    </header>
+    <div class="if-win"><h2 class="info-label"><span>Work</span></h2></div>
   </div>
-  <div class="wl" data-lenis-prevent hidden></div>
-  <div class="wc-track" aria-roledescription="carousel" aria-label="Projects">
-      <a class="wc-card" href="/work/bison/" data-cats="Branding|Packaging|Art Direction" data-name="Bison Coffee" data-ind="Speciality coffee"><span class="wc-media"><img src="/img/work/bison/cup.jpg" alt="" decoding="async"></span></a>
-      <a class="wc-card" href="/work/figtree/" data-cats="Branding|Art Direction|Motion|Website" data-name="Figtree" data-ind="Property technology"><span class="wc-media"><img src="/img/work/figtree/card.jpg" alt="" decoding="async"></span></a>
-      <div class="wc-card" data-cats="Branding|Automation|Art Direction|Photography" data-name="620 Tennis Multicamp" data-ind="Sports coaching" data-soon><span class="wc-media"><img src="/img/620-clean.jpg" alt="" decoding="async"></span></div>
-      <div class="wc-card" data-cats="Branding|Automation|Art Direction|App Build|Photography" data-name="Brewed by Boon" data-ind="Coffee" data-soon><span class="wc-media"><img src="/img/boon-sign.jpg" alt="" decoding="async" style="object-position:42% 50%"></span></div>
-      <div class="wc-card" data-cats="Tour Artwork|Campaign|Merch|Website" data-name="The Hunna" data-ind="Music" data-soon><span class="wc-media"><img src="/img/the-hunna-hero.jpg" alt="" decoding="async" style="object-position:50% 12%"></span></div>
-      <div class="wc-card" data-cats="Direction|Film &amp; Edit|Social Content" data-name="Download x Mary Wyatt" data-ind="Festival / Fashion" data-soon><span class="wc-media"><img src="/img/download-hero.jpg" alt="" decoding="async" style="object-position:50% 38%"></span></div>
-      <div class="wc-card" data-cats="Placeholder" data-name="Royal Enfield" data-ind="Motorcycles" data-soon><span class="wc-media"><canvas class="spray" data-spray="re" aria-hidden="true"></canvas></span></div>
-      <div class="wc-card" data-cats="Placeholder" data-name="Papa Salt" data-ind="" data-soon><span class="wc-media"><canvas class="spray" data-spray="ps" aria-hidden="true"></canvas></span></div>
-      <div class="wc-card" data-cats="Placeholder" data-name="Lower Than Atlantis" data-ind="Music" data-soon><span class="wc-media"><canvas class="spray" data-spray="lta" aria-hidden="true"></canvas></span></div>
+
+
+  <!-- every project: full-screen panels that stack under each other; once stacked, hovering a row opens it a little (page.js) -->
+  <div class="grid wk-list">
+    <article class="wk" data-cats="Branding|Packaging|Art Direction" data-rot-hover>
+      <a href="/work/bison/"><span class="wk-img"><img class="rv" src="/img/work/bison/cup.jpg" alt="" width="2000" height="1092"></span>
+      <p class="wk-name" data-rot>Bison Coffee</p><p class="wk-line">Bringing quality to a traditional scene</p></a>
+    </article>
+    <article class="wk soon" data-cats="Branding|Automation|Art Direction|Photography" data-rot-hover>
+      <div><span class="wk-img"><img class="rv" src="/img/620-clean.jpg" alt="" width="1800" height="1805" loading="lazy"></span>
+      <p class="wk-name" data-rot>620 Tennis Multicamp</p><p class="wk-line">More time coaching, less time promoting</p></div>
+    </article>
+    <article class="wk soon" data-cats="Branding|Automation|Art Direction|App Build|Photography" data-rot-hover>
+      <div><span class="wk-img"><img class="rv" src="/img/boon-sign.jpg" alt="" width="2200" height="1004" loading="lazy" style="object-position:42% 50%"></span>
+      <p class="wk-name" data-rot>Brewed by Boon</p><p class="wk-line">Crafted by hand, rolled out weekly by AI</p></div>
+    </article>
+    <article class="wk soon" data-cats="Tour Artwork|Campaign|Merch|Website" data-rot-hover>
+      <div><span class="wk-img"><img class="rv" src="/img/the-hunna-hero.jpg" alt="" width="1200" height="1500" loading="lazy" style="object-position:50% 12%"></span>
+      <p class="wk-name" data-rot>The Hunna</p><p class="wk-line">Back from a hiatus on their own terms</p></div>
+    </article>
+    <article class="wk soon" data-cats="Direction|Film &amp; Edit|Social Content" data-rot-hover>
+      <div><span class="wk-img"><img class="rv" src="/img/download-hero.jpg" alt="" width="1080" height="1920" loading="lazy" style="object-position:50% 38%"></span>
+      <p class="wk-name" data-rot>Download x Mary Wyatt</p><p class="wk-line">A collection, live at Download Festival</p></div>
+    </article>
+    <article class="wk soon" data-cats="Placeholder" data-rot-hover>
+      <div><span class="wk-img wk-art"><canvas class="spray" data-spray="re" aria-hidden="true"></canvas></span>
+      <p class="wk-name" data-rot>Royal Enfield</p><p class="wk-line"></p></div>
+    </article>
+    <article class="wk soon" data-cats="Placeholder" data-rot-hover>
+      <div><span class="wk-img wk-art"><canvas class="spray" data-spray="ps" aria-hidden="true"></canvas></span>
+      <p class="wk-name" data-rot>Papa Salt</p><p class="wk-line"></p></div>
+    </article>
+    <article class="wk soon" data-cats="Placeholder" data-rot-hover>
+      <div><span class="wk-img wk-art"><canvas class="spray" data-spray="lta" aria-hidden="true"></canvas></span>
+      <p class="wk-name" data-rot>Lower Than Atlantis</p><p class="wk-line"></p></div>
+    </article>
+    <article class="wk" data-cats="Branding|Art Direction|Motion|Website" data-rot-hover>
+      <a href="/work/figtree/"><span class="wk-img"><img class="rv" src="/img/work/figtree/card.jpg" alt="" width="1920" height="944" loading="lazy"></span>
+      <p class="wk-name" data-rot>Figtree</p><p class="wk-line">A warm brand for pricing software</p></a>
+    </article>
   </div>
-  <div class="wc-cap" aria-live="polite">
-    <div class="wc-reel" aria-hidden="true"></div>
-    <span class="wc-sr"></span>
-    <p class="wc-type"></p>
-  </div>
+
 </main>
 
 <footer class="foot" id="foot">
@@ -68,6 +95,5 @@
 <script src="/booking.js?v=20261130v"></script>
 <script src="/transition.js?v=20261130v"></script>
 <script src="/footer.js?v=20261130v"></script>
-<script src="/work/carousel.js?v=7"></script>
 </body>
 </html>
