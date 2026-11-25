@@ -497,7 +497,7 @@
   const lenis = new Lenis({
     // wheel and trackpad: the browser's own scrolling. Touch: Lenis drives it at its standard feel (no custom speeds),
     // so the iPhone Safari bar sliding in and out can't make it stick. Lenis also runs the glides for the buttons.
-    smoothWheel: false, syncTouch: true, syncTouchLerp: 0.06, touchInertiaExponent: 1.75, touchMultiplier: 1.35, autoRaf: false,   // touch feel Joe set on his iPhone (25 Nov)
+    smoothWheel: false, syncTouch: true, syncTouchLerp: 0.07, touchInertiaExponent: 1.7, touchMultiplier: 1.3, autoRaf: false,   // touch feel Joe set on his iPhone (25 Nov)
   });
   gsap.ticker.add(t => lenis.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
