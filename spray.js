@@ -350,18 +350,26 @@
   };
   const BRIGHT = ['#ff2f7a', '#ff6a1f', '#2f63ff', '#ff3a1a', '#c6ff4d', '#ffd23f'];
   function photo(img, cv, lime) {
+    // light touch: the paint keeps to the edges and corners and runs off them, so the picture still reads
     const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.round(cv.clientWidth * r), H = cv.height = Math.round(cv.clientHeight * r), u = Math.min(W, H);
-    const pick = a => a[Math.random() * a.length | 0], strokes = [];
-    if (lime) {   // 620: the lime shapes, sprayed
-      const L = '#d6ffa3';
-      [[0.15, 0.3, 0.2], [0.5, 0.6, 0.42], [0.82, 0.55, 0.24], [0.18, 0.85, 0.3]].forEach(([x, y, z]) => strokes.push({ c: L, rim: '#b5f06a', soft: true, w: z * u, speed: 12 * r, path: curve(spiral(x * W + (Math.random() - 0.5) * W * 0.1, y * H + (Math.random() - 0.5) * H * 0.1, z * u * 0.14)) }));
-      strokes.push({ c: L, rim: '#b5f06a', w: 0.1 * u, speed: 30 * r, drops: '#ff2f7a', path: curve(MARKS.loop(W, H)) });
-    } else {
-      const c = pick(BRIGHT), kind = pick(['loop', 'squiggle', 'smile', 'strike', 'eyes']);
-      if (kind === 'eyes') {   // two dabs and a mouth, after the Eike Koenig poster
-        strokes.push({ c, w: 0.09 * u, speed: 22 * r, path: curve([[0.38 * W, 0.24 * H], [0.385 * W, 0.42 * H]]) }, { c, w: 0.09 * u, speed: 22 * r, path: curve([[0.6 * W, 0.24 * H], [0.605 * W, 0.42 * H]]) }, { c, w: 0.09 * u, speed: 26 * r, path: curve(MARKS.smile(W, H)) });
-      } else strokes.push({ c, rim: RIM[c], w: (kind === 'strike' ? 0.08 : 0.1) * u, speed: 30 * r, drops: Math.random() < 0.5 ? pick(BRIGHT.filter(x => x !== c)) : null, path: curve(MARKS[kind](W, H)) });
-    }
+    const pick = a => a[Math.random() * a.length | 0], R1 = (a, b) => a + Math.random() * (b - a), strokes = [];
+    const c = lime ? '#d6ffa3' : pick(BRIGHT), c2 = pick(BRIGHT.filter(x => x !== c));
+    const corner = () => [Math.random() < 0.5 ? 0 : 1, Math.random() < 0.5 ? 0 : 1];
+    const sweep = () => {   // in from one edge, round the corner, out through the other
+      const [cx, cy] = corner(), X = v => (cx ? 1 - v : v) * W, Y = v => (cy ? 1 - v : v) * H;
+      strokes.push({ c, rim: RIM[c], w: u * R1(0.04, 0.07), speed: 40 * r, drops: Math.random() < 0.5 ? c2 : null,
+        path: curve([[X(-0.06), Y(R1(0.25, 0.45))], [X(R1(0.08, 0.16)), Y(R1(0.08, 0.16))], [X(R1(0.25, 0.45)), Y(-0.06)]]) });
+    };
+    const puff = () => { const [cx, cy] = corner(); strokes.push({ c, rim: RIM[c], soft: true, w: u * R1(0.2, 0.32), speed: 12 * r, path: curve(spiral(cx * W + R1(-0.04, 0.04) * W, cy * H + R1(-0.04, 0.04) * H, u * R1(0.03, 0.05))) }); };
+    const splats = () => {   // a few small splats flicked along one edge
+      const side = Math.random() * 4 | 0, n = 3 + (Math.random() * 6 | 0), t0 = R1(0.1, 0.7), col = Math.random() < 0.6 ? c : c2;
+      for (let k = 0; k < n; k++) {
+        const t = t0 + R1(0, 0.25), d = R1(0, 0.08), x = side === 0 ? t * W : side === 1 ? W - d * W : side === 2 ? t * W : d * W, y = side === 0 ? d * H : side === 1 ? t * H : side === 2 ? H - d * H : t * H;
+        strokes.push({ c: col, exact: true, w: u * R1(0.008, 0.03), speed: 99, path: [[x, y], [x + 1, y + 1], [x + 2, y + 1]] });
+      }
+    };
+    const kinds = [sweep, puff, splats]; kinds.sort(() => Math.random() - 0.5);
+    kinds[0](); if (Math.random() < 0.55) kinds[1]();
     run(cv, W, H, null, strokes, 140, null, true);   // on photography the paint is simply there
   }
   const imgs = [...document.querySelectorAll('img')].filter(img => {
@@ -371,7 +379,7 @@
   });
   imgs.forEach(img => {
     const lime = /620-clean/.test(img.src);
-    if (!lime && Math.random() > 0.22) return;
+    if (!lime && Math.random() > 0.28) return;
     const cv = document.createElement('canvas'); cv.className = 'photo-spray'; cv.setAttribute('aria-hidden', 'true'); img.after(cv);
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && cv.clientWidth > 60) { io.disconnect(); photo(img, cv, lime); } }), { rootMargin: '60% 0px' });   // painted just before it scrolls in
     io.observe(cv);
