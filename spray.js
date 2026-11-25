@@ -113,6 +113,7 @@
       for (let i = 0; i < d.length; i += 4) { const v = (Math.random() - 0.5) * 26; d[i] += v; d[i + 1] += v; d[i + 2] += v; }
       bgc.putImageData(im, 0, 0);
     }
+    const tint = document.createElement('canvas'); tint.width = W; tint.height = H; const tg = tint.getContext('2d', { willReadFrequently: true });   // the colour each part of a travelling stroke was sprayed in
     const halo = document.createElement('canvas'); halo.width = W; halo.height = H; const hg = halo.getContext('2d', { willReadFrequently: true });   // where the paint blooms into a lighter tint off its edge
     const dens = document.createElement('canvas'); dens.width = W; dens.height = H; const dg = dens.getContext('2d', { willReadFrequently: true });
     const lay = document.createElement('canvas'); lay.width = W; lay.height = H; const lg = lay.getContext('2d');
@@ -124,6 +125,7 @@
     const ink = (s, x0, y0, x1, y1) => {
       x0 = Math.max(0, x0 | 0); y0 = Math.max(0, y0 | 0); x1 = Math.min(W, Math.ceil(x1)); y1 = Math.min(H, Math.ceil(y1));
       const w = x1 - x0, h = y1 - y0; if (w <= 0 || h <= 0) return;
+      const td = s.ramp ? tg.getImageData(x0, y0, w, h).data : null, mid = s.midRgb;
       const dd = dg.getImageData(x0, y0, w, h).data, hd = hg.getImageData(x0, y0, w, h).data, out = lg.createImageData(w, h), o = out.data, [r, gg, b] = s.rgb, rim = s.rimRgb;
       const tn = s.rgb.map(v => v + (255 - v) * 0.5);   // the lighter tint of the same colour
       for (let yy = 0; yy < h; yy++) for (let xx = 0; xx < w; xx++) {
@@ -143,8 +145,13 @@
         if (a <= 0 && ha <= 0) continue;
         const sh = s.brush ? 1 : 0.9 + n * 0.2;
         let cr = r, cg = gg, cb = b;
+        if (td && td[i + 3]) { const k = 255 / td[i + 3]; cr = td[i] * k; cg = td[i + 1] * k; cb = td[i + 2] * k; }   // its colour at this point along the stroke
         const J = Math.random() - 0.5;   // colours meet as interleaved dots, not a smooth blend (as real spray does)
-        if (rim) { const t = Math.min(1, Math.max(0, Math.min(1, dv * (s.soft ? 1.25 : 1.6)) ** 1.6 + J * 0.75)); cr = rim[0] + (r - rim[0]) * t; cg = rim[1] + (gg - rim[1]) * t; cb = rim[2] + (b - rim[2]) * t; }
+        if (mid) {   // a soft form that shades from its core, through a ring of a second colour, out to its rim (after Erlich)
+          const t = Math.min(1, Math.max(0, Math.min(1, dv * 1.25) + J * 0.6)), m2 = t > 0.5 ? (t - 0.5) * 2 : 0, m1 = t > 0.5 ? 1 : t * 2;
+          const er = rim || tn; cr = er[0] + (mid[0] - er[0]) * m1; cg = er[1] + (mid[1] - er[1]) * m1; cb = er[2] + (mid[2] - er[2]) * m1;
+          cr += (r - cr) * m2; cg += (gg - cg) * m2; cb += (b - cb) * m2;
+        } else if (rim && !td) { const t = Math.min(1, Math.max(0, Math.min(1, dv * (s.soft ? 1.25 : 1.6)) ** 1.6 + J * 0.75)); cr = rim[0] + (r - rim[0]) * t; cg = rim[1] + (gg - rim[1]) * t; cb = rim[2] + (b - rim[2]) * t; }
         if (!s.brush && !s.solid) { const pale = Math.max(0, (1 - pv) * 0.28 + J * 0.25), hot = rim ? Math.max(0, pv - 0.55 + J * 0.3) * 0.5 : 0;   // paler where it thins, towards the rim colour where it is hot
           cr += (tn[0] - cr) * pale; cg += (tn[1] - cg) * pale; cb += (tn[2] - cb) * pale;
           if (hot) { cr += (rim[0] - cr) * hot; cg += (rim[1] - cg) * hot; cb += (rim[2] - cb) * hot; } }
@@ -156,7 +163,7 @@
     };
     const step = () => {
       const s = strokes[si]; if (!s) return done && done();
-      if (!s.rgb) { s.rgb = rgb(s.c); if (s.rim) s.rimRgb = rgb(s.rim); if (!s.soft && !s.exact) s.path = human(s.path, s.w * FAT); }
+      if (!s.rgb) { s.rgb = rgb(s.c); if (s.rim) s.rimRgb = rgb(s.rim); if (s.mid) s.midRgb = rgb(s.mid); if (s.ramp) s.rampRgb = s.ramp.map(rgb); if (!s.soft && !s.exact) s.path = human(s.path, s.w * FAT); }
       const n = s.path.length, u = at / n, ease = 0.3 + 2.2 * u * u;   // each pass starts slow and finishes quick, like a confident hand
       const adv = Q ? n : Math.max(3, Math.round(s.speed * ease * (0.6 + 0.8 * sp(at))));
       let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
@@ -165,6 +172,11 @@
         const R = s.w * FAT * 0.5 * (s.brush || s.taper ? Math.max(0.12, Math.min(1, (n - at) / (n * 0.4), 0.7 + at / (n * 0.3))) : 0.8 + 0.45 * (1 - p));   // a brush stroke lands blunt and flicks off to a point
         dg.globalAlpha = s.soft ? Math.min(0.6, (1 - Math.pow(0.04, 3 / n)) * (0.7 + 0.5 * p)) : Math.min(0.5, (1 - Math.pow(0.08, 3 / R)) * (0.4 + p) * 1.05);
         dg.drawImage(PUFF, x - R, y - R, 2 * R, 2 * R);   // (an airbrushed form builds to a full core over its few turns)
+        if (s.rampRgb) {   // colour that travels along the stroke: lay this point's colour where the paint lands
+          const rr = s.rampRgb, seg = Math.min(0.9999, at / n) * (rr.length - 1), i0 = seg | 0, fr = seg - i0, ca = rr[i0], cb2 = rr[i0 + 1];
+          tg.globalAlpha = 0.5; tg.fillStyle = 'rgb(' + (ca[0] + (cb2[0] - ca[0]) * fr | 0) + ',' + (ca[1] + (cb2[1] - ca[1]) * fr | 0) + ',' + (ca[2] + (cb2[2] - ca[2]) * fr | 0) + ')';
+          tg.beginPath(); tg.arc(x, y, R * 2.2, 0, 6.283); tg.fill();
+        }
         const B = R * (2 + 0.8 * p); if (!s.brush) { dg.globalAlpha = Math.min(0.08, (1 - Math.pow(0.6, 3 / B)) * (0.3 + p)); dg.drawImage(PUFF, x - B, y - B, 2 * B, 2 * B); }   // the wider mist round the nozzle; build to the same body
         if (!s.brush && Math.random() < 0.12) {   // stray spits of paint, some well clear of the line
           dg.globalAlpha = 0.1 + Math.random() * 0.25; const a = Math.random() * 6.283, d = R * (0.8 + Math.random() * Math.random() * 3.5), rr = R * (0.08 + Math.random() * 0.3);
@@ -180,7 +192,7 @@
       }
       ink(s, x0, y0, x1, y1); show();
       if (at >= n - 1) {   // this pass is done: fix it into the base and start the next on a clean density layer
-        bgc.drawImage(lay, 0, 0); lg.clearRect(0, 0, W, H); dg.clearRect(0, 0, W, H); hg.clearRect(0, 0, W, H); dg.globalAlpha = 1;
+        bgc.drawImage(lay, 0, 0); lg.clearRect(0, 0, W, H); dg.clearRect(0, 0, W, H); hg.clearRect(0, 0, W, H); tg.clearRect(0, 0, W, H); dg.globalAlpha = 1;
         if (s.drops) {   // a few flecks of a second colour flicked off the can: soft, grainy, fading out at their edges
           bgc.fillStyle = s.drops; const nd = 2 + (Math.random() * 5 | 0), sz = Math.max(3, s.w / 22), px = Math.max(1, Math.min(devicePixelRatio || 1, 1.5));
           for (let d = 0; d < nd; d++) {
@@ -273,11 +285,13 @@
     for (let j = 0; j < n; j++) { const side = (j % 2 ? -1 : 1) * amp * (0.5 + Math.random()); tag.push([tx - Math.sin(a) * side, ty + Math.cos(a) * side]); tx += Math.cos(a) * step; ty += Math.sin(a) * step; }
     strokes.push({ c: art.tag || '#f1eee7', w: (16 + Math.random() * 14) * k, speed: 60 * r, path: curve(tag.map(map)) });
     // after the references: sometimes a soft airbrushed form behind, the main pass shifting colour at its edge, droplets
-    const c0 = art[0][0];
+    const c0 = art[0][0], NEXT = { '#ffd23f': '#ff8a00', '#f6c9de': '#ff7ab0', '#1f2a4d': '#3a2cff', '#2b6a3e': '#18c95a', '#ff7a2b': '#ff2f55', '#ff3a1a': '#e01fb0', '#1f3fd1': '#7a2cff' };
+    const RING = ['#7a2cff', '#00b7c7', '#ffd400', '#ff2d55', '#18c95a'];
+    if (NEXT[c0] && Math.random() < 0.75) { const main = strokes.find(t => t.c === c0 && !t.soft); if (main) main.ramp = [c0, NEXT[c0], c0]; }
     if (RIM[c0] && Math.random() < 0.7) strokes[0].rim = RIM[c0];
     if (Math.random() < 0.6) strokes[0].drops = ['#1f2a4d', '#ff2f7a', '#f1eee7', '#1f3fd1'].filter(c => c !== c0)[Math.random() * 3 | 0];
     if (Math.random() < 0.85) { const b = blob(c0, 200 + Math.random() * 600, 200 + Math.random() * 600, 380 + Math.random() * 200);
-      strokes.unshift({ ...b, w: b.w * k, speed: 14 * r, path: curve(b.pts.map(map)) }); }
+      strokes.unshift({ ...b, mid: RING.filter(x => x !== c0)[Math.random() * 4 | 0], w: b.w * k, speed: 14 * r, path: curve(b.pts.map(map)) }); }
     run(cv, W, H, null, strokes, 160, done && (() => done({ url: cv.toDataURL('image/png'), x: (box.left - m.e) / m.a, y: (box.top - m.f) / m.d, w: box.width / m.a, h: box.height / m.d })), instant);
     return true;
   };
@@ -368,7 +382,7 @@
       if (G.pinch) { const a = R1(0.75, 1.05), dd = s0 * 1.9; forms.push(form(cx - Math.cos(a) * dd / 2, cy - Math.sin(a) * dd / 2, s0 * 0.85, 1), form(cx + Math.cos(a) * dd / 2, cy + Math.sin(a) * dd / 2, s0 * 0.8, 1)); }
       else { forms.push(form(cx, cy, s0, 1)); for (let k = 0; k < 2; k++) { const a = Math.random() * 6.283; forms.push(form(cx + Math.cos(a) * s0 * 1.4, cy + Math.sin(a) * s0 * 1.4, s0 * R1(0.45, 0.65), 0.85)); } }
       forms.forEach(f => { if (heats.length < 2) heats.push(form(f.x + R1(-0.35, 0.35) * f.sx, f.y + R1(-0.35, 0.35) * f.sy, f.sx * R1(0.5, 0.75), 1, R1(0.7, 1))); });
-      return { core: rgb(G.core), rim: rgb(G.rim), heat: rgb(G.heat), forms, heats, f: new Float32Array(W * H), F: new Float32Array(W * H), h: new Float32Array(W * H), m1: 0, m2: 0, m3: 0 };
+      return { core: rgb(G.core), rim: rgb(G.rim), heat: rgb(G.heat), mid: G.mid ? rgb(G.mid) : null, forms, heats, f: new Float32Array(W * H), F: new Float32Array(W * H), h: new Float32Array(W * H), m1: 0, m2: 0, m3: 0 };
     });
     const wa = U * R1(0.05, 0.09), f1 = R1(2, 4) / U, f2 = R1(2, 4) / U, f3 = R1(5, 8) / U, p1 = Math.random() * 6, p2 = Math.random() * 6;
     // the outline is lumpy and flares further in some directions than others (wide), the core edge a little uneven too
@@ -401,7 +415,11 @@
         const G = groups[gi], pv = P[i], t = G.f[i] / G.m1 * (0.7 + 0.6 * pv), T = G.F[i] / G.m2 * (0.75 + 0.5 * pv), hh = Math.min(0.75, ss(0.1, 1, G.h[i] / G.m3) * 0.5 + ss(0.55, 0.95, pv) * 0.3 * ss(0.2, 0.7, t));   // a soft, low-key heat
         let a = Math.max(Math.pow(ss(0, 0.95, T + (n - 0.5) * 0.08), 1.3) * 0.8, ss(0.05, 0.6, t) * 0.92);   // soft and a little see-through, like the first gradient
         const J = Math.random() - 0.5, m = Math.min(1, Math.max(0, ss(0.08, 0.95, t) + J * 0.55));   // colours meet as interleaved dots
-        let r = G.rim[0] + (G.core[0] - G.rim[0]) * m, gg = G.rim[1] + (G.core[1] - G.rim[1]) * m, b = G.rim[2] + (G.core[2] - G.rim[2]) * m;
+        let r, gg, b;
+        if (G.mid) { const a1 = m < 0.5 ? m * 2 : 1, a2 = m > 0.5 ? (m - 0.5) * 2 : 0;   // rim, then a ring of a third colour, then the core
+          r = G.rim[0] + (G.mid[0] - G.rim[0]) * a1; gg = G.rim[1] + (G.mid[1] - G.rim[1]) * a1; b = G.rim[2] + (G.mid[2] - G.rim[2]) * a1;
+          r += (G.core[0] - r) * a2; gg += (G.core[1] - gg) * a2; b += (G.core[2] - b) * a2; }
+        else { r = G.rim[0] + (G.core[0] - G.rim[0]) * m; gg = G.rim[1] + (G.core[1] - G.rim[1]) * m; b = G.rim[2] + (G.core[2] - G.rim[2]) * m; }
         const hd = Math.min(1, Math.max(0, hh * (0.4 + Math.random() * 1.2)));
         r += (G.heat[0] - r) * hd; gg += (G.heat[1] - gg) * hd; b += (G.heat[2] - b) * hd;   // the hotter glow inside it, dotted in
         const na = a + A * (1 - a); if (na > 0) { R = (r * a + R * A * (1 - a)) / na; Gc = (gg * a + Gc * A * (1 - a)) / na; B = (b * a + B * A * (1 - a)) / na; } A = na;
@@ -417,7 +435,7 @@
   const wheelBg = document.getElementById('wheel-bg');
   if (wheelBg) {
     const cv = document.createElement('canvas'); cv.className = 'wheel-air'; cv.setAttribute('aria-hidden', 'true'); wheelBg.appendChild(cv); wheelBg.classList.add('sprayed');
-    const paint = () => aiGlow(cv, [{ core: '#7fb4d4', rim: '#d3e6ec', heat: '#a8d2ea', x: 0.02, y: 0.45 }, { core: '#f5e3d6', rim: '#f8eee7', heat: '#f2d6c4', x: 0.52, y: 1.06 }], 0.55, 1.9);
+    const paint = () => aiGlow(cv, [{ core: '#7fb4d4', mid: '#c4bdea', rim: '#d3e6ec', heat: '#a8d2ea', x: 0.02, y: 0.45 }, { core: '#f5e3d6', mid: '#f6d0dd', rim: '#f8eee7', heat: '#f2d6c4', x: 0.52, y: 1.06 }], 0.55, 1.9);
     (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(() => later(paint), 300));
   }
   const aiPat = document.querySelector('.hv-half[data-k=ai] .hv-grad');
@@ -480,12 +498,13 @@
     const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.round(box.width * r), H = cv.height = Math.round(box.height * r);
     const P = (x, y) => [(x - box.left) * r, (y - box.top) * r], R1 = (a, b) => a + Math.random() * (b - a);
     const cx = tb.left + tb.width / 2, cy = tb.top + tb.height / 2, rx = Math.min(tb.width * 0.5, box.width * 0.44), ry = Math.min(tb.height * 0.95, box.height * 0.42), th = tb.height * r;
-    const c = ['#2f63ff', '#ff2f7a', '#ff6a1f'][Math.random() * 3 | 0], w = th * R1(0.13, 0.16);
+    const ramps = [['#1f5bff', '#7a2cff', '#ff2f7a'], ['#ff6a1f', '#ff2f7a', '#7a2cff'], ['#0f8a3a', '#1f3dff', '#8a1fff'], ['#ff2f7a', '#ff8a00', '#ffd400']];
+    const ramp = ramps[Math.random() * ramps.length | 0], c = ramp[0], w = th * R1(0.13, 0.16);   // the colour travels along each stroke (after Erlich)
     const ring = [], a0 = R1(-2.2, -1.6);   // the face, a hand-drawn loop that overlaps itself a little
     for (let t = 0; t <= 6.283 + 0.45; t += 0.2) { const k = 1 + 0.05 * Math.sin(t * 2 + a0); ring.push(P(cx + Math.cos(t + a0) * rx * k, cy + Math.sin(t + a0) * ry * k)); }
     const eye = sx => [P(cx + sx * rx * 0.3, cy - ry * 0.42), P(cx + sx * rx * 0.31, cy - ry * 0.18)];
     const grin = [P(cx - rx * 0.52, cy + ry * 0.12), P(cx - rx * 0.22, cy + ry * 0.52), P(cx + rx * 0.2, cy + ry * 0.55), P(cx + rx * 0.5, cy + ry * 0.1)];
-    const S = (pts, ww, sp) => ({ c, rim: RIM[c], exact: true, w: ww, speed: sp * r, path: curve(pts) });   // round brush: no taper, no flick
+    const S = (pts, ww, sp) => ({ c, ramp, exact: true, w: ww, speed: sp * r, path: curve(pts) });   // round brush: no taper, no flick
     const eyes = [S(eye(-1), w * 1.5, 12), S(eye(1), w * 1.5, 12)], g2 = S(grin, w * 1.2, 30); eyes.forEach(e => e.solid = true); g2.solid = true;   // the eyes and smile denser, so they read through the type
     run(cv, W, H, null, [S(ring, w, 44), ...eyes, g2], 160);
   }
