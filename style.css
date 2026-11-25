@@ -416,44 +416,41 @@ html.intro-dark .nb-ic{color:rgba(241,238,231,.5)}
 @media (max-width:760px){.nb-ic{width:2.6rem;height:2.6rem}.nb-ic svg{width:1.5rem;height:1.5rem}}
 
 /* ---------- Book a call: a sheet from the bottom, in the site's ruled style ---------- */
-.bk-veil{position:fixed;inset:0;z-index:47;background:rgba(11,11,11,.3);opacity:0;pointer-events:none;transition:opacity .45s}
+.bk-veil{position:fixed;inset:0;z-index:46;background:rgba(11,11,11,.25);opacity:0;pointer-events:none;transition:opacity .6s}
 .bk-veil.open{opacity:1;pointer-events:auto}
-/* the notch grown into the panel: one cream shape (booking.js), under the nav so its buttons stay on top */
-.bk-shape{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:48;pointer-events:none;display:none;overflow:visible}
-.bk-on .bk-shape{display:block}
-html.bk-on .notch-fill path{fill:var(--notch-bg)}
-html.bk-on .notch-fill{filter:none!important}
-html.bk-on #frame-bottom{background:var(--notch-bg)}   /* during the dark intro the notch turns cream to join the panel */
-.bk-shape path{fill:var(--notch-bg);pointer-events:auto}
-@media (min-width:761px){.bk-shape{filter:drop-shadow(0 -2px 14px rgba(11,11,11,.08))}}
-/* the form: sits in the shape, arrives once it has opened */
-.bk{position:fixed;left:0;top:0;z-index:51;color:var(--ink);overflow:auto;overscroll-behavior:contain;opacity:0;visibility:hidden;transform:translateY(.8rem);
-  transition:opacity .2s,transform .2s,visibility 0s .2s}
-.bk.show{opacity:1;visibility:visible;transform:none;transition:opacity .45s cubic-bezier(.33,1,.68,1),transform .55s cubic-bezier(.33,1,.68,1),visibility 0s}
-.bk-head{display:flex;justify-content:space-between;align-items:baseline;padding:1.4rem 1.6rem 0}
-.bk-tag{font-weight:500;font-size:var(--small);letter-spacing:-.02em}
-.bk-x{appearance:none;border:0;background:none;font:inherit;font-size:var(--small);color:var(--ink);cursor:pointer;text-decoration:underline;text-underline-offset:.2em}
-.bk-body,.bk-done{padding:2.4rem 1.6rem 1.6rem}
-.bk-big{font-weight:500;font-size:var(--fs-head);line-height:1.04;letter-spacing:-.055em;margin:0 0 var(--in)}
-/* the sentence: blanks sit in the line, underlined, and grow with what's typed */
-.bk-say{font-size:var(--fs-body);font-weight:500;line-height:1.3;letter-spacing:-.04em;max-width:22em;margin:0}
+/* the lid: the notch and the bottom bar ride up by the form's height (--bk-h, set by booking.js) */
+#frame-bottom{transition:transform .7s cubic-bezier(.22,1,.36,1)}
+html.bk-on #frame-bottom{transform:translateY(calc(-1 * var(--bk-h,0px)))}
+html.bk-on #nav{transform:translate(-50%,calc(-1 * var(--bk-h,0px)));transition-timing-function:cubic-bezier(.22,1,.36,1);transition-duration:.7s}
+/* the form: its own dark strip right across the screen, under the lid */
+.bk{position:fixed;left:0;right:0;bottom:0;z-index:48;background:var(--ink);color:var(--cream);max-height:80vh;max-height:80svh;overflow:auto;overscroll-behavior:contain;
+  transform:translateY(100%);visibility:hidden;transition:transform .7s cubic-bezier(.22,1,.36,1),visibility 0s .7s}
+html.bk-on .bk{transform:none;visibility:visible;transition:transform .7s cubic-bezier(.22,1,.36,1),visibility 0s}
+.bk-x{position:absolute;right:var(--margin);top:calc(var(--margin) + .4rem);appearance:none;border:0;background:none;font:inherit;font-size:var(--small);color:var(--cream);cursor:pointer;text-decoration:underline;text-underline-offset:.2em;z-index:1}
+.bk-body,.bk-done{display:grid;grid-template-columns:repeat(12,1fr);column-gap:var(--gutter);padding:calc(var(--margin) + 2.2rem) var(--margin) calc(var(--margin) + 1rem)}
+.bk-body[hidden],.bk-done[hidden]{display:none}
+.bk-big{grid-column:1/5;font-weight:500;font-size:var(--fs-head);line-height:1.04;letter-spacing:-.055em;margin:0}
+.bk-form,.bk-done-txt{grid-column:5/13}
+.bk-done-txt{font-size:var(--fs-body);font-weight:500;line-height:1.3;letter-spacing:-.04em;margin:0;align-self:start}
+.bk-say{font-size:var(--fs-body);font-weight:500;line-height:1.3;letter-spacing:-.04em;margin:0}
 .bk-in{display:inline}
 .bk-in input,.bk-meas{font:inherit;letter-spacing:inherit}
-.bk-in input{display:inline-block;min-width:3em;max-width:100%;border:0;border-bottom:2px solid currentColor;border-radius:0;background:none;color:var(--ink);padding:0;margin:0;line-height:1.1;vertical-align:baseline;transition:border-color .2s}
-.bk-in input::placeholder{color:rgba(11,11,11,.3)}
-.bk-in input:focus{outline:none;border-bottom-color:var(--ink);background:rgba(11,11,11,.05)}
-.bk-in input.bad{border-bottom-color:#b3261e}
+.bk-in input{display:inline-block;min-width:3em;max-width:100%;border:0;border-bottom:2px solid currentColor;border-radius:0;background:none;color:var(--cream);padding:0;margin:0;line-height:1.1;vertical-align:baseline;transition:border-color .2s}
+.bk-in input::placeholder{color:rgba(241,238,231,.32)}
+.bk-in input:focus{outline:none;background:rgba(241,238,231,.08)}
+.bk-in input.bad{border-bottom-color:#ff7a6b}
 .bk-meas{position:absolute;visibility:hidden;white-space:pre;left:-9999px;top:0;font-size:var(--fs-body);font-weight:500;letter-spacing:-.04em}
 .bk-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .bk-hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
-.bk-err{min-height:1.3em;font-size:var(--small);color:#b3261e;margin:var(--in) 0 .4rem}
+.bk-foot{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin-top:2.4rem}
+.bk-err{order:2;font-size:var(--small);color:#ff7a6b;margin:0}
 /* Send: plain words, no box */
-.bk-go{appearance:none;border:0;background:none;padding:0;font:inherit;font-size:var(--fs-body);font-weight:500;letter-spacing:-.04em;color:var(--ink);cursor:pointer;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.15em}
+.bk-go{appearance:none;border:0;background:none;padding:0;font:inherit;font-size:var(--fs-body);font-weight:500;letter-spacing:-.04em;color:var(--cream);cursor:pointer;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.15em}
 .bk-go:hover{text-decoration-color:transparent}
-.bk-go:disabled{color:rgba(11,11,11,.45);cursor:default}
-.bk-done-txt{font-size:var(--fs-sm);line-height:1.3;max-width:32em}
-.bk-go:focus-visible,.bk-x:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-@media (max-width:760px){.bk-say,.bk-go,.bk-meas{font-size:var(--fs-title)}}
+.bk-go:disabled{color:rgba(241,238,231,.45);cursor:default}
+.bk-go:focus-visible,.bk-x:focus-visible{outline:2px solid var(--cream);outline-offset:3px}
+@media (max-width:760px){.bk-say,.bk-go,.bk-meas,.bk-done-txt{font-size:var(--fs-title)}.bk-big,.bk-form,.bk-done-txt{grid-column:1/-1}.bk-big{margin-bottom:1.6rem}.bk-body,.bk-done{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.bk,html.bk-on .bk,#frame-bottom,html.bk-on #nav{transition-duration:0s}}
 
 /* ---------- moving between pages: everything blurs out, the next page blurs back into focus (transition.js) ----------
    A full-screen layer carries a real blur of what's under it. Its strength shows by fading the layer in and out
