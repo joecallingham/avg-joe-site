@@ -1076,7 +1076,7 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 .if-film{position:sticky;top:0;z-index:0;height:100vh;height:100svh;margin-bottom:-100vh;margin-bottom:-100svh;padding:0 var(--frame) var(--frame);pointer-events:none}
 .if-film .shot{display:block;position:relative;height:100%;overflow:hidden;border-radius:.25rem;background:#d9d4c8}
 .if-film video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none;display:block}
-.if-front{position:relative;z-index:1;display:flex;flex-direction:column;height:100vh;height:100svh}
+.if-front{position:relative;z-index:1;display:flex;flex-direction:column;height:100vh;height:100lvh}   /* lvh: the film window always reaches the bar, whatever the browser bars do */
 .if-front .info-hero{flex:0 0 auto;background:var(--cream);padding-bottom:calc(var(--s1) * 1.8)}
 .if-win{flex:1 1 auto;margin:0 var(--frame)}
 .if-win .info-label{position:static;transform:none}
@@ -1084,7 +1084,7 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 .if-front ~ .wk-list{background:transparent}
 @media (max-width:760px){
   .if-film{top:3.4rem;height:calc(100vh - 3.4rem);height:calc(100svh - 3.4rem);margin-bottom:calc(-100vh + 3.4rem);margin-bottom:calc(-100svh + 3.4rem)}
-  .if-front{height:calc(100vh - 3.4rem);height:calc(100svh - 3.4rem)}
+  .if-front{height:calc(100vh - 3.4rem);height:calc(100lvh - 3.4rem)}
 }
 
 /* the last picture in each stack fills to the foot of the (small) screen, set in CSS so it never resizes as a phone's browser bar moves */
