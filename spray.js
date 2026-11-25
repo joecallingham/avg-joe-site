@@ -142,10 +142,8 @@
         if (dv) {
           if (s.brush) { const t = dv + (rough[(y0 + yy) * W + x0 + xx] - 0.5) * 0.5 + (n - 0.5) * 0.04; a = t > 0.44 ? 1 : t > 0.4 ? (t - 0.4) / 0.04 : 0; }   // dry brush: flat paint with a hard, ragged edge
           else if (s.soft) { a = (dv * 1.1 - n * 0.2) * 1.2; if (a > 0.97) a = 0.97; }   // airbrush: a smooth soft form with fine grain, no hard core
-          else {   // grains, not tints: every grain is full colour, and the fade is in how many there are (sparse at the edge, closing up to solid in the middle)
-            const cover = Math.max(Math.min(1, dv * (s.solid ? 2 : 1.35)) ** 1.15, Math.max(0, dv - 0.02) * 0.5);
-            a = cover > n ? Math.min(1, (cover - n) * 14) : 0;
-          }
+          else { a = (dv * (s.solid ? 1.9 : 1.25) - n * 0.62) * 2.4; if (a > 1) a = 1;
+            const mist = (dv - n * 0.32) * 0.42; if (mist > a) a = mist; }   // the blowout: thin paint carried wide of the line
           if (a < 0) a = 0;
         }
         const pv = s.brush || s.solid ? 0.5 : patchAt(x0 + xx, y0 + yy);
@@ -165,7 +163,6 @@
         if (!s.brush && !s.solid) { const pale = Math.max(0, (1 - pv) * 0.28 + J * 0.25), hot = rim ? Math.max(0, pv - 0.55 + J * 0.3) * 0.5 : 0;   // paler where it thins, towards the rim colour where it is hot
           cr += (tn[0] - cr) * pale; cg += (tn[1] - cg) * pale; cb += (tn[2] - cb) * pale;
           if (hot) { cr += (rim[0] - cr) * hot; cg += (rim[1] - cg) * hot; cb += (rim[2] - cb) * hot; } }
-        if (!s.soft && !s.brush) { const deep = 0.3 * Math.max(0, Math.min(1, (dv - 0.45) / 0.55 + J * 0.25)); cr *= 1 - deep; cg *= 1 - deep * 1.15; cb *= 1 - deep * 0.9; }   // the paint is deeper and darker towards the middle of the line
         const A = a + ha * (1 - a), wa = Math.min(1, Math.max(0, a / A + J * 0.5)), wh = 1 - wa;   // the paint over its lighter bloom, mixed through dots
         let fr = cr * wa + tn[0] * wh, fg = cg * wa + tn[1] * wh, fb = cb * wa + tn[2] * wh;
         const pa = pd[i + 3] / 255;
