@@ -471,15 +471,14 @@
     const form = (x, y, s, a) => { const r = R1(0.55, 1), t = Math.random() * 3.14; return { x, y, sx: s, sy: s * r, c: Math.cos(t), sn: Math.sin(t), a,
       h: [R1(0.2, 0.45), Math.random() * 6.28, R1(0.12, 0.3), Math.random() * 6.28, R1(0.04, 0.1), Math.random() * 6.28] }; };
     const cx = W * (opt.pinch ? 0.5 + R1(-0.06, 0.06) : 0.5 + R1(0.08, 0.16) * (Math.random() < 0.5 ? -1 : 1)), cy = H * (opt.pinch ? 0.4 : 0.5 + R1(-0.06, 0.08)), s0 = u * R1(0.2, 0.26), forms = [form(cx, cy, s0, 1)];
-    let sprayLine = null;
     if (!opt.pinch) {
       // a sprayed line: soft forms strung along a gentle curve, thinner at its ends, and a round form off one end
       forms.length = 0;
-      const dir = Math.random() < 0.5 ? 1 : -1, x0 = W * R1(0.18, 0.3), x1 = W * R1(0.62, 0.78), y0 = H * (0.5 + dir * R1(0.04, 0.12)), y1 = H * (0.5 - dir * R1(0.02, 0.1)), bow = H * R1(-0.08, 0.08), N = 16;
-      const pts = []; for (let k = 0; k <= 6; k++) { const t = k / 6; pts.push([x0 + (x1 - x0) * t + R1(-0.02, 0.02) * W, y0 + (y1 - y0) * t + bow * Math.sin(Math.PI * t) + R1(-0.02, 0.02) * H]); }
-      sprayLine = { taper: true, c: opt.lineC, rim: opt.lineRim, w: u * R1(0.1, 0.14), speed: 99, path: curve(pts) };
-      const end = Math.random() < 0.5, ex = end ? x1 : x0, ey = end ? y1 : y0, ca = Math.random() * 6.283, cd = u * R1(0.32, 0.46);
-      forms.push(form(ex + Math.cos(ca) * cd, ey + Math.sin(ca) * cd * 0.6, u * R1(0.2, 0.26), 1.15, R1(0.88, 1)));
+      const dir = Math.random() < 0.5 ? 1 : -1, x0 = W * R1(0.04, 0.14), x1 = W * R1(0.86, 0.96), y0 = H * (0.5 + dir * R1(0.04, 0.12)), y1 = H * (0.5 - dir * R1(0.02, 0.1)), bow = H * R1(-0.07, 0.07);
+      // one smooth line in the heat-glow style: soft forms strung along a gentle curve, fullest in the middle, tapering at both ends
+      for (let k = 0, N = 22; k <= N; k++) { const t = k / N, tp = Math.sin(Math.PI * t) ** 0.7, x = x0 + (x1 - x0) * t, y = y0 + (y1 - y0) * t + bow * Math.sin(Math.PI * t);
+        forms.push({ x, y, sx: u * 0.11 * (0.35 + 0.65 * tp), sy: u * 0.11 * (0.35 + 0.65 * tp), c: 1, sn: 0, a: 0.5 + 0.5 * tp,
+          h: [R1(0.15, 0.35), Math.random() * 6.28, R1(0.1, 0.25), Math.random() * 6.28, R1(0.03, 0.08), Math.random() * 6.28] }); }
     } else {      const a = opt.pinch ? R1(0.75, 1.05) : R1(-0.9, 0.9) + Math.PI / 2, dd = s0 * R1(1.75, 2.1); forms[0].sx *= 0.85; forms[0].sy *= 0.85; /* two lobes with a pinch between them */
       if (opt.pinch) { forms[0].x = W * 0.5 - Math.cos(a) * dd / 2; forms[0].y = H * 0.5 - Math.sin(a) * dd / 2; }   // centred on the panel, top left to bottom right
       forms.push(form(forms[0].x + Math.cos(a) * dd, forms[0].y + Math.sin(a) * dd, s0 * R1(0.8, 1.05), 1));
@@ -496,15 +495,15 @@
       const X = x + wa * Math.sin(y * f1 + p1) + wa * 0.35 * Math.sin(y * f3 + p2), Y = y + wa * Math.sin(x * f2 + p2) + wa * 0.35 * Math.sin(x * f3 + p1); let f = 0, F = 0; P[y * W + x] = patch(x, y);
       for (const o of forms) { const dx = X - o.x, dy = Y - o.y, rx = dx * o.c + dy * o.sn, ry = -dx * o.sn + dy * o.c, q = rx * rx / (o.sx * o.sx) + ry * ry / (o.sy * o.sy), th = Math.atan2(ry, rx), h = o.h || [0.25, 0, 0.15, 1, 0.06, 2];
         const kw = 1 + h[0] * Math.sin(2 * th + h[1]) + h[2] * Math.sin(3 * th + h[3]), kc = 1 + h[4] * Math.sin(3 * th + h[5]) + h[4] * 0.6 * Math.sin(5 * th + h[1]);   /* flares unevenly; the core edge lumpy */
-        f += o.a * Math.exp(-q / (2 * kc * kc)); F += o.a * Math.exp(-q / (13 * kw * kw)); /* the rim flare: very wide */ }
+        f += o.a * Math.exp(-q / (2 * kc * kc)); F += o.a * Math.exp(-q / ((opt.bleed ? 60 : 13) * kw * kw)); /* the rim flare: very wide (wider still when it fills the section) */ }
       const i = y * W + x; core2[i] = f; wide[i] = F; if (f > m1) m1 = f; if (F > m2) m2 = F;
     }
     const ss = (a, b, t) => { t = Math.min(1, Math.max(0, (t - a) / (b - a))); return t * t * (3 - 2 * t); };
     const draw = k => {   // k: how far it has built up, 0 to 1
       for (let i = 0, j = 0; i < core2.length; i++, j += 4) {
         const pv = P[i], t = core2[i] / m1 * (0.3 + 0.7 * k) * (0.7 + 0.6 * pv), T = wide[i] / m2 * (0.3 + 0.7 * k) * (0.75 + 0.5 * pv), n = grain[i];   /* patchy, not one flat colour */
-        const ex = (i % W) / W, ey = (i / W | 0) / H, edge = ss(0, 0.14, Math.min(ex, 1 - ex, ey, 1 - ey));   // fades out before the canvas's edge, so it is never cut
-        const a = Math.max(Math.pow(ss(0, 0.9, T + (n - 0.5) * 0.1), 1.4) * 0.93, ss(0.05, 0.45, t)) * k * edge;   // fading out very gradually over a long way   // the rim colour flares out wide; the core sits inside it
+        const ex = (i % W) / W, ey = (i / W | 0) / H, edge = opt.bleed ? 1 : ss(0, 0.14, Math.min(ex, 1 - ex, ey, 1 - ey));   // fades out before the canvas's edge, so it is never cut
+        const a = Math.max(Math.pow(ss(0, 0.9, T + (n - 0.5) * 0.1), opt.bleed ? 1.1 : 1.4) * 0.93, ss(0.05, 0.45, t), opt.bleed ? 0.16 + (n - 0.5) * 0.04 : 0) * k * edge;   /* full bleed: a faint tint reaches every edge */   // fading out very gradually over a long way   // the rim colour flares out wide; the core sits inside it
         if (a <= 0.004) { d[j + 3] = 0; continue; }
         const m = ss(0.25, 0.9, t + (n - 0.5) * 0.05), sh = 0.93 + n * 0.14;
         d[j] = (rim[0] + (core[0] - rim[0]) * m) * sh; d[j + 1] = (rim[1] + (core[1] - rim[1]) * m) * sh; d[j + 2] = (rim[2] + (core[2] - rim[2]) * m) * sh; d[j + 3] = Math.min(1, a) * 255;
@@ -512,14 +511,9 @@
       g.putImageData(img, 0, 0);
     };
     draw(1);   // drawn once; the build-up is a fade and grow in CSS
-    if (sprayLine) {   // the line itself is a spray-can stroke, over the glow
-      sprayLine.c = sprayLine.c || '#' + core.map(v => v.toString(16).padStart(2, '0')).join(''); sprayLine.rim = sprayLine.rim || '#' + rim.map(v => v.toString(16).padStart(2, '0')).join('');
-      const off = document.createElement('canvas'); off.width = W; off.height = H;
-      run(off, W, H, null, [sprayLine], 0, () => g.drawImage(off, 0, 0), true);
-    }
     requestAnimationFrame(() => cv.classList.add('on'));
   }
-  watch('canvas.ca-glow', glow, 400);
+  watch('canvas.ca-glow', cv => glow(cv, { bleed: true, fill: 0.5 }), 400);
 
   watch('canvas.spray', picture, 0, ANIM ? null : '60% 0px');
 })();
