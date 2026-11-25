@@ -175,11 +175,15 @@
       ink(s, x0, y0, x1, y1); show();
       if (at >= n - 1) {   // this pass is done: fix it into the base and start the next on a clean density layer
         bgc.drawImage(lay, 0, 0); lg.clearRect(0, 0, W, H); dg.clearRect(0, 0, W, H); hg.clearRect(0, 0, W, H); dg.globalAlpha = 1;
-        if (s.drops) {   // a few hard droplets of a second colour, flicked off the can
-          bgc.fillStyle = s.drops; const nd = 8 + (Math.random() * 18 | 0), sz = Math.max(1.2, s.w / 60);
+        if (s.drops) {   // a few flecks of a second colour flicked off the can: soft, grainy, fading out at their edges
+          bgc.fillStyle = s.drops; const nd = 2 + (Math.random() * 5 | 0), sz = Math.max(3, s.w / 22), px = Math.max(1, Math.min(devicePixelRatio || 1, 1.5));
           for (let d = 0; d < nd; d++) {
-            const [px, py] = s.path[Math.random() * s.path.length | 0], an = Math.random() * 6.283, dist = s.w * (0.2 + Math.random() * 1.4);
-            bgc.globalAlpha = 0.6 + Math.random() * 0.4; bgc.beginPath(); bgc.arc(px + Math.cos(an) * dist, py + Math.sin(an) * dist, sz * (0.5 + Math.random() * 1.8), 0, 6.283); bgc.fill();
+            const [px0, py0] = s.path[Math.random() * s.path.length | 0], an = Math.random() * 6.283, dist = s.w * (0.2 + Math.random() * 1.4);
+            const cx = px0 + Math.cos(an) * dist, cy = py0 + Math.sin(an) * dist, rr = sz * (0.7 + Math.random() * 1.2), dots = Math.round(rr * rr * 3);   // a soft dab: dense grainy middle, fading right out
+            for (let k = 0; k < dots; k++) {
+              const r = rr * Math.abs((Math.random() + Math.random() + Math.random() - 1.5) / 1.5) * 1.6, a2 = Math.random() * 6.283, fall = Math.max(0, 1 - r / (rr * 1.7));
+              bgc.globalAlpha = (0.08 + Math.random() * 0.3) * fall * fall; bgc.fillRect(cx + Math.cos(a2) * r, cy + Math.sin(a2) * r, px * (0.6 + Math.random() * 0.9), px * (0.6 + Math.random() * 0.9));
+            }
           }
           bgc.globalAlpha = 1; show();
         }
