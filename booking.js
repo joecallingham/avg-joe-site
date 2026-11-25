@@ -7,7 +7,7 @@
   const el = (tag, cls) => { const n = document.createElement(tag); if (cls) n.className = cls; return n; };
 
   const veil = el('div', 'bk-veil');
-  const panel = el('div', 'bk'); panel.id = 'book'; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-modal', 'true'); panel.setAttribute('aria-labelledby', 'bk-title'); panel.setAttribute('aria-hidden', 'true'); panel.dataset.lenisPrevent = '';
+  const panel = el('div', 'bk'); panel.id = 'book'; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-modal', 'true'); panel.setAttribute('aria-label', 'Book a call'); panel.setAttribute('aria-hidden', 'true'); panel.dataset.lenisPrevent = '';
   const FORM = `<form class="bk-form" novalidate>
         <p class="bk-say">Hi Joe, my name is <label class="bk-in"><span class="bk-sr">Your name</span><input name="name" autocomplete="name" required maxlength="100" placeholder="your name"></label>.
           I'm free <label class="bk-in"><span class="bk-sr">When you're free</span><input name="when" required maxlength="120" placeholder="Tuesday afternoon"></label>,
@@ -18,7 +18,6 @@
   panel.innerHTML = `
     <button type="button" class="bk-x">Close</button>
     <div class="bk-body">
-      <h2 class="bk-big" id="bk-title">Let's talk.</h2>
       ${FORM}
     </div>
     <div class="bk-done" hidden>

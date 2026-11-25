@@ -433,7 +433,8 @@ html.bk-on .bk{transform:none;visibility:visible;transition:transform .7s cubic-
 .bk-body,.bk-done{display:grid;grid-template-columns:repeat(12,1fr);column-gap:var(--gutter);padding:calc(var(--margin) + 2.2rem) var(--margin) calc(var(--margin) + 1rem)}
 .bk-body[hidden],.bk-done[hidden]{display:none}
 .bk-big{grid-column:1/5;font-weight:500;font-size:var(--fs-head);line-height:1.04;letter-spacing:-.055em;margin:0}
-.bk-form,.bk-done-txt{grid-column:5/13}
+.bk-form{grid-column:1/11}
+.bk-done-txt{grid-column:5/13}
 .bk-done-txt{font-size:var(--fs-body);font-weight:500;line-height:1.3;letter-spacing:-.04em;margin:0;align-self:start}
 .bk-say{font-size:var(--fs-body);font-weight:500;line-height:1.3;letter-spacing:-.04em;margin:0}
 .bk-in{display:inline}
@@ -452,14 +453,10 @@ html.bk-on .bk{transform:none;visibility:visible;transition:transform .7s cubic-
 .bk-go:hover{text-decoration-color:transparent}
 .bk-go:disabled{color:rgba(11,11,11,.45);cursor:default}
 .bk-go:focus-visible,.bk-x:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-/* the same form on the home page, under the case studies, on a bold orange */
-.bk-home{position:relative;background:#ff5a1f;color:var(--ink);margin:0;min-height:70vh;min-height:70svh;display:flex;flex-direction:column;justify-content:center}
-.bk-home .bk-body,.bk-home .bk-done{padding:var(--s4) var(--margin) calc(var(--s4) + var(--frame))}
-.bk-home .bk-big{font-size:var(--fs-display);line-height:.98}
-.bk-home .bk-in input::placeholder{color:rgba(11,11,11,.42)}
-.bk-home .bk-in input:focus{background:rgba(255,255,255,.18)}
-.bk-home .bk-in input.bad{border-bottom-color:#fff}
-.bk-home .bk-err{color:var(--ink)}
+/* the same form on the home page, under the case studies, on white */
+.bk-home{position:relative;background:#fff;color:var(--ink)}
+.bk-home .bk-body,.bk-home .bk-done{padding:var(--s3) var(--margin) calc(var(--s3) + 56px)}   /* the bottom clears the notch */
+.bk-home .bk-in input:focus{background:rgba(11,11,11,.04)}
 @media (max-width:760px){.bk-say,.bk-go,.bk-meas,.bk-done-txt{font-size:var(--fs-title)}.bk-big,.bk-form,.bk-done-txt{grid-column:1/-1}.bk-big{margin-bottom:1.6rem}.bk-body,.bk-done{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){.bk,html.bk-on .bk,#frame-bottom,html.bk-on #nav{transition-duration:0s}}
 
