@@ -626,8 +626,8 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 /* the section's lines and text sit above the travelling image while it drops */
 .wd-stick{z-index:3}
 .wd.flying .wd-rule-b{opacity:0}
-/* phones: each step panel is half graphic, half text */
-@media (max-width:760px){.wd-sec .st{grid-template-rows:1fr 1fr}}
+/* phones: each step panel is about two fifths graphic, three fifths text */
+@media (max-width:760px){.wd-sec .st{grid-template-rows:minmax(0,2fr) minmax(0,3fr)}}   /* the cream text block sits higher, over more of the picture */
 /* desktop: the step panels end exactly at the bottom of the screen (so the image lands on the same bottom edge it dropped from) */
 @media (min-width:761px){.wd-sec .st{height:calc(100vh - var(--st-js,3.5rem));height:calc(100svh - var(--st-js,3.5rem))}}
 /* desktop: the black line between each step's graphic and its text draws up from the bottom as the panel arrives (instead of just appearing) */
