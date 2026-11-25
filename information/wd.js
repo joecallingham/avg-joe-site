@@ -14,7 +14,7 @@
   const MQ = matchMedia('(max-width: 760px)'), phone = () => MQ.matches;
   const items = [...run.querySelectorAll('.wd-list li')].map(li => ({ name: li.querySelector('b').textContent, desc: li.querySelector('span').textContent }));
   const N = items.length, PER = 0.6;          // screens of scrolling per service
-  run.style.height = (100 + (N - 0.75) * PER * 100) + 'vh';   // lets go as Digital starts sliding into the blur, so its image starts to drop then
+  run.style.height = (100 + (N - 1.05) * PER * 100) + 'vh';   // lets go just before Digital settles, so its image starts to drop then
 
   const stick = run.querySelector('.wd-stick');
   const tracks = [...run.querySelectorAll('.wd-track')];
