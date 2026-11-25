@@ -652,7 +652,7 @@ html.cs-page{--page:var(--cream);--text:var(--ink)}
 @media (prefers-reduced-motion:reduce){.wd-pic .s{scale:1;transition:none}}
 /* ---- What We Do rebuild (smoother): the hand-off copy is a screen-high layer revealed by a clip and moved by transform,
    so scrolling never changes layout; the soft names use a text shadow (cheap to move) instead of a blur filter */
-.wd-fly{position:fixed;top:0;height:100vh;height:100lvh;border:0!important;will-change:clip-path}
+.wd-fly{position:absolute;left:0;top:0;height:0;border:0!important;will-change:transform}   /* anchored to the page, not the screen, so it scrolls in step with Listen's text (no lag on phones) */
 .wd-fly.on{visibility:visible}
 .wd-fly svg{position:absolute;left:0;top:0;width:100%;will-change:transform}
 .wd-fly-line{display:none}

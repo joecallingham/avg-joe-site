@@ -113,13 +113,16 @@
     flag(fly, 'on', going); flag(box, 'off', going); flag(dest, 'off', going);
     if (!going) return;
     firstStep.classList.add('in');
-    const top = Math.max(box.getBoundingClientRect().top, pin), bottom = Math.min(H, d.bottom);   // the frame: from the grey grid line (read live, so it always follows it) or the title, to Listen's text
-    put(fly, 'left', d.left + 'px');
-    put(fly, 'clipPath', `inset(${top.toFixed(1)}px 0 ${(H - bottom).toFixed(1)}px 0)`);
+    // the frame: from the grey grid line (read live, so it always follows it) or the title, down to Listen's text.
+    // It's placed in page coordinates, so its edges that follow the page (the grid line, Listen) move with the page itself.
+    const sy = scrollY, top = Math.max(box.getBoundingClientRect().top, pin), bottom = d.bottom;
+    const topD = (top + sy).toFixed(1), hD = Math.max(0, bottom - top).toFixed(1);
+    put(fly, 'transform', `translate3d(${d.left.toFixed(1)}px,${topD}px,0)`);
+    put(fly, 'height', hD + 'px');
     // phones: the pattern rides with the frame's top; desktop: it sits on the bottom edge, lower by the drift still to come
     const y = phone() ? top : H - flyH + rise * (1 - Math.max(0, Math.min(1, (H - d.top) / Math.max(1, H - pin))));
-    put(flySvg, 'transform', `translate3d(0,${y.toFixed(1)}px,0)`);
-    put(flyLine, 'transform', `translate3d(0,${(bottom - 1).toFixed(1)}px,0)`);   // phones: the divider above "01 Listen"
+    put(flySvg, 'transform', `translate3d(0,${(y - top).toFixed(1)}px,0)`);
+    put(flyLine, 'transform', `translate3d(0,${(hD - 1).toFixed(1)}px,0)`);   // phones: the divider above "01 Listen"
   };
 
   const queue = () => { if (!raf) raf = requestAnimationFrame(tick); };
