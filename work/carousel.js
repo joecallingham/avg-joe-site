@@ -7,9 +7,8 @@
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const all = $$('.wc-card', wc), track = $('.wc-track', wc), slot = $('.wc-slot', wc);
   const fil = $('.wc-filters', wc), cap = $('.wc-cap', wc), edges = $$('.wc-edge', wc);
-  const nowEl = $('.wc-now', wc), prevEl = $('.wc-prev', wc), nextEl = $('.wc-next', wc), typeEl = $('.wc-type', wc);
+  const reel = $('.wc-reel', wc), srEl = $('.wc-sr', wc), typeEl = $('.wc-type', wc), list = $('.wl', wc);
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const FILTERS = { All: /./, Branding: /Branding/, Web: /Website|App Build|Web/, Motion: /Motion|Film|Direction/ };
 
   let vis = all.slice();
   let G = {};          // layout numbers
@@ -31,8 +30,10 @@
           B0, Bmax: B0 * 2.4, R: m ? vw * 0.1 : vw * 0.06, r: Math.max(8, W * 0.03) };
     all.forEach(c => { c.style.width = G.W + 'px'; c.style.height = (G.H + 2 * G.Bmax) + 'px'; });
     const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
-    fil.style.top = (G.T - (m ? 3.2 : 3.15) * rem) + 'px';
-    cap.style.top = (G.T + G.H + (m ? 1.8 : 2.7) * rem) + 'px';
+    fil.style.top = (G.T - (m ? 4.6 : 4.5) * rem) + 'px';
+    cap.style.top = (G.T + G.H + (m ? 3 : 4) * rem) + 'px';
+    list.style.top = (G.T - (m ? 4.6 : 4.5) * rem + fil.offsetHeight + (m ? 1.6 : 1.5) * rem) + 'px';
+    measureNames();
     edges.forEach(e => { e.style.top = (G.T - G.Bmax) + 'px'; e.style.height = (G.H + 2 * G.Bmax) + 'px'; });
   }
 
@@ -61,14 +62,49 @@
     centre = c;
     const set = () => {
       const cur = vis[c];
-      nowEl.textContent = cur.dataset.name;
-      prevEl.textContent = n > 1 ? vis[(c - 1 + n) % n].dataset.name : '';
-      nextEl.textContent = n > 1 ? vis[(c + 1) % n].dataset.name : '';
-      typeEl.textContent = [cur.dataset.ind, cur.hasAttribute('data-soon') ? 'Coming soon' : 'View case study ↘'].filter(Boolean).join(' · ');
+      srEl.textContent = cur.dataset.name;
+      typeEl.textContent = [cur.dataset.ind, cur.hasAttribute('data-soon') && 'Coming soon'].filter(Boolean).join(' · ');
       cap.classList.remove('flip');
     };
     if (!opened) return set();
     cap.classList.add('flip'); clearTimeout(caption.t); caption.t = setTimeout(set, 160);
+  }
+
+  /* ---- the names: one line that slides with the strip. The one in the middle is sharp; the ones either side sit in the blur.
+     Each name's place is worked out for whole steps (packed by their real widths) and blended between them as the strip moves. ---- */
+  const names = all.map(c => { const s = document.createElement('span'); s.className = 'wc-nm'; s.textContent = c.dataset.name; reel.appendChild(s); return s; });
+  let widths = [], gapPx = 0, lay = new Map();
+  function measureNames() {
+    widths = names.map(s => s.offsetWidth); gapPx = parseFloat(getComputedStyle(reel).fontSize) * 1.1; lay.clear();
+  }
+  function layout(c) {                       // x of each visible name's centre when name c is in the middle
+    if (lay.has(c)) return lay.get(c);
+    const n = vis.length, x = new Array(n).fill(0), w = k => widths[all.indexOf(vis[k])];
+    const ci = ((c % n) + n) % n;
+    let r = w(ci) / 2, l = -w(ci) / 2;
+    for (let j = 1; j <= n / 2; j++) {
+      const kr = (ci + j) % n; x[kr] = r + gapPx + w(kr) / 2; r = x[kr] + w(kr) / 2;
+      const kl = (ci - j + n) % n; if (j < n / 2 || n % 2) { x[kl] = l - gapPx - w(kl) / 2; l = x[kl] - w(kl) / 2; }
+    }
+    lay.set(c, x); return x;
+  }
+  let stepPx = 200;
+  function names_() {
+    const n = vis.length; if (!n || !widths.length) return;
+    const fl = Math.floor(pos), f = pos - fl, A = layout(fl), Bx = layout(fl + 1), mid = reel.clientWidth / 2;
+    stepPx = Math.max(60, Math.abs(Bx[((fl % n) + n) % n] - A[((fl % n) + n) % n]) || 200);
+    all.forEach((c, i) => {
+      const s = names[i], k = vis.indexOf(c);
+      if (k < 0) { s.style.visibility = 'hidden'; return; }
+      const a = Math.abs(wrapD(k));
+      if (a > 1.9) { s.style.visibility = 'hidden'; return; }
+      const x = A[k] + (Bx[k] - A[k]) * f;
+      const op = a <= 1 ? 1 - 0.65 * a : Math.max(0, 0.35 * (1 - (a - 1) / 0.8));
+      s.style.visibility = '';
+      s.style.transform = `translate3d(${(mid + x - widths[i] / 2).toFixed(1)}px,0,0)`;
+      s.style.opacity = op.toFixed(3);
+      s.style.filter = RM ? '' : `blur(${(2.6 * Math.min(a, 1.4)).toFixed(2)}px)`;
+    });
   }
 
   let last = performance.now(), prevPos = 0;
@@ -111,6 +147,7 @@
       c.style.zIndex = Math.abs(d) < 0.5 ? 2 : 1;
     });
     if (intro >= 1 || !introT0) caption();
+    names_();
     requestAnimationFrame(frame);
   }
 
@@ -123,6 +160,7 @@
   // ---- input ----
   let wheelT = 0;
   addEventListener('wheel', e => {
+    if (listOn) return;                  // the list scrolls as a page does
     e.preventDefault();
     if (!opened) return start();
     const dlt = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
@@ -131,18 +169,21 @@
   }, { passive: false });
 
   // listen on the window rather than capturing the pointer, so a plain click still reaches the card under it
-  let dragging = false, downX = 0, downT = 0, moved = false, hist = [];
+  let dragging = false, downX = 0, downT = 0, moved = false, hist = [], per = 1, listOn = false;
   track.addEventListener('dragstart', e => e.preventDefault());     // links and pictures would otherwise start a native drag
-  track.addEventListener('pointerdown', e => {
+  const down = from => e => {
     if (!opened) { start(); return; }
-    if (e.button > 0) return;
+    if (e.button > 0 || listOn) return;
+    per = from === reel ? stepPx : G.W + G.gap;                      // the names follow the thumb as the pictures do
     dragging = true; moved = false; downX = e.clientX; downT = target = pos; hist = [[e.clientX, performance.now()]];
-  });
+  };
+  track.addEventListener('pointerdown', down(track));
+  reel.addEventListener('pointerdown', down(reel));
   addEventListener('pointermove', e => {
     if (!dragging) return;
     const dx = e.clientX - downX;
     if (Math.abs(dx) > 6) moved = true;
-    pos = target = downT - dx / (G.W + G.gap);
+    pos = target = downT - dx / per;
     hist.push([e.clientX, performance.now()]); if (hist.length > 6) hist.shift();
   });
   const up = () => {
@@ -151,7 +192,7 @@
       const [a, b] = [hist[0], hist[hist.length - 1]];
       const v = (b[0] - a[0]) / Math.max(16, b[1] - a[1]);          // px per ms
       const proj = (v * 1000 / 1000) * 0.998 / (1 - 0.998) * 0.35;   // where the flick would carry it
-      target = Math.round(pos - proj / (G.W + G.gap));
+      target = Math.round(pos - proj / per);
     } else target = Math.round(target);
   };
   addEventListener('pointerup', up); addEventListener('pointercancel', up);
@@ -162,8 +203,15 @@
     if (Math.abs(d) > 0.5) { e.preventDefault(); target = Math.round(pos + d); }
     else if (c.hasAttribute('data-soon')) e.preventDefault();
   });
+  reel.addEventListener('click', e => {
+    const s = e.target.closest('.wc-nm'); if (!s || moved || !opened) return;
+    const c = all[names.indexOf(s)], d = wrapD(vis.indexOf(c));
+    if (Math.abs(d) > 0.5) target = Math.round(pos + d);
+    else if (c.href) location.href = c.href;
+  });
   addEventListener('keydown', e => {
     if (e.target.closest && e.target.closest('input,textarea,[contenteditable]')) return;
+    if (listOn) return;
     if (!opened) { if (/Arrow|Enter| /.test(e.key)) start(); return; }
     if (e.key === 'ArrowRight') target = Math.round(target) + 1;
     if (e.key === 'ArrowLeft') target = Math.round(target) - 1;
@@ -171,22 +219,24 @@
   });
   addEventListener('touchstart', () => { if (!opened) start(); }, { passive: true });
 
+  // ---- Grid / List: the list is every project as a row, like the clients on Information ----
+  list.innerHTML = all.map((c, i) => {
+    const soon = c.hasAttribute('data-soon'), tag = soon ? 'div' : 'a', href = soon ? '' : ` href="${c.getAttribute('href')}"`;
+    return `<${tag} class="wl-row${soon ? ' soon' : ''}"${href}><span class="wl-name"><span class="wl-no">${String(i + 1).padStart(2, '0')}</span>${c.dataset.name}</span>`
+      + `<span class="wl-ind">${c.dataset.ind || ''}</span><span class="wl-more">${soon ? 'Coming soon' : '↘'}</span></${tag}>`;
+  }).join('');
   fil.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b || b.classList.contains('on')) return;
-    $$('button', fil).forEach(x => x.classList.toggle('on', x === b));
-    wc.classList.add('swap');
-    setTimeout(() => {
-      const re = FILTERS[b.dataset.f];
-      vis = all.filter(c => re.test(c.dataset.cats));
-      all.forEach(c => { c.hidden = !vis.includes(c); c.classList.remove('on'); });
-      pos = target = prevPos = 0; centre = -1; caption();
-      wc.classList.remove('swap');
-    }, 200);
+    $$('button', fil).forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', String(x === b)); });
+    listOn = b.dataset.v === 'list';
+    if (listOn) { list.hidden = false; list.scrollTop = 0; requestAnimationFrame(() => wc.classList.add('list')); }
+    else { wc.classList.remove('list'); setTimeout(() => { if (!listOn) list.hidden = true; }, 450); }
   });
 
   // ---- go ----
   measure();
   let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(measure, 80); });
+  document.fonts?.ready.then(measureNames);
   slot.style.visibility = 'hidden';                 // the first project stands in for the line's picture from here
   if (RM) wc.classList.add('open');
   requestAnimationFrame(t => { last = t; frame(t); });

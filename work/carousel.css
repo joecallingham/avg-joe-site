@@ -21,7 +21,6 @@ html.wc-page,html.wc-page body{height:100%;overflow:hidden;overscroll-behavior:n
 .wc-media{display:block;width:100%;height:100%;background:#d9d4c8}
 .wc-media img,.wc-media svg{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-user-drag:none}
 .wc-card[hidden]{display:none}
-.wc.swap .wc-track{opacity:0;transition:opacity .2s}
 .wc-track{transition:opacity .35s}
 
 /* filters above, the name below: they arrive once the strip has opened */
@@ -30,18 +29,16 @@ html.wc-page,html.wc-page body{height:100%;overflow:hidden;overscroll-behavior:n
 .wc-filters{display:flex;justify-content:center;gap:1.2rem}
 .wc-filters button{appearance:none;border:0;background:none;padding:.3rem 0;margin:0;font:inherit;font-size:.76rem;font-weight:500;letter-spacing:-.01em;color:rgba(11,11,11,.4);cursor:pointer;transition:color .25s}
 .wc-filters button:hover,.wc-filters button.on{color:var(--ink)}
-.wc-names{margin:0;display:grid;grid-template-columns:1fr auto 1fr;align-items:baseline;column-gap:.9em;font-size:1.5rem;font-weight:500;line-height:1.1;letter-spacing:-.035em}
-.wc-prev,.wc-next{color:rgba(11,11,11,.35);filter:blur(2.5px);white-space:nowrap;overflow:hidden;max-width:7em}
-.wc-prev{justify-self:end;-webkit-mask-image:linear-gradient(90deg,transparent,#000 70%);mask-image:linear-gradient(90deg,transparent,#000 70%)}
-.wc-next{justify-self:start;-webkit-mask-image:linear-gradient(270deg,transparent,#000 70%);mask-image:linear-gradient(270deg,transparent,#000 70%)}
-.wc-now{white-space:nowrap}
+.wc-reel{position:relative;height:1.15em;font-size:1.5rem;font-weight:500;line-height:1.1;letter-spacing:-.035em;cursor:grab;touch-action:none}
+.wc-nm{position:absolute;left:0;top:0;white-space:nowrap;will-change:transform,opacity,filter}
+.wc-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .wc-type{margin:.4rem 0 0;font-size:.74rem;letter-spacing:-.02em;color:rgba(11,11,11,.55);min-height:1.35em}
-.wc-names span{transition:opacity .25s}
-.wc-cap.flip .wc-names span,.wc-cap.flip .wc-type{opacity:0}
+.wc-type{transition:opacity .25s}
+.wc-cap.flip .wc-type{opacity:0}
 
 @media (max-width:760px){
   .wc-say{font-size:1.75rem}
-  .wc-names{font-size:2rem}
+  .wc-reel{font-size:2rem}
   .wc-filters{gap:1.1rem}
   .wc-filters button,.wc-type{font-size:var(--small)}
 }
@@ -59,3 +56,21 @@ html.wc-page,html.wc-page body{height:100%;overflow:hidden;overscroll-behavior:n
 .wc-edge i:nth-child(5){--b:24px;-webkit-mask-image:linear-gradient(270deg,transparent 65%,#000 85%);mask-image:linear-gradient(270deg,transparent 65%,#000 85%)}
 @media (max-width:760px){.wc-edge{width:14vw}.wc-edge i:nth-child(1),.wc-edge i:nth-child(2){display:none}}
 @media (prefers-reduced-transparency:reduce){.wc-edge{display:none}}
+
+/* Grid / List: the list is every project as a row, like the clients on Information */
+.wc-track,.wc-edge,.wc-cap{transition:opacity .4s cubic-bezier(.33,1,.68,1)}
+.wc.list .wc-track,.wc.list .wc-edge,.wc.list .wc-cap{opacity:0;pointer-events:none}
+.wl{position:absolute;left:0;right:0;bottom:calc(var(--frame) + 3.6rem);overflow:auto;overscroll-behavior:contain;touch-action:pan-y;user-select:text;-webkit-user-select:text;
+  border-top:1px solid var(--ink);opacity:0;transform:translateY(.8rem);transition:opacity .4s cubic-bezier(.33,1,.68,1),transform .4s cubic-bezier(.33,1,.68,1);scrollbar-width:none}
+.wl::-webkit-scrollbar{display:none}
+.wc.list .wl{opacity:1;transform:none}
+.wl-row{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gutter);align-items:baseline;border-bottom:1px solid var(--ink);color:var(--ink);font-size:var(--small);font-weight:500;line-height:1.35;letter-spacing:-.02em}
+.wl-row > *{padding:.9rem 0 .8rem}
+.wl-name{grid-column:1/span 5;padding-left:var(--margin)}
+.wl-no{color:#8e8b86;margin-right:.8em}
+.wl-ind{grid-column:6/span 4;color:#8e8b86}
+.wl-more{grid-column:10/span 3;text-align:right;padding-right:var(--margin)}
+.wl-row.soon .wl-more{color:#8e8b86}
+a.wl-row:hover .wl-name{text-decoration:underline;text-underline-offset:.2em}
+@media (max-width:760px){.wl{bottom:calc(var(--frame) + 4.6rem)}.wl-name{grid-column:1/span 8}.wl-ind{display:none}.wl-more{grid-column:9/span 4}}
+@media (prefers-reduced-motion:reduce){.wl,.wc-track,.wc-edge,.wc-cap{transition:none}}

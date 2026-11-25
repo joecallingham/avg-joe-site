@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#f1eee7">
 <link rel="stylesheet" href="/style.css?v=20261130a">
 <link rel="stylesheet" href="/work.css?v=20261130a">
-<link rel="stylesheet" href="/work/carousel.css?v=2">
+<link rel="stylesheet" href="/work/carousel.css?v=3">
 </head>
 <body>
 <div class="pt" aria-hidden="true"></div>
@@ -17,9 +17,10 @@
   <!-- Work: the line first; its picture opens out into the first project and the rest slide in from the sides.
        The strip bends out at the screen's edges (more while it moves), after pivenilya.com/portfolio. work-carousel.js -->
   <h1 class="wc-say" aria-label="Where craft and AI blend."><span class="wc-w wc-w1" aria-hidden="true">Where <span class="craft" data-rot data-rot-auto>craft</span></span><span class="wc-slot" aria-hidden="true"><img src="/img/work/bison/cup.jpg" alt=""></span><span class="wc-w wc-w2" aria-hidden="true">and <span class="ai">AI</span> blend.</span></h1>
-  <div class="wc-filters" role="toolbar" aria-label="Filter the work">
-    <button type="button" class="on" data-f="All">All</button><button type="button" data-f="Branding">Branding</button><button type="button" data-f="Web">Web</button><button type="button" data-f="Motion">Motion</button>
+  <div class="wc-filters" role="toolbar" aria-label="View">
+    <button type="button" class="on" data-v="grid" aria-pressed="true">Grid</button><button type="button" data-v="list" aria-pressed="false">List</button>
   </div>
+  <div class="wl" data-lenis-prevent hidden></div>
   <div class="wc-track" aria-roledescription="carousel" aria-label="Projects">
       <a class="wc-card" href="/work/bison/" data-cats="Branding|Packaging|Art Direction" data-name="Bison Coffee" data-ind="Speciality coffee"><span class="wc-media"><img src="/img/work/bison/cup.jpg" alt="" decoding="async"></span></a>
       <a class="wc-card" href="/work/figtree/" data-cats="Branding|Art Direction|Motion|Website" data-name="Figtree" data-ind="Property technology"><span class="wc-media"><img src="/img/work/figtree/card.jpg" alt="" decoding="async"></span></a>
@@ -33,7 +34,8 @@
   </div>
   <div class="wc-edge l" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><div class="wc-edge r" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
   <div class="wc-cap" aria-live="polite">
-    <p class="wc-names"><span class="wc-prev" aria-hidden="true"></span><span class="wc-now"></span><span class="wc-next" aria-hidden="true"></span></p>
+    <div class="wc-reel" aria-hidden="true"></div>
+    <span class="wc-sr"></span>
     <p class="wc-type"></p>
   </div>
 </main>
@@ -66,6 +68,6 @@
 <script src="/booking.js?v=20261130a"></script>
 <script src="/transition.js?v=20261130a"></script>
 <script src="/footer.js?v=20261130a"></script>
-<script src="/work/carousel.js?v=2"></script>
+<script src="/work/carousel.js?v=3"></script>
 </body>
 </html>
