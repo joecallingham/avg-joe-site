@@ -176,7 +176,7 @@
     };
     const step = () => {
       const s = strokes[si];
-      if (!s) {   // finished: a sparse pepper of tiny solid dots across the whole piece, in its paint colours, for depth
+      if (!s && strokes.pepper) {   // finished: on some full-colour pieces, a sparse pepper of tiny solid dots across the whole thing, for depth
         const deep = h => { const c = rgb(h); return 'rgb(' + (c[0] * 0.5 | 0) + ',' + (c[1] * 0.5 | 0) + ',' + (c[2] * 0.5 | 0) + ')'; };
         const cols = strokes.flatMap(t => [t.c, deep(t.c)]), px = Math.max(1, Math.min(devicePixelRatio || 1, 1.5)), nDots = Math.round(W * H / 6000 * (bg ? 1 : 0.5));   // half of them a deeper shade, so they read
         for (let k = 0; k < nDots; k++) {
@@ -186,6 +186,7 @@
         bgc.globalAlpha = 1; show();
         return done && done();
       }
+      if (!s) return done && done();
       if (!s.rgb) { s.rgb = rgb(s.c); if (s.rim) s.rimRgb = rgb(s.rim); if (s.mid) s.midRgb = rgb(s.mid); if (!s.soft && !s.exact) s.path = human(s.path, s.w * FAT); }
       const n = s.path.length, u = at / n, ease = 0.3 + 2.2 * u * u;   // each pass starts slow and finishes quick, like a confident hand
       const adv = Q ? n : Math.max(3, Math.round(s.speed * ease * (0.6 + 0.8 * sp(at))));
@@ -249,10 +250,12 @@
     const SY = Math.max(H, W / 1.6), k = Math.min(W, SY) / 1000;   // wide boxes crop into the middle of the piece rather than squashing it
     const map = ([x, y]) => [x / 1000 * W, H / 2 + (0.76 * y / 1000 - 0.38) * SY];
     const J = () => (Math.random() - 0.5) * 80;
-    run(cv, W, H, art.bg, art.strokes.map(s => {
+    const list = art.strokes.map(s => {
       const pts = s.soft ? spiral(s.pts.reduce((a, p) => a + p[0], 0) / s.pts.length + J(), s.pts.reduce((a, p) => a + p[1], 0) / s.pts.length + J(), s.w * 0.16) : s.pts.map(([x, y]) => [x + J(), y + J()]);
       return { ...s, w: s.w * k * (0.85 + Math.random() * 0.3), speed: (s.speed || 30) * Math.max(1, k * 1.5), path: curve(pts.map(map)) };
-    }), 220, null, !ANIM);   // painted as it is, except on Information
+    });
+    list.pepper = Math.random() < 0.7;   // most full-colour placeholders get the pepper of dots
+    run(cv, W, H, art.bg, list, 220, null, !ANIM);   // painted as it is, except on Information
   }
 
 
@@ -287,7 +290,7 @@
   // spray an art list over an SVG picture, on a canvas the same size as the SVG, in the SVG's own coordinates
   const overSvg = (svg, cv, art, done, instant, area) => {
     const box = area || cv.getBoundingClientRect(), m = svg.getScreenCTM();   // area: paint a given screen rectangle instead of the canvas's own if (!box.width || !m) return false;
-    const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.round(box.width * r), H = cv.height = Math.round(box.height * r);
+    const r = Math.min(devicePixelRatio || 1, 2)   /* full screen resolution, so the speckle at its edges is fine */, W = cv.width = Math.round(box.width * r), H = cv.height = Math.round(box.height * r);
     const vb = svg.viewBox.baseVal, vy = vb.y, vH = vb.height || 1000;
     // cropped in and tilted a different way each time, with a little wobble in the hand, so no two sit square
     const rot = (Math.random() - 0.5) * 0.5, zoom = 1.15 + Math.random() * 0.2, sxg = Math.random() < 0.5 ? -1 : 1, syg = Math.random() < 0.5 ? -1 : 1, ox = sxg * (120 + Math.random() * 90), oy = syg * (100 + Math.random() * 90);   // asymmetric: the mass sits on a thirds point, not the middle
@@ -305,6 +308,7 @@
     const n = 3 + (Math.random() * 4 | 0), a = Math.random() * 6.283, step = 40 + Math.random() * 50, amp = 30 + Math.random() * 80, tag = [];
     let tx = 500 - sxg * (230 + Math.random() * 120) - ox, ty = 500 - syg * (200 + Math.random() * 120) - oy;   // and the tag is its counterweight, in the opposite corner
     for (let j = 0; j < n; j++) { const side = (j % 2 ? -1 : 1) * amp * (0.5 + Math.random()); tag.push([tx - Math.sin(a) * side, ty + Math.cos(a) * side]); tx += Math.cos(a) * step; ty += Math.sin(a) * step; }
+    strokes.pepper = Math.random() < 0.6;   // some of these full-colour panels get the pepper of dots
     strokes.push({ c: art.tag || '#f1eee7', w: (16 + Math.random() * 14) * k, speed: 60 * r, path: curve(tag.map(map)) });
     // after the references: sometimes a soft airbrushed form behind, the main pass shifting colour at its edge, droplets
     const c0 = art[0][0];
@@ -527,7 +531,7 @@
     const sz = Math.min(tb.height * 1.55, tb.width * 0.42), tilt = R1(0.18, 0.32) * (Math.random() < 0.5 ? -1 : 1), co = Math.cos(tilt), si = Math.sin(tilt);
     const F = (u, v) => P(cx + (u * co - v * si) * sz, cy + (u * si + v * co) * sz);
     const S = (pts, ww, sp) => ({ c, rim: RIM[c], exact: true, w: ww, speed: sp * r, path: curve(pts) });   // round brush: no taper, no flick
-    const W2 = Math.min(th * 0.19, sz * r * 0.15);   // a thick round brush, but the features still stand apart
+    const W2 = Math.min(th * 0.25, sz * r * 0.2);   // a thick round brush, but the features still stand apart
     const eyeL = [F(-0.3, -0.4), F(-0.29, -0.2)], eyeR = [F(0.3, -0.4), F(0.31, -0.2)];
     const smileP = [F(-0.55, 0.1), F(-0.3, 0.42), F(0.02, 0.52), F(0.33, 0.4), F(0.56, 0.08)];
     const st = [S(eyeL, W2 * 1.1, 12), S(eyeR, W2 * 1.1, 12), S(smileP, W2, 30)]; st.forEach(t => t.solid = true);
