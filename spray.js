@@ -148,7 +148,7 @@
         }
         const pv = s.brush || s.solid ? 0.5 : patchAt(x0 + xx, y0 + yy);
         if (a > 0 && !s.brush && !s.solid) a *= 0.78 + 0.4 * pv;   // denser in some patches, thinner in others
-        let ha = (hv * 1.7 - n * 0.35) * 0.6; if (ha < 0) ha = 0; if (ha > 0.6) ha = 0.6;
+        let ha = s.aim !== undefined ? 0 : (hv * 1.7 - n * 0.35) * 0.6; if (ha < 0) ha = 0; if (ha > 0.6) ha = 0.6;   /* aimed strokes: no pale band, the flare only steers the rim */
         if (a <= 0 && ha <= 0) continue;
         const sh = s.brush ? 1 : 0.9 + n * 0.2;
         let cr = r, cg = gg, cb = b;
@@ -157,7 +157,9 @@
           const t = Math.min(1, Math.max(0, Math.min(1, dv * 1.25) + J * 0.6)), m2 = t > 0.5 ? (t - 0.5) * 2 : 0, m1 = t > 0.5 ? 1 : t * 2;
           const er = rim || tn; cr = er[0] + (mid[0] - er[0]) * m1; cg = er[1] + (mid[1] - er[1]) * m1; cb = er[2] + (mid[2] - er[2]) * m1;
           cr += (r - cr) * m2; cg += (gg - cg) * m2; cb += (b - cb) * m2;
-        } else if (rim) { let t = Math.min(1, Math.max(0, Math.min(1, dv * (s.soft ? 1.25 : 1.6)) ** 1.6 + J * 0.75)); if (s.aim !== undefined) t = 1 - (1 - t) * Math.min(1, hv * 3.2); /* the outer colour only shows where the flare landed */ cr = rim[0] + (r - rim[0]) * t; cg = rim[1] + (gg - rim[1]) * t; cb = rim[2] + (b - rim[2]) * t; }
+        } else if (rim) { let t;
+          if (s.aim !== undefined) { const fl = Math.min(1, hv * 5), t0 = Math.min(1, dv * 1.6); t = Math.min(1, Math.max(0, t0 ** (0.5 + fl * 3) + J * 0.4)); t = 1 - (1 - t) * Math.min(1, hv * 3.2); }   /* the rim thickens where the flare is strong, thins where it is weak, and is absent where there is none */
+          else t = Math.min(1, Math.max(0, Math.min(1, dv * (s.soft ? 1.25 : 1.6)) ** 1.6 + J * 0.75)); cr = rim[0] + (r - rim[0]) * t; cg = rim[1] + (gg - rim[1]) * t; cb = rim[2] + (b - rim[2]) * t; }
         if (!s.brush && !s.solid) { const pale = Math.max(0, (1 - pv) * 0.28 + J * 0.25), hot = rim ? Math.max(0, pv - 0.55 + J * 0.3) * 0.5 : 0;   // paler where it thins, towards the rim colour where it is hot
           cr += (tn[0] - cr) * pale; cg += (tn[1] - cg) * pale; cb += (tn[2] - cb) * pale;
           if (hot) { cr += (rim[0] - cr) * hot; cg += (rim[1] - cg) * hot; cb += (rim[2] - cb) * hot; } }
