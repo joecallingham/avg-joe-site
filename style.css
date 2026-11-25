@@ -452,6 +452,14 @@ html.bk-on .bk{transform:none;visibility:visible;transition:transform .7s cubic-
 .bk-go:hover{text-decoration-color:transparent}
 .bk-go:disabled{color:rgba(11,11,11,.45);cursor:default}
 .bk-go:focus-visible,.bk-x:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+/* the same form on the home page, under the case studies, on a bold orange */
+.bk-home{position:relative;background:#ff5a1f;color:var(--ink);margin:0;min-height:70vh;min-height:70svh;display:flex;flex-direction:column;justify-content:center}
+.bk-home .bk-body,.bk-home .bk-done{padding:var(--s4) var(--margin) calc(var(--s4) + var(--frame))}
+.bk-home .bk-big{font-size:var(--fs-display);line-height:.98}
+.bk-home .bk-in input::placeholder{color:rgba(11,11,11,.42)}
+.bk-home .bk-in input:focus{background:rgba(255,255,255,.18)}
+.bk-home .bk-in input.bad{border-bottom-color:#fff}
+.bk-home .bk-err{color:var(--ink)}
 @media (max-width:760px){.bk-say,.bk-go,.bk-meas,.bk-done-txt{font-size:var(--fs-title)}.bk-big,.bk-form,.bk-done-txt{grid-column:1/-1}.bk-big{margin-bottom:1.6rem}.bk-body,.bk-done{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){.bk,html.bk-on .bk,#frame-bottom,html.bk-on #nav{transition-duration:0s}}
 

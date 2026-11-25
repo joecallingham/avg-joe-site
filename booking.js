@@ -8,32 +8,37 @@
 
   const veil = el('div', 'bk-veil');
   const panel = el('div', 'bk'); panel.id = 'book'; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-modal', 'true'); panel.setAttribute('aria-labelledby', 'bk-title'); panel.setAttribute('aria-hidden', 'true'); panel.dataset.lenisPrevent = '';
-  panel.innerHTML = `
-    <button type="button" class="bk-x">Close</button>
-    <div class="bk-body">
-      <h2 class="bk-big" id="bk-title">Let's talk.</h2>
-      <form class="bk-form" novalidate>
+  const FORM = `<form class="bk-form" novalidate>
         <p class="bk-say">Hi Joe, my name is <label class="bk-in"><span class="bk-sr">Your name</span><input name="name" autocomplete="name" required maxlength="100" placeholder="your name"></label>.
           I'm free <label class="bk-in"><span class="bk-sr">When you're free</span><input name="when" required maxlength="120" placeholder="Tuesday afternoon"></label>,
           and you can reach me on <label class="bk-in"><span class="bk-sr">Email or number</span><input name="contact" autocomplete="email" required maxlength="120" placeholder="email or number"></label>.</p>
         <input class="bk-hp" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
         <div class="bk-foot"><p class="bk-err" role="alert"></p><button type="submit" class="bk-go">Send ↘</button></div>
-      </form>
+      </form>`;
+  panel.innerHTML = `
+    <button type="button" class="bk-x">Close</button>
+    <div class="bk-body">
+      <h2 class="bk-big" id="bk-title">Let's talk.</h2>
+      ${FORM}
     </div>
     <div class="bk-done" hidden>
       <h2 class="bk-big">Thanks.</h2>
       <p class="bk-done-txt"></p>
     </div>`;
   document.body.append(veil, panel);
-  const form = $('.bk-form', panel), go = $('.bk-go', panel), err = $('.bk-err', panel), root = document.documentElement;
+  const home = $('.bk-home');   // the home page's own section under the case studies
+  if (home) home.querySelector('.bk-body').insertAdjacentHTML('beforeend', FORM);
+  const root = document.documentElement;
   let opener = null, isOpen = false;
 
   // each blank grows with what's typed in it (or its placeholder)
   const meas = el('span', 'bk-meas'); panel.appendChild(meas);
-  const inputs = [...form.querySelectorAll('.bk-in input')];
-  const fit = i => { meas.textContent = i.value || i.placeholder; i.style.width = Math.ceil(meas.getBoundingClientRect().width + 1) + 'px'; };
-  const fitAll = () => inputs.forEach(fit);
-  inputs.forEach(i => i.addEventListener('input', () => { fit(i); i.classList.remove('bad'); if (!form.querySelector('.bad')) err.textContent = ''; }));
+  if (home) home.appendChild(meas.cloneNode());
+  const fit = i => { const m = i.closest('.bk, .bk-home').querySelector('.bk-meas'); m.textContent = i.value || i.placeholder; i.style.width = Math.ceil(m.getBoundingClientRect().width + 1) + 'px'; };
+  const allIn = () => document.querySelectorAll('.bk-in input');
+  const fitAll = () => allIn().forEach(fit);
+  allIn().forEach(i => i.addEventListener('input', () => { fit(i); i.classList.remove('bad'); const f = i.form; if (!f.querySelector('.bad')) f.querySelector('.bk-err').textContent = ''; }));
+  const inputs = [...panel.querySelectorAll('.bk-in input')];
 
   // the notch and the bottom bar lift by the form's height, and the form slides up under them
   const size = () => { fitAll(); root.style.setProperty('--bk-h', panel.offsetHeight + 'px'); };
@@ -102,7 +107,8 @@
   /* ---------- sending ---------- */
   const isEmail = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
   const isPhone = s => (s.match(/\d/g) || []).length >= 7 && !/[^\d\s+()-]/.test(s);
-  form.addEventListener('submit', async e => {
+  document.querySelectorAll('.bk-form').forEach(form => form.addEventListener('submit', async e => {
+    const box = form.closest('.bk, .bk-home'), go = $('.bk-go', form), err = $('.bk-err', form), inputs = [...form.querySelectorAll('.bk-in input')];
     e.preventDefault(); err.textContent = '';
     const f = new FormData(form), v = k => String(f.get(k) || '').trim();
     const name = v('name'), when = v('when'), contact = v('contact'), okC = isEmail(contact) || isPhone(contact);
@@ -119,10 +125,10 @@
       const body = `Hi Joe,\n\nMy name is ${name}. I'm free ${when}, and you can reach me on ${contact}.\n`;
       location.href = `mailto:${TO}?subject=${encodeURIComponent('Book a call: ' + name)}&body=${encodeURIComponent(body)}`;
     }
-    $('.bk-body', panel).hidden = true; const d = $('.bk-done', panel); d.hidden = false;
+    $('.bk-body', box).hidden = true; const d = $('.bk-done', box); d.hidden = false;
     $('.bk-done-txt', d).textContent = emailed ? `Joe will be in touch on ${contact} to fix a time.` : 'Your email app has opened with the details: hit send and Joe will be in touch.';
-    size();
-  });
+    size(); dispatchEvent(new Event('resize'));   // the home section changed height: let the page re-measure
+  }));
 
   window.AvgBook = { open: from => open(true, from), close: () => open(false) };
 })();
