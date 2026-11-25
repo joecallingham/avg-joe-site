@@ -7,6 +7,9 @@
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const all = $$('.wc-card', wc), track = $('.wc-track', wc), slot = $('.wc-slot', wc);
   const fil = $('.wc-filters', wc), cap = $('.wc-cap', wc), edges = $$('.wc-edge', wc);
+  const mkFrame = c => { const v = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); v.setAttribute('class', 'wc-frame ' + c); v.setAttribute('aria-hidden', 'true'); v.setAttribute('preserveAspectRatio', 'none');
+    v.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'path')); wc.appendChild(v); return v; };
+  const frT = mkFrame('t'), frB = mkFrame('b');
   const reel = $('.wc-reel', wc), srEl = $('.wc-sr', wc), typeEl = $('.wc-type', wc), list = $('.wl', wc);
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -35,6 +38,13 @@
     list.style.top = (G.T - (m ? 4.6 : 4.5) * rem + fil.offsetHeight + (m ? 1.6 : 1.5) * rem) + 'px';
     measureNames();
     edges.forEach(e => { e.style.top = (G.T - G.Bmax) + 'px'; e.style.height = (G.H + 2 * G.Bmax) + 'px'; });
+    // the two cream notches that frame the strip: flat across the middle, curving away at the screen's edges along the strip's own bend
+    const top = [], bot = [];
+    for (let x = 0; x <= vw + 0.5; x += 6) { const b = bulge(x, G.B0); top.push(x.toFixed(1) + ' ' + (G.T - b).toFixed(1)); bot.push(x.toFixed(1) + ' ' + (G.T + G.H + b).toFixed(1)); }
+    frT.setAttribute('viewBox', '0 0 ' + vw + ' ' + vh); frB.setAttribute('viewBox', '0 0 ' + vw + ' ' + vh);
+    frT.firstChild.setAttribute('d', 'M0 -40 L' + vw + ' -40 L' + top.slice().reverse().join(' L') + ' Z');
+    frB.firstChild.setAttribute('d', 'M0 ' + (vh + 40) + ' L' + vw + ' ' + (vh + 40) + ' L' + bot.slice().reverse().join(' L') + ' Z');
+    frame.eF = -1;
   }
 
   // how far the strip's top (and bottom) edge bends out at screen x: flat in the middle, a quarter-ellipse into each edge
@@ -111,18 +121,28 @@
   function frame(now) {
     const dt = Math.max(0.25, Math.min(64, now - last) / 16.67); last = now;
     // intro: 0 → 1 over 1.5s once started
-    if (introT0 && intro < 1) { intro = clamp((now - introT0) / 1500, 0, 1); if (intro === 1 && !opened) { opened = true; wc.classList.add('open'); centre = -1; } }
+    if (introT0 && intro < 1) { intro = clamp((now - introT0) / 2600, 0, 1); if (intro === 1 && !opened) { opened = true; wc.classList.add('open'); centre = -1; } }   // unhurried
     const eC = ease(clamp(intro / 0.8, 0, 1));               // the first project opening out
     const eS = out(clamp((intro - 0.3) / 0.7, 0, 1));         // the others arriving from the sides
 
     if (!dragging) pos += (target - pos) * (1 - Math.pow(1 - 0.14, dt));
     const vel = (pos - prevPos) / dt; prevPos = pos;
-    const want = RM ? 0 : Math.min(Math.abs(vel) * 9, 1.4) * G.B0;
+    const want = 0;   // the frame is fixed now, so the strip no longer bends as it moves
     bend += (want - bend) * 0.12 * dt;
     const B = G.B0 * eC + bend;
     const mv = Math.min(1, bend / (G.B0 * 1.4)) * eS;   // how hard it's moving: the edge blur strengthens with it
     if (Math.abs(mv - (frame.mv || 0)) > 0.01) { frame.mv = mv; wc.style.setProperty('--wc-move', mv.toFixed(2)); }
-    edges.forEach(e => { e.style.visibility = eS > 0 ? '' : 'hidden'; });
+    edges.forEach(e => { e.style.visibility = 'hidden'; });
+    // the frame: the nav's notch grows sideways and up into the bottom shape while a matching notch comes down from the top
+    const eF = ease(clamp((intro - 0.3) / 0.7, 0, 1));
+    if (frT && eF !== frame.eF && (Math.abs(eF - (frame.eF ?? -1)) > 0.0005 || eF === 1 || eF === 0)) {
+      frame.eF = eF;
+      frT.style.transform = 'translate3d(0,' + (-(G.T + G.Bmax + 20) * (1 - eF)).toFixed(1) + 'px,0)';
+      const n = document.getElementById('nav'), nb = n ? n.getBoundingClientRect() : { width: G.vw * 0.25, height: 50 }, bh = G.vh - (G.T + G.H);
+      const fx = nb.width / G.vw, fy = Math.min(1, nb.height / bh);
+      frB.style.transform = 'scale(' + (fx + (1 - fx) * eF).toFixed(4) + ',' + (fy + (1 - fy) * eF).toFixed(4) + ')';
+      frT.style.visibility = frB.style.visibility = eF > 0 ? 'visible' : 'hidden';
+    }
 
     const s = slot.getBoundingClientRect();
     vis.forEach((c, k) => {
@@ -143,7 +163,12 @@
       c.classList.toggle('on', onScreen);
       if (!onScreen) return;
       c.style.transform = `translate3d(${X.toFixed(1)}px,${Y.toFixed(1)}px,0) scale(${sc.toFixed(4)})`;
-      c.style.clipPath = c.style.webkitClipPath = shape(sx, B, r, sc);
+      let clip;
+      if (frame.eF > 0 && frame.eF < 1) {   // the pictures grow taller, then the two notches crop them into the frame
+        const g = ease(clamp(frame.eF * 2.5, 0, 1)), ins = (G.Bmax - 2) * (1 - g);
+        clip = 'inset(' + ins.toFixed(1) + 'px 0 ' + ins.toFixed(1) + 'px 0 round ' + r.toFixed(1) + 'px)';
+      } else clip = shape(sx, B, r, sc);
+      c.style.clipPath = c.style.webkitClipPath = clip;
       c.style.zIndex = Math.abs(d) < 0.5 ? 2 : 1;
     });
     if (intro >= 1 || !introT0) caption();
