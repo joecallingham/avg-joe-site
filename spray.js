@@ -54,7 +54,7 @@
     return p; };
   // a splat: a drop of paint that hit and spread a little unevenly, with a few tiny flecks thrown off it
   const splat = (g, x, y, size, col) => {   // a sparse scatter of spray grit: fine dots, the odd slightly bigger fleck
-    g.fillStyle = col; const n = 14 + (Math.random() * 36 | 0), px = Math.max(1, Math.min(devicePixelRatio || 1, 1.5));
+    g.fillStyle = col; const n = 14 + (Math.random() * 36 | 0), px = Math.max(1, Math.min(devicePixelRatio || 1, 2));
     for (let k = 0; k < n; k++) {
       const a = Math.random() * 6.283, d = size * 3 * Math.abs((Math.random() + Math.random() + Math.random() - 1.5) / 1.5), big = Math.random() < 0.06;
       const z = (big ? 1.6 + Math.random() * 1.2 : 0.5 + Math.random() * 1.1) * px;
@@ -142,8 +142,10 @@
         if (dv) {
           if (s.brush) { const t = dv + (rough[(y0 + yy) * W + x0 + xx] - 0.5) * 0.5 + (n - 0.5) * 0.04; a = t > 0.44 ? 1 : t > 0.4 ? (t - 0.4) / 0.04 : 0; }   // dry brush: flat paint with a hard, ragged edge
           else if (s.soft) { a = (dv * 1.1 - n * 0.2) * 1.2; if (a > 0.97) a = 0.97; }   // airbrush: a smooth soft form with fine grain, no hard core
-          else { a = (dv * (s.solid ? 1.9 : 1.25) - n * 0.62) * 2.4; if (a > 1) a = 1;
-            const mist = (dv - n * 0.32) * 0.42; if (mist > a) a = mist; }   // the blowout: thin paint carried wide of the line
+          else {   // grains, not tints: every grain is full colour, and the fade is in how many there are (sparse at the edge, closing up to solid in the middle)
+            const cover = Math.max(Math.min(1, dv * (s.solid ? 2 : 1.35)) ** 1.15, Math.max(0, dv - 0.02) * 0.5);
+            a = cover > n ? Math.min(1, (cover - n) * 14) : 0;
+          }
           if (a < 0) a = 0;
         }
         const pv = s.brush || s.solid ? 0.5 : patchAt(x0 + xx, y0 + yy);
@@ -163,6 +165,7 @@
         if (!s.brush && !s.solid) { const pale = Math.max(0, (1 - pv) * 0.28 + J * 0.25), hot = rim ? Math.max(0, pv - 0.55 + J * 0.3) * 0.5 : 0;   // paler where it thins, towards the rim colour where it is hot
           cr += (tn[0] - cr) * pale; cg += (tn[1] - cg) * pale; cb += (tn[2] - cb) * pale;
           if (hot) { cr += (rim[0] - cr) * hot; cg += (rim[1] - cg) * hot; cb += (rim[2] - cb) * hot; } }
+        if (!s.soft && !s.brush) { const deep = 0.3 * Math.max(0, Math.min(1, (dv - 0.45) / 0.55 + J * 0.25)); cr *= 1 - deep; cg *= 1 - deep * 1.15; cb *= 1 - deep * 0.9; }   // the paint is deeper and darker towards the middle of the line
         const A = a + ha * (1 - a), wa = Math.min(1, Math.max(0, a / A + J * 0.5)), wh = 1 - wa;   // the paint over its lighter bloom, mixed through dots
         let fr = cr * wa + tn[0] * wh, fg = cg * wa + tn[1] * wh, fb = cb * wa + tn[2] * wh;
         const pa = pd[i + 3] / 255;
@@ -180,7 +183,7 @@
       const s = strokes[si];
       if (!s && strokes.pepper) {   // finished: on some full-colour pieces, a sparse pepper of tiny solid dots across the whole thing, for depth
         const deep = h => { const c = rgb(h); return 'rgb(' + (c[0] * 0.5 | 0) + ',' + (c[1] * 0.5 | 0) + ',' + (c[2] * 0.5 | 0) + ')'; };
-        const cols = strokes.flatMap(t => [t.c, deep(t.c)]), px = Math.max(1, Math.min(devicePixelRatio || 1, 1.5)), nDots = Math.round(W * H / 6000 * (bg ? 1 : 0.5));   // half of them a deeper shade, so they read
+        const cols = strokes.flatMap(t => [t.c, deep(t.c)]), px = Math.max(1, Math.min(devicePixelRatio || 1, 2)), nDots = Math.round(W * H / 6000 * (bg ? 1 : 0.5));   // half of them a deeper shade, so they read
         for (let k = 0; k < nDots; k++) {
           bgc.fillStyle = cols[Math.random() * cols.length | 0]; bgc.globalAlpha = 0.55 + Math.random() * 0.45;
           bgc.beginPath(); bgc.arc(Math.random() * W, Math.random() * H, px * (0.6 + Math.random() * Math.random() * 1.8), 0, 6.283); bgc.fill();
@@ -219,7 +222,7 @@
       if (at >= n - 1) {   // this pass is done: fix it into the base and start the next on a clean density layer
         bgc.drawImage(lay, 0, 0); pg.drawImage(lay, 0, 0); lg.clearRect(0, 0, W, H); dg.clearRect(0, 0, W, H); hg.clearRect(0, 0, W, H); dg.globalAlpha = 1;
         if (s.drops) {   // a few flecks of a second colour flicked off the can: soft, grainy, fading out at their edges
-          bgc.fillStyle = s.drops; const nd = 2 + (Math.random() * 5 | 0), sz = Math.max(1.2, s.w / 90),   /* just extra grains of paint, not sprays of their own */ px = Math.max(1, Math.min(devicePixelRatio || 1, 1.5));
+          bgc.fillStyle = s.drops; const nd = 2 + (Math.random() * 5 | 0), sz = Math.max(1.2, s.w / 90),   /* just extra grains of paint, not sprays of their own */ px = Math.max(1, Math.min(devicePixelRatio || 1, 2));
           for (let d = 0; d < nd; d++) {
             const [px0, py0] = s.path[Math.random() * s.path.length | 0], an = Math.random() * 6.283, dist = s.w * (0.2 + Math.random() * 1.4);
             const cx = px0 + Math.cos(an) * dist, cy = py0 + Math.sin(an) * dist, rr = sz * (0.6 + Math.random() * 1), dots = Math.max(3, Math.round(rr * rr * 3));   // a soft dab: dense grainy middle, fading right out
@@ -244,7 +247,7 @@
   }
 
   // the second colour each paint shifts to at its edge (after the references: orange into pink, blue into green, red into pink)
-  const RIM = { '#ff6a1f': '#ff2f7a', '#ff7a2b': '#ff2f7a', '#ffd23f': '#ff8a1f', '#ff3a1a': '#ff2f7a', '#2f63ff': '#22c55e', '#1f3fd1': '#3ad06a',
+  const RIM = { '#ff2f7a': '#ff8a3d', '#9be22e': '#18a84a', '#5bb8f0': '#1f5bff', '#ffd21f': '#ff8a00', '#ff6a1f': '#ff2f7a', '#ff7a2b': '#ff2f7a', '#ffd23f': '#ff8a1f', '#ff3a1a': '#ff2f7a', '#2f63ff': '#22c55e', '#1f3fd1': '#3ad06a',
                 '#5bb8e6': '#1f3fd1', '#2b6a3e': '#9be15d', '#1f2a4d': '#5b6cff', '#f6c9de': '#ffffff', '#ff8a1f': '#ff2f7a' };
   // an airbrushed soft form: a few slow turns of the can on one spot (x, y, size in the art's 0-1000 units)
   const blob = (c, x, y, size) => ({ c, rim: RIM[c], soft: true, w: size, speed: 14, pts: spiral(x, y, size * 0.16) });
@@ -252,7 +255,7 @@
   // placeholder pictures
   function picture(cv) {
     const art = ART[cv.dataset.spray]; if (!art) return;
-    const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.max(2, Math.round(cv.clientWidth * r)), H = cv.height = Math.max(2, Math.round(cv.clientHeight * r));
+    const r = Math.min(devicePixelRatio || 1, 2), W = cv.width = Math.max(2, Math.round(cv.clientWidth * r)), H = cv.height = Math.max(2, Math.round(cv.clientHeight * r));
     const SY = Math.max(H, W / 1.6), k = Math.min(W, SY) / 1000;   // wide boxes crop into the middle of the piece rather than squashing it
     const map = ([x, y]) => [x / 1000 * W, H / 2 + (0.76 * y / 1000 - 0.38) * SY];
     const J = () => (Math.random() - 0.5) * 80;
@@ -400,7 +403,7 @@
   // AI: full bleed, two airbrushed gradients overlapping (navy into green, magenta into orange), each with a couple of small
   // hotter glows in it, after Joe's references. Still.
   function aiGlow(cv, spec, strength = 1, size = 1, mask = null) {
-    const px = cv.clientWidth * cv.clientHeight, sc = Math.min(Math.min(devicePixelRatio || 1, 1.5), Math.sqrt(2.6e6 / Math.max(1, px)));
+    const px = cv.clientWidth * cv.clientHeight, sc = Math.min(Math.min(devicePixelRatio || 1, 2), Math.sqrt(2.6e6 / Math.max(1, px)));
     const W = cv.width = Math.max(2, Math.round(cv.clientWidth * sc)), H = cv.height = Math.max(2, Math.round(cv.clientHeight * sc));
     const g = cv.getContext('2d'), img = g.createImageData(W, H), d = img.data, R1 = (a, b) => a + Math.random() * (b - a), U = Math.max(W, H);
     const ss = (a, b, t) => { t = Math.min(1, Math.max(0, (t - a) / (b - a))); return t * t * (3 - 2 * t); };
@@ -492,7 +495,7 @@
   const BRIGHT = ['#ff2f7a', '#ff6a1f', '#2f63ff', '#ff3a1a', '#c6ff4d', '#ffd23f'];
   function photo(img, cv, lime) {
     // light touch: the paint keeps to the edges and corners and runs off them, so the picture still reads
-    const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.round(cv.clientWidth * r), H = cv.height = Math.round(cv.clientHeight * r), u = Math.min(W, H);
+    const r = Math.min(devicePixelRatio || 1, 2), W = cv.width = Math.round(cv.clientWidth * r), H = cv.height = Math.round(cv.clientHeight * r), u = Math.min(W, H);
     const pick = a => a[Math.random() * a.length | 0], R1 = (a, b) => a + Math.random() * (b - a), strokes = [];
     const c = lime ? '#d6ffa3' : pick(BRIGHT), c2 = pick(BRIGHT.filter(x => x !== c));
     const corner = () => [Math.random() < 0.5 ? 0 : 1, Math.random() < 0.5 ? 0 : 1], after = [];
@@ -529,10 +532,10 @@
   /* ---------- the statement: a smiley face sprayed over it with a round brush ---------- */
   function smile(cv) {
     const wrap = cv.parentElement, tb = wrap.querySelector('.ca-state').getBoundingClientRect(), box = cv.getBoundingClientRect();
-    const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.round(box.width * r), H = cv.height = Math.round(box.height * r);
+    const r = Math.min(devicePixelRatio || 1, 2), W = cv.width = Math.round(box.width * r), H = cv.height = Math.round(box.height * r);
     const P = (x, y) => [(x - box.left) * r, (y - box.top) * r], R1 = (a, b) => a + Math.random() * (b - a);
     const cx = tb.left + tb.width / 2, cy = tb.top + tb.height / 2, rx = Math.min(tb.width * 0.5, box.width * 0.44), ry = Math.min(tb.height * 0.95, box.height * 0.42), th = tb.height * r;
-    const c = ['#2f63ff', '#ff2f7a', '#ff6a1f'][Math.random() * 3 | 0], w = th * R1(0.13, 0.16);
+    const c = ['#2f63ff', '#ff2f7a', '#ff6a1f', '#9be22e', '#5bb8f0', '#ffd21f'][Math.random() * 6 | 0], w = th * R1(0.13, 0.16);   // blue, pink, orange, lime, light blue, yellow
     // just two eyes and a smile, in a thick round brush, at a tilt over the text (no face outline, not stretched to the sentence)
     const sz = Math.min(tb.height * 1.55, tb.width * 0.42), tilt = R1(0.18, 0.32) * (Math.random() < 0.5 ? -1 : 1), co = Math.cos(tilt), si = Math.sin(tilt);
     const F = (u, v) => P(cx + (u * co - v * si) * sz, cy + (u * si + v * co) * sz);
