@@ -6,6 +6,11 @@
    Each draws itself the first time it comes into view. */
 (() => {
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // static paints queue up and run one at a time in the browser's idle moments, so they never pile into one long freeze
+  const jobs = []; let pumping = false;
+  const idle = window.requestIdleCallback ? f => requestIdleCallback(f, { timeout: 400 }) : f => setTimeout(f, 16);
+  const later = fn => { jobs.push(fn); if (!pumping) { pumping = true; idle(pump); } };
+  const pump = () => { const fn = jobs.shift(); if (fn) fn(); if (jobs.length) idle(pump); else pumping = false; };
   const ANIM = false;   // spray is simply there, painted just before it scrolls in; it only animates over text (the statement) or where Joe asks
   const FAT = 1.8;   // how fat every line is, over the widths set below
   const ART = {
@@ -189,7 +194,7 @@
           bgc.globalAlpha = 1; show();
         }
         si++; at = 0; pr = wob(); sp = wob();
-        if (Q) return step();
+        if (Q) return RM ? step() : later(step);   // painted up front: one pass per idle moment, so it never freezes the page
         return setTimeout(() => requestAnimationFrame(step), gap + Math.random() * 160);
       }
       Q ? step() : requestAnimationFrame(step);
@@ -224,7 +229,7 @@
     const io = new IntersectionObserver(es => es.forEach(e => {
       if (!e.isIntersecting || !e.target.clientWidth) return;
       io.unobserve(e.target);
-      (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(() => fn(e.target), RM ? 0 : delay));
+      (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(() => margin ? later(() => fn(e.target)) : fn(e.target), RM ? 0 : delay));
     }), margin ? { rootMargin: margin } : { threshold: 0.4 });
     els.forEach(c => io.observe(c));
   };
@@ -308,7 +313,7 @@
       if (overSvg(svg, cv, art, null, !ANIM)) pic.dataset.sprayed = '1';
     };
     if (!ANIM || i === pics.length - 1) {   // painted already (all at once, before you get there), so its hand-off into Listen is smooth
-      const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { go(); if (pic.dataset.sprayed) io.disconnect(); } }, { rootMargin: '100% 0px' });
+      const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); later(go); } }, { rootMargin: '100% 0px' });
       io.observe(pic.closest('.wd') || pic);
       return;
     }
@@ -328,7 +333,7 @@
     svg.after(cv); svg.classList.add('sprayed');
     const place = () => { cv.style.gridColumn = getComputedStyle(svg).gridColumnStart; cv.style.gridRow = svg.style.gridRow = '1'; };   // the same cell as the picture
     place(); addEventListener('resize', place);
-    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && overSvg(svg, cv, art, null, !ANIM)) io.disconnect(); }), ANIM ? { threshold: 0.4 } : { rootMargin: '60% 0px' });
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { io.disconnect(); later(() => overSvg(svg, cv, art, null, !ANIM)); } }), ANIM ? { threshold: 0.4 } : { rootMargin: '60% 0px' });
     io.observe(cv);
   });
 
@@ -337,7 +342,7 @@
   const CRAFT = [['#ff3a1a', 150, [[120, 260], [480, 140], [820, 330], [600, 520], [260, 420], [420, 260]]], ['#ff3a1a', 90, [[160, 760], [380, 640], [560, 820], [780, 660], [900, 840]]],
                  ['#f1eee7', 40, [[620, 880], [700, 800], [760, 900], [840, 810]]], ['#ff3a1a', 70, ring(820, 560, 70, 70)]];
   const onPick = (half, fn) => {
-    if (!ANIM) { const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting) && !half.dataset.sprayed) { half.dataset.sprayed = '1'; io.disconnect(); fn(); } }, { rootMargin: '60% 0px' }); io.observe(half); return; }
+    if (!ANIM) { const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting) && !half.dataset.sprayed) { half.dataset.sprayed = '1'; io.disconnect(); later(fn); } }, { rootMargin: '60% 0px' }); io.observe(half); return; }
     const go = () => { if (half.classList.contains('dim') && !half.dataset.sprayed) { half.dataset.sprayed = '1'; fn(); } };
     new MutationObserver(go).observe(half, { attributes: true, attributeFilter: ['class'] }); go();
   };
@@ -374,16 +379,23 @@
     const nq = U / 5, nw = Math.ceil(W / nq) + 2, nv = Array.from({ length: nw * (Math.ceil(H / nq) + 2) }, Math.random);
     const patch = (x, y) => { const fx = x / nq, ix = fx | 0, tx = fx - ix, fy = y / nq, iy = fy | 0, ty = fy - iy, i = iy * nw + ix, a = tx * tx * (3 - 2 * tx), b = ty * ty * (3 - 2 * ty);
       return (nv[i] * (1 - a) + nv[i + 1] * a) * (1 - b) + (nv[i + nw] * (1 - a) + nv[i + nw + 1] * a) * b; };
-    const P = new Float32Array(W * H);
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-      const X = x + wa * Math.sin(y * f1 + p1) + wa * 0.35 * Math.sin(y * f3 + p2), Y = y + wa * Math.sin(x * f2 + p2) + wa * 0.35 * Math.sin(x * f3 + p1), i = y * W + x;
-      P[i] = patch(x, y);
+    // the fields are smooth, so they are worked out on a grid a third of the size and blended up (the grain and dots stay per pixel)
+    const q = 3, Wc = Math.ceil(W / q) + 2, Hc = Math.ceil(H / q) + 2, cP = new Float32Array(Wc * Hc);
+    groups.forEach(G => { G.cf = new Float32Array(Wc * Hc); G.cF = new Float32Array(Wc * Hc); G.ch = new Float32Array(Wc * Hc); });
+    for (let cy = 0; cy < Hc; cy++) for (let cx = 0; cx < Wc; cx++) {
+      const x = cx * q, y = cy * q, X = x + wa * Math.sin(y * f1 + p1) + wa * 0.35 * Math.sin(y * f3 + p2), Y = y + wa * Math.sin(x * f2 + p2) + wa * 0.35 * Math.sin(x * f3 + p1), i = cy * Wc + cx;
+      cP[i] = patch(x, y);
       for (const G of groups) {
         let f = 0, F = 0, h = 0; for (const o of G.forms) { f += field(o, X, Y, 2, false); F += field(o, X, Y, 16, true); } for (const o of G.heats) h += field(o, X, Y, 3, true);
-        G.f[i] = f; G.F[i] = F; G.h[i] = h; if (f > G.m1) G.m1 = f; if (F > G.m2) G.m2 = F; if (h > G.m3) G.m3 = h;
+        G.cf[i] = f; G.cF[i] = F; G.ch[i] = h; if (f > G.m1) G.m1 = f; if (F > G.m2) G.m2 = F; if (h > G.m3) G.m3 = h;
       }
     }
-    for (let i = 0, j = 0; i < W * H; i++, j += 4) {
+    const up = (c, out) => { for (let y = 0; y < H; y++) { const fy = y / q, iy = fy | 0, ty = fy - iy; for (let x = 0; x < W; x++) { const fx = x / q, ix = fx | 0, tx = fx - ix, i = iy * Wc + ix;
+      out[y * W + x] = (c[i] * (1 - tx) + c[i + 1] * tx) * (1 - ty) + (c[i + Wc] * (1 - tx) + c[i + Wc + 1] * tx) * ty; } } return out; };
+    const P = up(cP, new Float32Array(W * H));
+    groups.forEach(G => { up(G.cf, G.f); up(G.cF, G.F); up(G.ch, G.h); G.cf = G.cF = G.ch = null; });
+    // the final per-pixel pass runs in slices of rows, one per idle moment, so a big background never freezes the page
+    const slice = (y0, y1) => { for (let i = y0 * W, j = i * 4, iEnd = y1 * W; i < iEnd; i++, j += 4) {
       const n = Math.random(); let A = 0, R = 0, Gc = 0, B = 0;
       for (let gi = groups.length - 1; gi >= 0; gi--) {   // the second gradient under the first
         const G = groups[gi], pv = P[i], t = G.f[i] / G.m1 * (0.7 + 0.6 * pv), T = G.F[i] / G.m2 * (0.75 + 0.5 * pv), hh = Math.min(0.75, ss(0.1, 1, G.h[i] / G.m3) * 0.5 + ss(0.55, 0.95, pv) * 0.3 * ss(0.2, 0.7, t));   // a soft, low-key heat
@@ -396,20 +408,22 @@
       }
       const sh = 0.94 + n * 0.12;
       d[j] = R * sh; d[j + 1] = Gc * sh; d[j + 2] = B * sh; d[j + 3] = A * strength * 255;
-    }
-    g.putImageData(img, 0, 0);
+    } };
+    const rows = Math.max(40, Math.ceil(H / 6));
+    const next = y => { slice(y, Math.min(H, y + rows)); if (y + rows < H) later(() => next(y + rows)); else g.putImageData(img, 0, 0); };
+    next(0);
   }
   // the home page's services wheel: a very faint airbrushed blue off the left, warm cream at the foot (was a CSS gradient)
   const wheelBg = document.getElementById('wheel-bg');
   if (wheelBg) {
     const cv = document.createElement('canvas'); cv.className = 'wheel-air'; cv.setAttribute('aria-hidden', 'true'); wheelBg.appendChild(cv); wheelBg.classList.add('sprayed');
     const paint = () => aiGlow(cv, [{ core: '#7fb4d4', rim: '#d3e6ec', heat: '#a8d2ea', x: 0.02, y: 0.45 }, { core: '#f5e3d6', rim: '#f8eee7', heat: '#f2d6c4', x: 0.52, y: 1.06 }], 0.55, 1.9);
-    (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(paint, 300));
+    (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(() => later(paint), 300));
   }
   const aiPat = document.querySelector('.hv-half[data-k=ai] .hv-grad');
   if (aiPat) {
     const cv = document.createElement('canvas'); cv.className = 'hv-air'; cv.setAttribute('aria-hidden', 'true'); aiPat.appendChild(cv); aiPat.classList.add('sprayed');
-    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); aiGlow(cv); } }, { rootMargin: '60% 0px' });
+    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); later(() => aiGlow(cv)); } }, { rootMargin: '60% 0px' });
     io.observe(aiPat);
   }
 
@@ -456,65 +470,10 @@
     const lime = /620-clean/.test(img.src);
     if (!lime && Math.random() > 0.28) return;
     const cv = document.createElement('canvas'); cv.className = 'photo-spray'; cv.setAttribute('aria-hidden', 'true'); img.after(cv);
-    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && cv.clientWidth > 60) { io.disconnect(); photo(img, cv, lime); } }), { rootMargin: '60% 0px' });   // painted just before it scrolls in
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && cv.clientWidth > 60) { io.disconnect(); later(() => photo(img, cv, lime)); } }), { rootMargin: '60% 0px' });   // painted just before it scrolls in
     io.observe(cv);
   });
 
-  /* ---------- the statement: soft airbrushed glows behind it (after Joe's references): a few soft forms that run into one,
-     a deep core shading out to a second colour at the rim, and a long fall-off into fine grain. It builds up from the middle. ---------- */
-  // deep core against a contrasting rim (never blue on blue)
-  const GLOWS = [['#ee3a17', '#f7b21e'], ['#262163', '#5ee03a'], ['#1c2fa8', '#ff8a2a'], ['#5a1fb8', '#ff7ab0'], ['#d4145a', '#ffa23a'], ['#0f5e3c', '#d6f24a']];
-  function glow(cv, opt = {}) {
-    const px = cv.clientWidth * cv.clientHeight, sc = Math.min(Math.min(devicePixelRatio || 1, 1.5), Math.sqrt(2.6e6 / Math.max(1, px)));   // full resolution, so the grain is fine
-    const W = cv.width = Math.max(2, Math.round(cv.clientWidth * sc)), H = cv.height = Math.max(2, Math.round(cv.clientHeight * sc));
-    const g = cv.getContext('2d'), img = g.createImageData(W, H), d = img.data, R1 = (a, b) => a + Math.random() * (b - a);
-    const [core, rim] = (opt.pair || GLOWS[Math.random() * GLOWS.length | 0]).map(rgb), u = Math.min(W * (opt.fill || 0.4), H * 0.55);
-    // the forms: each stretched and tilted its own way; one large, off centre, others running into it (or two lobes pinched)
-    const form = (x, y, s, a) => { const r = R1(0.55, 1), t = Math.random() * 3.14; return { x, y, sx: s, sy: s * r, c: Math.cos(t), sn: Math.sin(t), a,
-      h: [R1(0.2, 0.45), Math.random() * 6.28, R1(0.12, 0.3), Math.random() * 6.28, R1(0.04, 0.1), Math.random() * 6.28] }; };
-    const cx = W * (opt.pinch ? 0.5 + R1(-0.06, 0.06) : 0.5 + R1(0.08, 0.16) * (Math.random() < 0.5 ? -1 : 1)), cy = H * (opt.pinch ? 0.4 : 0.5 + R1(-0.06, 0.08)), s0 = u * R1(0.2, 0.26), forms = [form(cx, cy, s0, 1)];
-    if (!opt.pinch) {
-      // a sprayed line: soft forms strung along a gentle curve, thinner at its ends, and a round form off one end
-      forms.length = 0;
-      const dir = Math.random() < 0.5 ? 1 : -1, x0 = W * R1(0.04, 0.14), x1 = W * R1(0.86, 0.96), y0 = H * (0.5 + dir * R1(0.04, 0.12)), y1 = H * (0.5 - dir * R1(0.02, 0.1)), bow = H * R1(-0.07, 0.07);
-      // one smooth line in the heat-glow style: soft forms strung along a gentle curve, fullest in the middle, tapering at both ends
-      for (let k = 0, N = 22; k <= N; k++) { const t = k / N, tp = Math.sin(Math.PI * t) ** 0.7, x = x0 + (x1 - x0) * t, y = y0 + (y1 - y0) * t + bow * Math.sin(Math.PI * t);
-        forms.push({ x, y, sx: u * 0.11 * (0.35 + 0.65 * tp), sy: u * 0.11 * (0.35 + 0.65 * tp), c: 1, sn: 0, a: 0.5 + 0.5 * tp,
-          h: [R1(0.15, 0.35), Math.random() * 6.28, R1(0.1, 0.25), Math.random() * 6.28, R1(0.03, 0.08), Math.random() * 6.28] }); }
-    } else {      const a = opt.pinch ? R1(0.75, 1.05) : R1(-0.9, 0.9) + Math.PI / 2, dd = s0 * R1(1.75, 2.1); forms[0].sx *= 0.85; forms[0].sy *= 0.85; /* two lobes with a pinch between them */
-      if (opt.pinch) { forms[0].x = W * 0.5 - Math.cos(a) * dd / 2; forms[0].y = H * 0.5 - Math.sin(a) * dd / 2; }   // centred on the panel, top left to bottom right
-      forms.push(form(forms[0].x + Math.cos(a) * dd, forms[0].y + Math.sin(a) * dd, s0 * R1(0.8, 1.05), 1));
-    }
-    // a gentle warp of the whole field, so no edge is a clean curve
-    const wa = u * R1(0.09, 0.15), f1 = R1(1.5, 3) / u, f2 = R1(1.5, 3) / u, f3 = R1(4, 7) / u, p1 = Math.random() * 6, p2 = Math.random() * 6;
-    const nq = Math.max(W, H) / 5, nw = Math.ceil(W / nq) + 2, nv = Array.from({ length: nw * (Math.ceil(H / nq) + 2) }, Math.random);
-    const patch = (x, y) => { const fx = x / nq, ix = fx | 0, tx = fx - ix, fy = y / nq, iy = fy | 0, ty = fy - iy, i = iy * nw + ix, a = tx * tx * (3 - 2 * tx), b = ty * ty * (3 - 2 * ty);
-      return (nv[i] * (1 - a) + nv[i + 1] * a) * (1 - b) + (nv[i + nw] * (1 - a) + nv[i + nw + 1] * a) * b; };
-    const P = new Float32Array(W * H);
-    const grain = new Float32Array(W * H); for (let i = 0; i < grain.length; i++) grain[i] = Math.random();
-    const core2 = new Float32Array(W * H), wide = new Float32Array(W * H); let m1 = 0, m2 = 0;
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-      const X = x + wa * Math.sin(y * f1 + p1) + wa * 0.35 * Math.sin(y * f3 + p2), Y = y + wa * Math.sin(x * f2 + p2) + wa * 0.35 * Math.sin(x * f3 + p1); let f = 0, F = 0; P[y * W + x] = patch(x, y);
-      for (const o of forms) { const dx = X - o.x, dy = Y - o.y, rx = dx * o.c + dy * o.sn, ry = -dx * o.sn + dy * o.c, q = rx * rx / (o.sx * o.sx) + ry * ry / (o.sy * o.sy), th = Math.atan2(ry, rx), h = o.h || [0.25, 0, 0.15, 1, 0.06, 2];
-        const kw = 1 + h[0] * Math.sin(2 * th + h[1]) + h[2] * Math.sin(3 * th + h[3]), kc = 1 + h[4] * Math.sin(3 * th + h[5]) + h[4] * 0.6 * Math.sin(5 * th + h[1]);   /* flares unevenly; the core edge lumpy */
-        f += o.a * Math.exp(-q / (2 * kc * kc)); F += o.a * Math.exp(-q / ((opt.bleed ? 60 : 13) * kw * kw)); /* the rim flare: very wide (wider still when it fills the section) */ }
-      const i = y * W + x; core2[i] = f; wide[i] = F; if (f > m1) m1 = f; if (F > m2) m2 = F;
-    }
-    const ss = (a, b, t) => { t = Math.min(1, Math.max(0, (t - a) / (b - a))); return t * t * (3 - 2 * t); };
-    const draw = k => {   // k: how far it has built up, 0 to 1
-      for (let i = 0, j = 0; i < core2.length; i++, j += 4) {
-        const pv = P[i], t = core2[i] / m1 * (0.3 + 0.7 * k) * (0.7 + 0.6 * pv), T = wide[i] / m2 * (0.3 + 0.7 * k) * (0.75 + 0.5 * pv), n = grain[i];   /* patchy, not one flat colour */
-        const ex = (i % W) / W, ey = (i / W | 0) / H, edge = opt.bleed ? 1 : ss(0, 0.14, Math.min(ex, 1 - ex, ey, 1 - ey));   // fades out before the canvas's edge, so it is never cut
-        const a = Math.max(Math.pow(ss(0, 0.9, T + (n - 0.5) * 0.1), opt.bleed ? 1.1 : 1.4) * 0.93, ss(0.05, 0.45, t), opt.bleed ? 0.16 + (n - 0.5) * 0.04 : 0) * k * edge;   /* full bleed: a faint tint reaches every edge */   // fading out very gradually over a long way   // the rim colour flares out wide; the core sits inside it
-        if (a <= 0.004) { d[j + 3] = 0; continue; }
-        const m = ss(0.25, 0.9, t + (n - 0.5) * 0.05), sh = 0.93 + n * 0.14;
-        d[j] = (rim[0] + (core[0] - rim[0]) * m) * sh; d[j + 1] = (rim[1] + (core[1] - rim[1]) * m) * sh; d[j + 2] = (rim[2] + (core[2] - rim[2]) * m) * sh; d[j + 3] = Math.min(1, a) * 255;
-      }
-      g.putImageData(img, 0, 0);
-    };
-    draw(1);   // drawn once; the build-up is a fade and grow in CSS
-    requestAnimationFrame(() => cv.classList.add('on'));
-  }
   /* ---------- the statement: a smiley face sprayed over it with a round brush ---------- */
   function smile(cv) {
     const wrap = cv.parentElement, tb = wrap.querySelector('.ca-state').getBoundingClientRect(), box = cv.getBoundingClientRect();

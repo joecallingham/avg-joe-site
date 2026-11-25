@@ -1118,8 +1118,6 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 .hv-air{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}   /* still, full bleed */
 @media (prefers-reduced-motion:reduce){.hv-air{animation:none}}
 .ca-say{position:relative;overflow:hidden}
-.ca-glow{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0;transform:scale(1.06);transition:opacity 1.6s ease,transform 2.2s cubic-bezier(.22,1,.36,1)}   /* full bleed: the whole section is the painting */
-.ca-glow.on{opacity:1;transform:none}
 .ca-pic{border-radius:.1em;object-fit:cover;width:1.45em;height:.95em;vertical-align:-.1em;margin:0 .12em}
 .ca-arr{font-weight:500}
 .ca-wrap .ca-state{position:relative;z-index:1}

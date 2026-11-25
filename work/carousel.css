@@ -44,18 +44,7 @@ html.wc-page,html.wc-page body{height:100%;overflow:hidden;overscroll-behavior:n
 }
 @media (prefers-reduced-motion:reduce){.wc-w,.wc-filters,.wc-cap{transition:none}}
 
-/* the edges: a progressive blur over each end of the strip (stacked layers, each blurring more and masked to a band nearer
-   the edge), stronger while the strip moves (--wc-move, set by carousel.js) */
-.wc-edge{position:absolute;left:0;width:22vw;pointer-events:none;z-index:3}   /* no opacity here: it would cut the blur off from what is behind */
-.wc-edge.r{left:auto;right:0;transform:scaleX(-1)}
-.wc-edge i{position:absolute;inset:0;-webkit-backdrop-filter:blur(calc(var(--b) * (.45 + .75 * var(--wc-move,0))));backdrop-filter:blur(calc(var(--b) * (.45 + .75 * var(--wc-move,0))))}
-.wc-edge i:nth-child(1){--b:1px;-webkit-mask-image:linear-gradient(270deg,transparent 0,#000 15%,#000 30%,transparent 45%);mask-image:linear-gradient(270deg,transparent 0,#000 15%,#000 30%,transparent 45%)}
-.wc-edge i:nth-child(2){--b:2.5px;-webkit-mask-image:linear-gradient(270deg,transparent 15%,#000 30%,#000 45%,transparent 60%);mask-image:linear-gradient(270deg,transparent 15%,#000 30%,#000 45%,transparent 60%)}
-.wc-edge i:nth-child(3){--b:5px;-webkit-mask-image:linear-gradient(270deg,transparent 30%,#000 45%,#000 60%,transparent 75%);mask-image:linear-gradient(270deg,transparent 30%,#000 45%,#000 60%,transparent 75%)}
-.wc-edge i:nth-child(4){--b:12px;-webkit-mask-image:linear-gradient(270deg,transparent 45%,#000 60%,#000 80%,transparent 92%);mask-image:linear-gradient(270deg,transparent 45%,#000 60%,#000 80%,transparent 92%)}
-.wc-edge i:nth-child(5){--b:24px;-webkit-mask-image:linear-gradient(270deg,transparent 65%,#000 85%);mask-image:linear-gradient(270deg,transparent 65%,#000 85%)}
-@media (max-width:760px){.wc-edge{width:14vw}.wc-edge i:nth-child(1),.wc-edge i:nth-child(2){display:none}}
-@media (prefers-reduced-transparency:reduce){.wc-edge{display:none}}
+
 
 /* Grid / List: the list is every project as a row, like the clients on Information */
 .wc-track,.wc-edge,.wc-cap{transition:opacity .4s cubic-bezier(.33,1,.68,1)}
