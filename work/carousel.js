@@ -20,6 +20,17 @@
   let centre = -1;
 
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  // the bottom shape at stage e (0 = the nav notch, 1 = the frame across the screen): a flat top between two shoulders that
+  // curve down to the base, and outside them the bar
+  const notchPath = e => {
+    const N = G.notch, lerp = (a, b) => a + (b - a) * e;
+    const top = lerp(N.top, G.T + G.H), outer = lerp(N.outer, -2), sh = lerp(N.sh, G.R), base = lerp(N.base, G.T + G.H + G.B0), vw = G.vw, vh = G.vh, pts = [];
+    pts.push([-2, vh + 40], [-2, base], [outer, base]);
+    for (let k = 1; k <= 12; k++) { const u = 1 - k / 12; pts.push([outer + sh * (1 - u), top + (base - top) * (1 - Math.sqrt(1 - u * u))]); }
+    for (let k = 0; k <= 12; k++) { const u = k / 12; pts.push([vw - outer - sh * (1 - u), top + (base - top) * (1 - Math.sqrt(1 - u * u))]); }
+    pts.push([vw + 2, base], [vw + 2, vh + 40]);
+    return 'M' + pts.map(([x, y]) => x.toFixed(1) + ' ' + y.toFixed(1)).join(' L') + ' Z';
+  };
   const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;   // in-out cubic
   const out = t => 1 - Math.pow(1 - t, 3);
 
@@ -43,7 +54,10 @@
     for (let x = 0; x <= vw + 0.5; x += 6) { const b = bulge(x, G.B0); top.push(x.toFixed(1) + ' ' + (G.T - b).toFixed(1)); bot.push(x.toFixed(1) + ' ' + (G.T + G.H + b).toFixed(1)); }
     frT.setAttribute('viewBox', '0 0 ' + vw + ' ' + vh); frB.setAttribute('viewBox', '0 0 ' + vw + ' ' + vh);
     frT.firstChild.setAttribute('d', 'M0 -40 L' + vw + ' -40 L' + top.slice().reverse().join(' L') + ' Z');
-    frB.firstChild.setAttribute('d', 'M0 ' + (vh + 40) + ' L' + vw + ' ' + (vh + 40) + ' L' + bot.slice().reverse().join(' L') + ' Z');
+    // the nav notch, measured: where its flat top sits, how wide it is, and its shoulders
+    const nv = document.getElementById('nav'), nr = nv ? nv.getBoundingClientRect() : { left: vw * 0.37, width: vw * 0.26, top: vh - 50 };
+    const fb = document.getElementById('frame-bottom'), barTop = fb ? fb.getBoundingClientRect().top : vh - 10;
+    G.notch = { top: nr.top + 1, outer: nr.left, sh: Math.min(nr.width * 0.16, 70), base: barTop };
     frame.eF = -1;
   }
 
@@ -129,7 +143,7 @@
     const vel = (pos - prevPos) / dt; prevPos = pos;
     const want = 0;   // the frame is fixed now, so the strip no longer bends as it moves
     bend += (want - bend) * 0.12 * dt;
-    const B = G.B0 * eC + bend;
+    const B = 0;   // the pictures stay flat; the frame does the shaping
     const mv = Math.min(1, bend / (G.B0 * 1.4)) * eS;   // how hard it's moving: the edge blur strengthens with it
     if (Math.abs(mv - (frame.mv || 0)) > 0.01) { frame.mv = mv; wc.style.setProperty('--wc-move', mv.toFixed(2)); }
     edges.forEach(e => { e.style.visibility = 'hidden'; });
@@ -138,10 +152,9 @@
     if (frT && eF !== frame.eF && (Math.abs(eF - (frame.eF ?? -1)) > 0.0005 || eF === 1 || eF === 0)) {
       frame.eF = eF;
       frT.style.transform = 'translate3d(0,' + (-(G.T + G.Bmax + 20) * (1 - eF)).toFixed(1) + 'px,0)';
-      const n = document.getElementById('nav'), nb = n ? n.getBoundingClientRect() : { width: G.vw * 0.25, height: 50 }, bh = G.vh - (G.T + G.H);
-      const fx = nb.width / G.vw, fy = Math.min(1, nb.height / bh);
-      frB.style.transform = 'scale(' + (fx + (1 - fx) * eF).toFixed(4) + ',' + (fy + (1 - fy) * eF).toFixed(4) + ')';
+      frB.firstChild.setAttribute('d', notchPath(eF));
       frT.style.visibility = frB.style.visibility = eF > 0 ? 'visible' : 'hidden';
+      document.documentElement.classList.toggle('wc-grown', eF > 0);   // the nav's own notch steps back while its shape grows
     }
 
     const s = slot.getBoundingClientRect();

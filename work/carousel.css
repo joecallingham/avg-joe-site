@@ -78,6 +78,6 @@ a.wl-row:hover .wl-name{text-decoration:underline;text-underline-offset:.2em}
 /* the frame: two cream notches over the strip (carousel.js draws and moves them) */
 .wc-frame{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;visibility:hidden;will-change:transform}
 .wc-frame path{fill:var(--notch-bg,var(--cream))}
-.wc-frame.b{transform-origin:50% 100%}
 .wc-filters,.wc-cap,.wl{z-index:4}
 .wc-edge{display:none}
+html.wc-grown .notch-fill{visibility:hidden}   /* the growing shape takes over from the nav's notch */
