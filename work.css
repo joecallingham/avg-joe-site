@@ -1117,3 +1117,7 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 .hv-grad.sprayed::before{display:none}
 .hv-air{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 @media (prefers-reduced-motion:reduce){.hv-air{animation:none}}
+.ca-glow{position:absolute;left:-12%;top:50%;width:124%;height:115vh;height:115svh;transform:translateY(-50%);z-index:0;pointer-events:none;opacity:0;transition:opacity 1.2s ease}
+.ca-glow.on{opacity:1}
+.ca-wrap .ca-state{position:relative;z-index:1}
+@media (max-width:760px){.ca-glow{left:-20%;width:140%}}

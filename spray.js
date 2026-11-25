@@ -381,5 +381,39 @@
     io.observe(cv);
   });
 
+  /* ---------- the statement: soft airbrushed glows behind it (after Joe's references): a few soft forms that run into one,
+     a deep core shading out to a second colour at the rim, and a long fall-off into fine grain. It builds up from the middle. ---------- */
+  const GLOWS = [['#ee3a17', '#f6a21e'], ['#262163', '#38c73a'], ['#17246e', '#a9bfe8'], ['#ff2f6e', '#ff8a3d']];
+  function glow(cv) {
+    const sc = 0.55, W = cv.width = Math.max(2, Math.round(cv.clientWidth * sc)), H = cv.height = Math.max(2, Math.round(cv.clientHeight * sc));
+    const g = cv.getContext('2d'), img = g.createImageData(W, H), d = img.data, R1 = (a, b) => a + Math.random() * (b - a);
+    const [core, rim] = GLOWS[Math.random() * GLOWS.length | 0].map(rgb), u = Math.min(W * 0.42, H * 0.6);
+    // the forms: one large, off centre, with smaller ones running into it (or a pair of lobes pinched together)
+    const cx = W * (0.5 + R1(0.08, 0.16) * (Math.random() < 0.5 ? -1 : 1)), cy = H * (0.5 + R1(-0.06, 0.08)), blobs = [[cx, cy, u * R1(0.2, 0.26), 1]];
+    if (Math.random() < 0.6) {
+      for (let k = 0, n = 2 + (Math.random() * 3 | 0); k < n; k++) { const a = Math.random() * 6.283, s0 = u * R1(0.09, 0.16), dd = blobs[0][2] * R1(1.1, 1.9); blobs.push([cx + Math.cos(a) * dd * 1.3, cy + Math.sin(a) * dd * 0.8, s0, R1(0.75, 1)]); }
+    } else { const a = R1(-0.9, 0.9) + Math.PI / 2, dd = blobs[0][2] * R1(1.75, 2.1); blobs[0][2] *= 0.85; /* two lobes with a pinch between them */ blobs.push([cx + Math.cos(a) * dd, cy + Math.sin(a) * dd, blobs[0][2] * R1(0.85, 1.05), 1]); }
+    const grain = new Float32Array(W * H); for (let i = 0; i < grain.length; i++) grain[i] = Math.random();
+    const field = new Float32Array(W * H); let mx = 0;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { let f = 0; for (const [bx, by, s, a] of blobs) { const dx = x - bx, dy = y - by; f += a * Math.exp(-(dx * dx + dy * dy) / (2 * s * s)); } field[y * W + x] = f; if (f > mx) mx = f; }
+    const ss = (a, b, t) => { t = Math.min(1, Math.max(0, (t - a) / (b - a))); return t * t * (3 - 2 * t); };
+    const draw = k => {   // k: how far it has built up, 0 to 1
+      for (let i = 0, j = 0; i < field.length; i++, j += 4) {
+        const t = field[i] / mx * (0.35 + 0.65 * k), n = grain[i];
+        let a = ss(0.03, 0.55, t + (n - 0.5) * 0.12) * k;   // the long fall-off, broken by grain at its edge
+        if (a <= 0.004) { d[j + 3] = 0; continue; }
+        const m = ss(0.3, 0.95, t), sh = 0.93 + n * 0.14;   // deep core shading to the rim colour
+        d[j] = (rim[0] + (core[0] - rim[0]) * m) * sh; d[j + 1] = (rim[1] + (core[1] - rim[1]) * m) * sh; d[j + 2] = (rim[2] + (core[2] - rim[2]) * m) * sh; d[j + 3] = Math.min(1, a) * 255;
+      }
+      g.putImageData(img, 0, 0);
+    };
+    cv.classList.add('on');
+    if (RM) return draw(1);
+    const t0 = performance.now(), dur = 1800;
+    const tick = now => { const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3); draw(e); if (p < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  }
+  watch('canvas.ca-glow', glow, 400);
+
   watch('canvas.spray', picture, 0, ANIM ? null : '60% 0px');
 })();
