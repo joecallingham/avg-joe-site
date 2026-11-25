@@ -62,7 +62,7 @@
     requestAnimationFrame(step);
   }
   /* the doodles: 18 baked pictures (1200 x 750) and their stroke paths, as fractions of the picture */
-  let FT = null; const doodles = () => FT || (FT = fetch('/img/spray/ft.json?v=2').then(r => r.json()).catch(() => null));
+  let FT = null; const doodles = () => FT || (FT = fetch('/img/spray/ft.json?v=3').then(r => r.json()).catch(() => null));
   const loadImg = src => new Promise((ok, no) => { const i = new Image(); i.decoding = 'async'; i.onload = () => ok(i); i.onerror = no; i.src = src; });
   const pickD = (() => { const used = []; return () => { let i; do i = Math.random() * 18 | 0; while (used.includes(i) && used.length < 18); used.push(i); return i; }; })();
   const pathsFor = (meta, w, h) => meta.strokes.map(({ r, p }) => ({ r: r * w, p: p.map(([x, y]) => [x * w, y * h]) }));
@@ -80,7 +80,7 @@
     };
     place(); addEventListener('resize', place); if (document.fonts) document.fonts.ready.then(place);
     const near = new IntersectionObserver(es => { if (!es.some(e => e.isIntersecting)) return; near.disconnect();
-      Promise.all([doodles(), loadImg('/img/spray/ft-' + di + '.webp?v=2')]).then(([meta, img]) => { pic = img;
+      Promise.all([doodles(), loadImg('/img/spray/ft-' + di + '.webp?v=3')]).then(([meta, img]) => { pic = img;
         onView(cv, () => { const g = cv.getContext('2d'), go = () => sprayOn(img, meta ? pathsFor(meta[di], img.width, img.height) : [], f => { g.clearRect(0, 0, cv.width, cv.height); g.drawImage(f, 0, 0, cv.width, cv.height); }, () => { shown = true; });
           if (!meta) { g.drawImage(img, 0, 0, cv.width, cv.height); shown = true; } else go(); }, 0.5);
       }).catch(() => {}); }, { rootMargin: '60% 0px' });
@@ -105,7 +105,7 @@
   /* ---------- the statement: a doodle sprayed over it, then a strike through "never" in another colour ----------
      The strike is worked out in the page in the halation spray (signed off 25 Nov 2026): it thickens and thins, fades and
      goes in and out of focus, a close-colour glow blooms off it in short stretches, in particles finer than a pixel. */
-  const PAIRS = [['#ff5a12', '#ffab85'], ['#ff3f8e', '#ffa3b8'], ['#1f3dff', '#7cc3ff'], ['#1f3dff', '#8a4dff'], ['#8fdc2a', '#2fae55'], ['#8b45ff', '#b0559e']];
+  const PAIRS = [['#ff6a00', '#ffd23f'], ['#c6f000', '#2fae55'], ['#ff6a00', '#ffd23f'], ['#c6f000', '#2fae55'], ['#ff3f8e', '#ffab85'], ['#1f3dff', '#7cc3ff'], ['#8b45ff', '#c9a8ff'], ['#ff3a1a', '#ff8a5a']];   /* one colour family each; lime and orange lead */
   const hue = h => { const [r, g, b] = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255), M = Math.max(r, g, b), n = Math.min(r, g, b), c = M - n; if (!c) return 0;
     const x = M === r ? ((g - b) / c) % 6 : M === g ? (b - r) / c + 2 : (r - g) / c + 4; return (x * 60 + 360) % 360; };
   /* the strike, worked out in idle slices: returns {ready, stroke, rect} via cb */
@@ -171,7 +171,7 @@
       sprayOn(img, meta ? pathsFor(meta[di], img.width, img.height) : [], f => { g.clearRect(0, 0, cv.width, cv.height); g.drawImage(f, x, y, w * d, h * d); }, () => setTimeout(strikeOn, 120));
     };
     const near = new IntersectionObserver(es => { if (!es.some(e => e.isIntersecting && cv.clientWidth)) return; near.disconnect();
-      (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => Promise.all([doodles(), loadImg('/img/spray/ft-' + di + '.webp?v=2')])).then(([meta, img]) => {
+      (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => Promise.all([doodles(), loadImg('/img/spray/ft-' + di + '.webp?v=3')])).then(([meta, img]) => {
         const c = meta && meta[di] ? meta[di].c : '#000000', pool = PAIRS.filter(([k]) => { const dh = Math.abs(hue(k) - hue(c)); return Math.min(dh, 360 - dh) > 70; });
         const pair = (pool.length ? pool : PAIRS)[Math.random() * (pool.length || PAIRS.length) | 0];
         strike(cv2, wrap, pair, sk => { parts = [meta, img, sk]; run(); });
