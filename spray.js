@@ -6,7 +6,7 @@
    Each draws itself the first time it comes into view. */
 (() => {
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const ANIM = location.pathname.startsWith('/information');   // spray animates in on Information and over text; on imagery elsewhere it is simply there
+  const ANIM = false;   // spray is simply there, painted just before it scrolls in; it only animates over text (the statement) or where Joe asks
   const FAT = 1.8;   // how fat every line is, over the widths set below
   const ART = {
     re: { bg: '#1f2a4d', strokes: [
@@ -270,16 +270,27 @@
     const art = WD[i], svg = pic.querySelector('svg'); if (!art || !svg) return;
     const cv = document.createElement('canvas'); cv.className = 'wd-spray'; cv.setAttribute('aria-hidden', 'true'); pic.appendChild(cv);
     pic.classList.add('sprayed');
+    const last = i === pics.length - 1, fly = copies.find(t => t.closest('.wd-fly')), dest = copies.find(t => !t.closest('.wd-fly'));
     const go = () => {
       if (pic.dataset.sprayed) return;
-      if (overSvg(svg, cv, art, i === pics.length - 1 ? ({ url, x, y, w, h }) => copies.forEach(t => {
-        // the last picture's paint goes into the copy that flies into step 01, and into step 01 itself
-        const im = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        im.setAttribute('class', 'wd-paint'); im.setAttribute('href', url); im.setAttribute('x', x); im.setAttribute('y', y); im.setAttribute('width', w); im.setAttribute('height', h); im.setAttribute('preserveAspectRatio', 'none');
-        t.appendChild(im);
-      }) : null, i === pics.length - 1)) pic.dataset.sprayed = '1';
+      if (last && dest) {
+        // Digital: painted once at the size of step 01 (Listen), which shows all of it; the picture here shows its middle,
+        // and the copy that flies between them shows it in the same place, so the hand-off is seamless
+        let cvD = dest.parentElement.querySelector('.st-spray');
+        if (!cvD) { cvD = document.createElement('canvas'); cvD.className = 'st-spray'; cvD.setAttribute('aria-hidden', 'true'); dest.after(cvD);
+          const place = () => { cvD.style.gridColumn = getComputedStyle(dest).gridColumnStart; cvD.style.gridRow = dest.style.gridRow = '1'; }; place(); addEventListener('resize', place); }
+        if (overSvg(dest, cvD, art, ({ url, x, y, w, h }) => {
+          if (fly && !fly.querySelector('image.wd-paint')) { const im = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+            im.setAttribute('class', 'wd-paint'); im.setAttribute('href', url); im.setAttribute('x', x); im.setAttribute('y', y); im.setAttribute('width', w); im.setAttribute('height', h); im.setAttribute('preserveAspectRatio', 'none'); fly.appendChild(im); }
+          const bx = pic.getBoundingClientRect(), r = Math.min(devicePixelRatio || 1, 1.5); cv.width = Math.round(bx.width * r); cv.height = Math.round(bx.height * r);
+          const sc = Math.max(cv.width / cvD.width, cv.height / cvD.height), dw = cvD.width * sc, dh = cvD.height * sc;
+          cv.getContext('2d').drawImage(cvD, (cv.width - dw) / 2, (cv.height - dh) / 2, dw, dh);
+        }, true)) pic.dataset.sprayed = '1';
+        return;
+      }
+      if (overSvg(svg, cv, art, null, !ANIM)) pic.dataset.sprayed = '1';
     };
-    if (i === pics.length - 1) {   // Digital is painted already (all at once, before you get there), so its hand-off into Listen is smooth
+    if (!ANIM || i === pics.length - 1) {   // painted already (all at once, before you get there), so its hand-off into Listen is smooth
       const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { go(); if (pic.dataset.sprayed) io.disconnect(); } }, { rootMargin: '100% 0px' });
       io.observe(pic.closest('.wd') || pic);
       return;
@@ -300,7 +311,7 @@
     svg.after(cv); svg.classList.add('sprayed');
     const place = () => { cv.style.gridColumn = getComputedStyle(svg).gridColumnStart; cv.style.gridRow = svg.style.gridRow = '1'; };   // the same cell as the picture
     place(); addEventListener('resize', place);
-    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && overSvg(svg, cv, art)) io.disconnect(); }), { threshold: 0.4 });
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && overSvg(svg, cv, art, null, !ANIM)) io.disconnect(); }), ANIM ? { threshold: 0.4 } : { rootMargin: '60% 0px' });
     io.observe(cv);
   });
 
@@ -309,13 +320,14 @@
   const CRAFT = [['#ff3a1a', 150, [[120, 260], [480, 140], [820, 330], [600, 520], [260, 420], [420, 260]]], ['#ff3a1a', 90, [[160, 760], [380, 640], [560, 820], [780, 660], [900, 840]]],
                  ['#f1eee7', 40, [[620, 880], [700, 800], [760, 900], [840, 810]]], ['#ff3a1a', 70, ring(820, 560, 70, 70)]];
   const onPick = (half, fn) => {
+    if (!ANIM) { const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting) && !half.dataset.sprayed) { half.dataset.sprayed = '1'; io.disconnect(); fn(); } }, { rootMargin: '60% 0px' }); io.observe(half); return; }
     const go = () => { if (half.classList.contains('dim') && !half.dataset.sprayed) { half.dataset.sprayed = '1'; fn(); } };
     new MutationObserver(go).observe(half, { attributes: true, attributeFilter: ['class'] }); go();
   };
   const craft = document.querySelector('.hv-half[data-k=craft]');
   if (craft) {
     const svg = craft.querySelector('svg.hv-pat'), cv = document.createElement('canvas'); cv.className = 'hv-spray'; cv.setAttribute('aria-hidden', 'true');
-    if (svg) { svg.after(cv); svg.classList.add('sprayed'); onPick(craft, () => setTimeout(() => overSvg(svg, cv, CRAFT), 150)); }
+    if (svg) { svg.after(cv); svg.classList.add('sprayed'); onPick(craft, () => setTimeout(() => overSvg(svg, cv, CRAFT, null, !ANIM), ANIM ? 150 : 0)); }
   }
   const aiPat = document.querySelector('.hv-half[data-k=ai] .hv-grad');
   if (aiPat) {
@@ -323,7 +335,7 @@
     onPick(aiPat.closest('.hv-half'), () => setTimeout(() => {
       const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.round(cv.clientWidth * r), H = cv.height = Math.round(cv.clientHeight * r), u = Math.min(W, H);
       const at = (x, y, size, c, rim) => ({ c, rim, soft: true, w: size * u, speed: 10 * r, path: curve(spiral(x * W + (Math.random() - 0.5) * W * 0.12, y * H + (Math.random() - 0.5) * H * 0.12, size * u * 0.14)) });
-      run(cv, W, H, null, [at(0.36, 0.4, 0.42, '#ff5200', '#ff2f7a'), at(0.52, 0.24, 0.26, '#ff6e32', '#ffb000'), at(0.7, 0.5, 0.24, '#fa5c8c', '#ffc2d4'), at(0.6, 0.76, 0.3, '#ffb3c4', '#fff0f3'), at(0.3, 0.72, 0.14, '#2f63ff', '#22c55e')], 60);
+      run(cv, W, H, null, [at(0.36, 0.4, 0.42, '#ff5200', '#ff2f7a'), at(0.52, 0.24, 0.26, '#ff6e32', '#ffb000'), at(0.7, 0.5, 0.24, '#fa5c8c', '#ffc2d4'), at(0.6, 0.76, 0.3, '#ffb3c4', '#fff0f3'), at(0.3, 0.72, 0.14, '#2f63ff', '#22c55e')], 60, null, !ANIM);
     }, 150));
   }
 
