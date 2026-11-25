@@ -40,16 +40,15 @@
 
   // Services on the wheel, each with the work that pops in beside it.
   // x/y are % of the screen, w is rem, ar is width/height. href is ready for case-study links.
-  const W = (img, x, y, w, ar, href = '#') => ({ img, x, y, w, ar, href });
   const SERVICES = [
-    { name: 'AI Content',      desc: "We art direct every frame, then AI handles the production, so your imagery and film keep up with how often you post.", works: [W('mushroom', 66, 20, 10, 1.5), W('portrait', 70, 55, 8, 0.95)] },
-    { name: 'Art Direction',   desc: "We set the look of every shoot, campaign and drop, so each frame feels like it came from the same hand.", works: [W('boon-sign', 58, 26, 11, 1.6), W('620-clean', 66, 52, 8.5, 1)] },
-    { name: 'Branding',        desc: "We find what makes you you, then shape it into a name, a mark and a voice people remember.", works: [W('boon-van', 72, 18, 8.5, 1.07), W('620-clean', 58, 56, 8, 1)] },
-    { name: 'Design',          desc: "We curate every typeface, colour and grid around your brand, then build it into a design system that grows with you.", works: [W('mushroom', 57.8, 25, 8, 1.53), W('portrait', 72.8, 59, 8, 0.95)] },
-    { name: 'Digital',         desc: "Websites and apps that move nicely, load fast and feel easy on any screen.", works: [W('620-clean', 64, 22, 8.5, 1), W('boon-sign', 76, 58, 10, 1.6)] },
-    { name: 'Packaging',       desc: "Packs that earn their spot on the shelf, from structure and print to the moment they're opened.", works: [W('boon-van', 60, 30, 9, 1.07), W('mushroom', 78, 60, 8, 1.53)] },
-    { name: 'Strategy',        desc: "We dig into your audience and your market first, so every creative call has a reason behind it.", works: [W('boon-sign', 68, 24, 10, 1.6), W('portrait', 58, 58, 7.5, 0.95)] },
-    { name: 'Visual Identity', desc: "Logo, type, colour and imagery pulled into one kit your team can use without us.", works: [W('620-clean', 74, 20, 8, 1), W('boon-van', 60, 54, 8.5, 1.07)] },
+    { name: 'AI Content',      desc: "We art direct every frame, then AI handles the production, so your imagery and film keep up with how often you post.", works: [] },
+    { name: 'Art Direction',   desc: "We set the look of every shoot, campaign and drop, so each frame feels like it came from the same hand.", works: [] },
+    { name: 'Branding',        desc: "We find what makes you you, then shape it into a name, a mark and a voice people remember.", works: [] },
+    { name: 'Design',          desc: "We curate every typeface, colour and grid around your brand, then build it into a design system that grows with you.", works: [] },
+    { name: 'Digital',         desc: "Websites and apps that move nicely, load fast and feel easy on any screen.", works: [] },
+    { name: 'Packaging',       desc: "Packs that earn their spot on the shelf, from structure and print to the moment they're opened.", works: [] },
+    { name: 'Strategy',        desc: "We dig into your audience and your market first, so every creative call has a reason behind it.", works: [] },
+    { name: 'Visual Identity', desc: "Logo, type, colour and imagery pulled into one kit your team can use without us.", works: [] },
   ];
 
   const el = {
