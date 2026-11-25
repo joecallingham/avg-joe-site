@@ -175,7 +175,17 @@
       lg.putImageData(out, x0, y0);
     };
     const step = () => {
-      const s = strokes[si]; if (!s) return done && done();
+      const s = strokes[si];
+      if (!s) {   // finished: a sparse pepper of tiny solid dots across the whole piece, in its paint colours, for depth
+        const deep = h => { const c = rgb(h); return 'rgb(' + (c[0] * 0.5 | 0) + ',' + (c[1] * 0.5 | 0) + ',' + (c[2] * 0.5 | 0) + ')'; };
+        const cols = strokes.flatMap(t => [t.c, deep(t.c)]), px = Math.max(1, Math.min(devicePixelRatio || 1, 1.5)), nDots = Math.round(W * H / 6000 * (bg ? 1 : 0.5));   // half of them a deeper shade, so they read
+        for (let k = 0; k < nDots; k++) {
+          bgc.fillStyle = cols[Math.random() * cols.length | 0]; bgc.globalAlpha = 0.55 + Math.random() * 0.45;
+          bgc.beginPath(); bgc.arc(Math.random() * W, Math.random() * H, px * (0.6 + Math.random() * Math.random() * 1.8), 0, 6.283); bgc.fill();
+        }
+        bgc.globalAlpha = 1; show();
+        return done && done();
+      }
       if (!s.rgb) { s.rgb = rgb(s.c); if (s.rim) s.rimRgb = rgb(s.rim); if (s.mid) s.midRgb = rgb(s.mid); if (!s.soft && !s.exact) s.path = human(s.path, s.w * FAT); }
       const n = s.path.length, u = at / n, ease = 0.3 + 2.2 * u * u;   // each pass starts slow and finishes quick, like a confident hand
       const adv = Q ? n : Math.max(3, Math.round(s.speed * ease * (0.6 + 0.8 * sp(at))));
@@ -210,9 +220,9 @@
               const r = rr * Math.abs((Math.random() + Math.random() + Math.random() - 1.5) / 1.5) * 1.6, a2 = Math.random() * 6.283, fall = Math.max(0, 1 - r / (rr * 1.7));
               bgc.globalAlpha = (0.08 + Math.random() * 0.3) * fall * fall; bgc.fillRect(cx + Math.cos(a2) * r, cy + Math.sin(a2) * r, px * (0.6 + Math.random() * 0.9), px * (0.6 + Math.random() * 0.9));
             }
-            for (let k = 0, nk = 2 + (Math.random() * 5 | 0); k < nk; k++) {   // and a few tiny solid flecks round it, for depth
-              const a3 = Math.random() * 6.283, r3 = rr * (0.3 + Math.random() * 2.4), z = px * (0.8 + Math.random() * 1.8);
-              bgc.globalAlpha = 0.85 + Math.random() * 0.15; bgc.beginPath(); bgc.arc(cx + Math.cos(a3) * r3, cy + Math.sin(a3) * r3, z, 0, 6.283); bgc.fill();
+            if (Math.random() < 0.4) for (let k = 0, nk = 1 + (Math.random() * 3 | 0); k < nk; k++) {   // now and then a few solid flecks gather by it
+              const a3 = Math.random() * 6.283, r3 = rr * (0.4 + Math.random() * 2), z = px * (0.7 + Math.random() * 1.4);
+              bgc.globalAlpha = 0.85; bgc.beginPath(); bgc.arc(cx + Math.cos(a3) * r3, cy + Math.sin(a3) * r3, z, 0, 6.283); bgc.fill();
             }
           }
           bgc.globalAlpha = 1; show();
