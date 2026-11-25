@@ -495,8 +495,8 @@
 
   /* ---------- smooth scroll: Lenis (same settings as sumojoestudio.com) ---------- */
   const lenis = new Lenis({
-    // standard smooth scrolling: Lenis defaults (phones keep their own native scrolling)
-    autoRaf: false,
+    // the browser's own scrolling (Safari stuck on the eased wheel); Lenis only runs the glides for the buttons
+    smoothWheel: false, autoRaf: false,
   });
   gsap.ticker.add(t => lenis.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
