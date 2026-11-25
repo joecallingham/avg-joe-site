@@ -332,7 +332,13 @@
     const svg = craft.querySelector('svg.hv-pat'), cv = document.createElement('canvas'); cv.className = 'hv-spray'; cv.setAttribute('aria-hidden', 'true');
     if (svg) { svg.after(cv); svg.classList.add('sprayed'); onPick(craft, () => setTimeout(() => overSvg(svg, cv, CRAFT, null, !ANIM), ANIM ? 150 : 0)); }
   }
-  // AI keeps its clean gradient: no paint over it
+  // AI: a flared airbrush glow, navy pinched into a wide green flare (Joe's reference), still
+  const aiPat = document.querySelector('.hv-half[data-k=ai] .hv-grad');
+  if (aiPat) {
+    const cv = document.createElement('canvas'); cv.className = 'hv-air'; cv.setAttribute('aria-hidden', 'true'); aiPat.appendChild(cv); aiPat.classList.add('sprayed');
+    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); glow(cv, { pair: ['#2a2276', '#3fd13a'], pinch: true, fill: 0.36, still: true }); } }, { rootMargin: '60% 0px' });
+    io.observe(aiPat);
+  }
 
 
   /* ---------- odd bits of photography get a sprayed mark over them: a few at random on each visit, the 620 picture always
@@ -383,35 +389,45 @@
 
   /* ---------- the statement: soft airbrushed glows behind it (after Joe's references): a few soft forms that run into one,
      a deep core shading out to a second colour at the rim, and a long fall-off into fine grain. It builds up from the middle. ---------- */
-  const GLOWS = [['#ee3a17', '#f6a21e'], ['#262163', '#38c73a'], ['#17246e', '#a9bfe8'], ['#ff2f6e', '#ff8a3d']];
-  function glow(cv) {
-    const sc = 0.55, W = cv.width = Math.max(2, Math.round(cv.clientWidth * sc)), H = cv.height = Math.max(2, Math.round(cv.clientHeight * sc));
+  // deep core against a contrasting rim (never blue on blue)
+  const GLOWS = [['#ee3a17', '#f7b21e'], ['#262163', '#5ee03a'], ['#1c2fa8', '#ff8a2a'], ['#5a1fb8', '#ff7ab0'], ['#d4145a', '#ffa23a'], ['#0f5e3c', '#d6f24a']];
+  function glow(cv, opt = {}) {
+    const px = cv.clientWidth * cv.clientHeight, sc = Math.min(Math.min(devicePixelRatio || 1, 1.5), Math.sqrt(2.6e6 / Math.max(1, px)));   // full resolution, so the grain is fine
+    const W = cv.width = Math.max(2, Math.round(cv.clientWidth * sc)), H = cv.height = Math.max(2, Math.round(cv.clientHeight * sc));
     const g = cv.getContext('2d'), img = g.createImageData(W, H), d = img.data, R1 = (a, b) => a + Math.random() * (b - a);
-    const [core, rim] = GLOWS[Math.random() * GLOWS.length | 0].map(rgb), u = Math.min(W * 0.42, H * 0.6);
-    // the forms: one large, off centre, with smaller ones running into it (or a pair of lobes pinched together)
-    const cx = W * (0.5 + R1(0.08, 0.16) * (Math.random() < 0.5 ? -1 : 1)), cy = H * (0.5 + R1(-0.06, 0.08)), blobs = [[cx, cy, u * R1(0.2, 0.26), 1]];
-    if (Math.random() < 0.6) {
-      for (let k = 0, n = 2 + (Math.random() * 3 | 0); k < n; k++) { const a = Math.random() * 6.283, s0 = u * R1(0.09, 0.16), dd = blobs[0][2] * R1(1.1, 1.9); blobs.push([cx + Math.cos(a) * dd * 1.3, cy + Math.sin(a) * dd * 0.8, s0, R1(0.75, 1)]); }
-    } else { const a = R1(-0.9, 0.9) + Math.PI / 2, dd = blobs[0][2] * R1(1.75, 2.1); blobs[0][2] *= 0.85; /* two lobes with a pinch between them */ blobs.push([cx + Math.cos(a) * dd, cy + Math.sin(a) * dd, blobs[0][2] * R1(0.85, 1.05), 1]); }
+    const [core, rim] = (opt.pair || GLOWS[Math.random() * GLOWS.length | 0]).map(rgb), u = Math.min(W * (opt.fill || 0.4), H * 0.55);
+    // the forms: each stretched and tilted its own way; one large, off centre, others running into it (or two lobes pinched)
+    const form = (x, y, s, a) => { const r = R1(0.55, 1), t = Math.random() * 3.14; return { x, y, sx: s, sy: s * r, c: Math.cos(t), sn: Math.sin(t), a }; };
+    const cx = W * (opt.pinch ? 0.5 + R1(-0.06, 0.06) : 0.5 + R1(0.08, 0.16) * (Math.random() < 0.5 ? -1 : 1)), cy = H * (opt.pinch ? 0.4 : 0.5 + R1(-0.06, 0.08)), s0 = u * R1(0.2, 0.26), forms = [form(cx, cy, s0, 1)];
+    if (!opt.pinch && Math.random() < 0.6) { for (let k = 0, n = 2 + (Math.random() * 3 | 0); k < n; k++) { const a = Math.random() * 6.283, dd = s0 * R1(1.1, 2); forms.push(form(cx + Math.cos(a) * dd * 1.3, cy + Math.sin(a) * dd * 0.85, u * R1(0.08, 0.17), R1(0.7, 1))); } }
+    else {
+      const a = opt.pinch ? R1(0.75, 1.05) : R1(-0.9, 0.9) + Math.PI / 2, dd = s0 * R1(1.75, 2.1); forms[0].sx *= 0.85; forms[0].sy *= 0.85; /* two lobes with a pinch between them */
+      if (opt.pinch) { forms[0].x = W * 0.5 - Math.cos(a) * dd / 2; forms[0].y = H * 0.5 - Math.sin(a) * dd / 2; }   // centred on the panel, top left to bottom right
+      forms.push(form(forms[0].x + Math.cos(a) * dd, forms[0].y + Math.sin(a) * dd, s0 * R1(0.8, 1.05), 1));
+    }
+    // a gentle warp of the whole field, so no edge is a clean curve
+    const wa = u * R1(0.06, 0.12), f1 = R1(1.5, 3) / u, f2 = R1(1.5, 3) / u, p1 = Math.random() * 6, p2 = Math.random() * 6;
     const grain = new Float32Array(W * H); for (let i = 0; i < grain.length; i++) grain[i] = Math.random();
-    const field = new Float32Array(W * H); let mx = 0;
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { let f = 0; for (const [bx, by, s, a] of blobs) { const dx = x - bx, dy = y - by; f += a * Math.exp(-(dx * dx + dy * dy) / (2 * s * s)); } field[y * W + x] = f; if (f > mx) mx = f; }
+    const core2 = new Float32Array(W * H), wide = new Float32Array(W * H); let m1 = 0, m2 = 0;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const X = x + wa * Math.sin(y * f1 + p1), Y = y + wa * Math.sin(x * f2 + p2); let f = 0, F = 0;
+      for (const o of forms) { const dx = X - o.x, dy = Y - o.y, rx = dx * o.c + dy * o.sn, ry = -dx * o.sn + dy * o.c, q = rx * rx / (o.sx * o.sx) + ry * ry / (o.sy * o.sy); f += o.a * Math.exp(-q / 2); F += o.a * Math.exp(-q / 13); /* the rim flare: very wide */ }
+      const i = y * W + x; core2[i] = f; wide[i] = F; if (f > m1) m1 = f; if (F > m2) m2 = F;
+    }
     const ss = (a, b, t) => { t = Math.min(1, Math.max(0, (t - a) / (b - a))); return t * t * (3 - 2 * t); };
     const draw = k => {   // k: how far it has built up, 0 to 1
-      for (let i = 0, j = 0; i < field.length; i++, j += 4) {
-        const t = field[i] / mx * (0.35 + 0.65 * k), n = grain[i];
-        let a = ss(0.03, 0.55, t + (n - 0.5) * 0.12) * k;   // the long fall-off, broken by grain at its edge
+      for (let i = 0, j = 0; i < core2.length; i++, j += 4) {
+        const t = core2[i] / m1 * (0.3 + 0.7 * k), T = wide[i] / m2 * (0.3 + 0.7 * k), n = grain[i];
+        const ex = (i % W) / W, ey = (i / W | 0) / H, edge = ss(0, 0.14, Math.min(ex, 1 - ex, ey, 1 - ey));   // fades out before the canvas's edge, so it is never cut
+        const a = Math.max(Math.pow(ss(0, 0.9, T + (n - 0.5) * 0.1), 1.4) * 0.93, ss(0.05, 0.45, t)) * k * edge;   // fading out very gradually over a long way   // the rim colour flares out wide; the core sits inside it
         if (a <= 0.004) { d[j + 3] = 0; continue; }
-        const m = ss(0.3, 0.95, t), sh = 0.93 + n * 0.14;   // deep core shading to the rim colour
+        const m = ss(0.25, 0.9, t + (n - 0.5) * 0.05), sh = 0.93 + n * 0.14;
         d[j] = (rim[0] + (core[0] - rim[0]) * m) * sh; d[j + 1] = (rim[1] + (core[1] - rim[1]) * m) * sh; d[j + 2] = (rim[2] + (core[2] - rim[2]) * m) * sh; d[j + 3] = Math.min(1, a) * 255;
       }
       g.putImageData(img, 0, 0);
     };
-    cv.classList.add('on');
-    if (RM) return draw(1);
-    const t0 = performance.now(), dur = 1800;
-    const tick = now => { const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3); draw(e); if (p < 1) requestAnimationFrame(tick); };
-    requestAnimationFrame(tick);
+    draw(1);   // drawn once; the build-up is a fade and grow in CSS
+    requestAnimationFrame(() => cv.classList.add('on'));
   }
   watch('canvas.ca-glow', glow, 400);
 
