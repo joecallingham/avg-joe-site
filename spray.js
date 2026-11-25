@@ -76,6 +76,13 @@
     for (let d = 2; d < ov; d += 2) out.push([e[0] + dx / l * d - dy / l * d * bend * d / ov, e[1] + dy / l * d + dx / l * d * bend * d / ov]);   // overshoot, curling off
     return out;
   };
+  // two paints mixed as paint, on the painter's red-yellow-blue wheel rather than as light: yellow and blue make green,
+  // red and blue make purple, red and yellow make orange
+  const rgb2ryb = (r, g, b) => { const w = Math.min(r, g, b); r -= w; g -= w; b -= w; const mg = Math.max(r, g, b); let y = Math.min(r, g); r -= y; g -= y;
+    if (b && g) { b /= 2; g /= 2; } y += g; b += g; const my = Math.max(r, y, b); if (my) { const n = mg / my; r *= n; y *= n; b *= n; } return [r + w, y + w, b + w]; };
+  const ryb2rgb = (r, y, b) => { const w = Math.min(r, y, b); r -= w; y -= w; b -= w; const my = Math.max(r, y, b); let g = Math.min(y, b); y -= g; b -= g;
+    if (b && g) { b *= 2; g *= 2; } r += y; g += y; const mg = Math.max(r, g, b); if (mg) { const n = my / mg; r *= n; g *= n; b *= n; } return [r + w, g + w, b + w]; };
+  const mixPaint = (r1, g1, b1, r2, g2, b2) => { const A = rgb2ryb(r1, g1, b1), B = rgb2ryb(r2, g2, b2); return ryb2rgb((A[0] + B[0]) / 2, (A[1] + B[1]) / 2, (A[2] + B[2]) / 2); };
   const wob = () => { const a = Math.random() * 6, b = Math.random() * 6, c = Math.random() * 6;
     // the hand's pressure: slow swells plus the odd dip where the paint thins right out, so a line is never even
     return t => Math.max(0.04, Math.min(1, 0.55 + 0.32 * Math.sin(t * 0.011 + a) + 0.22 * Math.sin(t * 0.037 + b) - 0.45 * Math.max(0, Math.sin(t * 0.006 + c)) ** 6)); };
@@ -113,7 +120,7 @@
       for (let i = 0; i < d.length; i += 4) { const v = (Math.random() - 0.5) * 26; d[i] += v; d[i + 1] += v; d[i + 2] += v; }
       bgc.putImageData(im, 0, 0);
     }
-    const tint = document.createElement('canvas'); tint.width = W; tint.height = H; const tg = tint.getContext('2d', { willReadFrequently: true });   // the colour each part of a travelling stroke was sprayed in
+    const prior = document.createElement('canvas'); prior.width = W; prior.height = H; const pg = prior.getContext('2d', { willReadFrequently: true });   // the paint already down
     const halo = document.createElement('canvas'); halo.width = W; halo.height = H; const hg = halo.getContext('2d', { willReadFrequently: true });   // where the paint blooms into a lighter tint off its edge
     const dens = document.createElement('canvas'); dens.width = W; dens.height = H; const dg = dens.getContext('2d', { willReadFrequently: true });
     const lay = document.createElement('canvas'); lay.width = W; lay.height = H; const lg = lay.getContext('2d');
@@ -125,7 +132,7 @@
     const ink = (s, x0, y0, x1, y1) => {
       x0 = Math.max(0, x0 | 0); y0 = Math.max(0, y0 | 0); x1 = Math.min(W, Math.ceil(x1)); y1 = Math.min(H, Math.ceil(y1));
       const w = x1 - x0, h = y1 - y0; if (w <= 0 || h <= 0) return;
-      const td = s.ramp ? tg.getImageData(x0, y0, w, h).data : null, mid = s.midRgb;
+      const mid = s.midRgb, pd = pg.getImageData(x0, y0, w, h).data;
       const dd = dg.getImageData(x0, y0, w, h).data, hd = hg.getImageData(x0, y0, w, h).data, out = lg.createImageData(w, h), o = out.data, [r, gg, b] = s.rgb, rim = s.rimRgb;
       const tn = s.rgb.map(v => v + (255 - v) * 0.5);   // the lighter tint of the same colour
       for (let yy = 0; yy < h; yy++) for (let xx = 0; xx < w; xx++) {
@@ -145,25 +152,31 @@
         if (a <= 0 && ha <= 0) continue;
         const sh = s.brush ? 1 : 0.9 + n * 0.2;
         let cr = r, cg = gg, cb = b;
-        if (td && td[i + 3]) { const k = 255 / td[i + 3]; cr = td[i] * k; cg = td[i + 1] * k; cb = td[i + 2] * k; }   // its colour at this point along the stroke
         const J = Math.random() - 0.5;   // colours meet as interleaved dots, not a smooth blend (as real spray does)
         if (mid) {   // a soft form that shades from its core, through a ring of a second colour, out to its rim (after Erlich)
           const t = Math.min(1, Math.max(0, Math.min(1, dv * 1.25) + J * 0.6)), m2 = t > 0.5 ? (t - 0.5) * 2 : 0, m1 = t > 0.5 ? 1 : t * 2;
           const er = rim || tn; cr = er[0] + (mid[0] - er[0]) * m1; cg = er[1] + (mid[1] - er[1]) * m1; cb = er[2] + (mid[2] - er[2]) * m1;
           cr += (r - cr) * m2; cg += (gg - cg) * m2; cb += (b - cb) * m2;
-        } else if (rim && !td) { const t = Math.min(1, Math.max(0, Math.min(1, dv * (s.soft ? 1.25 : 1.6)) ** 1.6 + J * 0.75)); cr = rim[0] + (r - rim[0]) * t; cg = rim[1] + (gg - rim[1]) * t; cb = rim[2] + (b - rim[2]) * t; }
+        } else if (rim) { const t = Math.min(1, Math.max(0, Math.min(1, dv * (s.soft ? 1.25 : 1.6)) ** 1.6 + J * 0.75)); cr = rim[0] + (r - rim[0]) * t; cg = rim[1] + (gg - rim[1]) * t; cb = rim[2] + (b - rim[2]) * t; }
         if (!s.brush && !s.solid) { const pale = Math.max(0, (1 - pv) * 0.28 + J * 0.25), hot = rim ? Math.max(0, pv - 0.55 + J * 0.3) * 0.5 : 0;   // paler where it thins, towards the rim colour where it is hot
           cr += (tn[0] - cr) * pale; cg += (tn[1] - cg) * pale; cb += (tn[2] - cb) * pale;
           if (hot) { cr += (rim[0] - cr) * hot; cg += (rim[1] - cg) * hot; cb += (rim[2] - cb) * hot; } }
         const A = a + ha * (1 - a), wa = Math.min(1, Math.max(0, a / A + J * 0.5)), wh = 1 - wa;   // the paint over its lighter bloom, mixed through dots
-        o[i] = (cr * wa + tn[0] * wh) * sh; o[i + 1] = (cg * wa + tn[1] * wh) * sh; o[i + 2] = (cb * wa + tn[2] * wh) * sh;
+        let fr = cr * wa + tn[0] * wh, fg = cg * wa + tn[1] * wh, fb = cb * wa + tn[2] * wh;
+        const pa = pd[i + 3] / 255;
+        if (pa > 0.05) {   // crossing earlier paint: the two mix like pigment (blue over yellow goes green), softly, through the dots
+          const t = Math.min(1, Math.max(0, 0.5 + (Math.random() - 0.5) * 0.5)) * pa * Math.min(1, 0.4 + a);
+          const m = mixPaint(pd[i], pd[i + 1], pd[i + 2], fr, fg, fb);
+          fr += (m[0] - fr) * t; fg += (m[1] - fg) * t; fb += (m[2] - fb) * t;
+        }
+        o[i] = fr * sh; o[i + 1] = fg * sh; o[i + 2] = fb * sh;
         o[i + 3] = A * (s.solid || s.brush ? 255 : 222);   // never quite opaque, so passes that cross build up on each other
       }
       lg.putImageData(out, x0, y0);
     };
     const step = () => {
       const s = strokes[si]; if (!s) return done && done();
-      if (!s.rgb) { s.rgb = rgb(s.c); if (s.rim) s.rimRgb = rgb(s.rim); if (s.mid) s.midRgb = rgb(s.mid); if (s.ramp) s.rampRgb = s.ramp.map(rgb); if (!s.soft && !s.exact) s.path = human(s.path, s.w * FAT); }
+      if (!s.rgb) { s.rgb = rgb(s.c); if (s.rim) s.rimRgb = rgb(s.rim); if (s.mid) s.midRgb = rgb(s.mid); if (!s.soft && !s.exact) s.path = human(s.path, s.w * FAT); }
       const n = s.path.length, u = at / n, ease = 0.3 + 2.2 * u * u;   // each pass starts slow and finishes quick, like a confident hand
       const adv = Q ? n : Math.max(3, Math.round(s.speed * ease * (0.6 + 0.8 * sp(at))));
       let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
@@ -172,11 +185,6 @@
         const R = s.w * FAT * 0.5 * (s.brush || s.taper ? Math.max(0.12, Math.min(1, (n - at) / (n * 0.4), 0.7 + at / (n * 0.3))) : 0.8 + 0.45 * (1 - p));   // a brush stroke lands blunt and flicks off to a point
         dg.globalAlpha = s.soft ? Math.min(0.6, (1 - Math.pow(0.04, 3 / n)) * (0.7 + 0.5 * p)) : Math.min(0.5, (1 - Math.pow(0.08, 3 / R)) * (0.4 + p) * 1.05);
         dg.drawImage(PUFF, x - R, y - R, 2 * R, 2 * R);   // (an airbrushed form builds to a full core over its few turns)
-        if (s.rampRgb) {   // colour that travels along the stroke: lay this point's colour where the paint lands
-          const rr = s.rampRgb, seg = Math.min(0.9999, at / n) * (rr.length - 1), i0 = seg | 0, fr = seg - i0, ca = rr[i0], cb2 = rr[i0 + 1];
-          tg.globalAlpha = 0.5; tg.fillStyle = 'rgb(' + (ca[0] + (cb2[0] - ca[0]) * fr | 0) + ',' + (ca[1] + (cb2[1] - ca[1]) * fr | 0) + ',' + (ca[2] + (cb2[2] - ca[2]) * fr | 0) + ')';
-          tg.beginPath(); tg.arc(x, y, R * 2.2, 0, 6.283); tg.fill();
-        }
         const B = R * (2 + 0.8 * p); if (!s.brush) { dg.globalAlpha = Math.min(0.08, (1 - Math.pow(0.6, 3 / B)) * (0.3 + p)); dg.drawImage(PUFF, x - B, y - B, 2 * B, 2 * B); }   // the wider mist round the nozzle; build to the same body
         if (!s.brush && Math.random() < 0.12) {   // stray spits of paint, some well clear of the line
           dg.globalAlpha = 0.1 + Math.random() * 0.25; const a = Math.random() * 6.283, d = R * (0.8 + Math.random() * Math.random() * 3.5), rr = R * (0.08 + Math.random() * 0.3);
@@ -192,7 +200,7 @@
       }
       ink(s, x0, y0, x1, y1); show();
       if (at >= n - 1) {   // this pass is done: fix it into the base and start the next on a clean density layer
-        bgc.drawImage(lay, 0, 0); lg.clearRect(0, 0, W, H); dg.clearRect(0, 0, W, H); hg.clearRect(0, 0, W, H); tg.clearRect(0, 0, W, H); dg.globalAlpha = 1;
+        bgc.drawImage(lay, 0, 0); pg.drawImage(lay, 0, 0); lg.clearRect(0, 0, W, H); dg.clearRect(0, 0, W, H); hg.clearRect(0, 0, W, H); dg.globalAlpha = 1;
         if (s.drops) {   // a few flecks of a second colour flicked off the can: soft, grainy, fading out at their edges
           bgc.fillStyle = s.drops; const nd = 2 + (Math.random() * 5 | 0), sz = Math.max(3, s.w / 22), px = Math.max(1, Math.min(devicePixelRatio || 1, 1.5));
           for (let d = 0; d < nd; d++) {
@@ -201,6 +209,10 @@
             for (let k = 0; k < dots; k++) {
               const r = rr * Math.abs((Math.random() + Math.random() + Math.random() - 1.5) / 1.5) * 1.6, a2 = Math.random() * 6.283, fall = Math.max(0, 1 - r / (rr * 1.7));
               bgc.globalAlpha = (0.08 + Math.random() * 0.3) * fall * fall; bgc.fillRect(cx + Math.cos(a2) * r, cy + Math.sin(a2) * r, px * (0.6 + Math.random() * 0.9), px * (0.6 + Math.random() * 0.9));
+            }
+            for (let k = 0, nk = 2 + (Math.random() * 5 | 0); k < nk; k++) {   // and a few tiny solid flecks round it, for depth
+              const a3 = Math.random() * 6.283, r3 = rr * (0.3 + Math.random() * 2.4), z = px * (0.8 + Math.random() * 1.8);
+              bgc.globalAlpha = 0.85 + Math.random() * 0.15; bgc.beginPath(); bgc.arc(cx + Math.cos(a3) * r3, cy + Math.sin(a3) * r3, z, 0, 6.283); bgc.fill();
             }
           }
           bgc.globalAlpha = 1; show();
@@ -285,9 +297,9 @@
     for (let j = 0; j < n; j++) { const side = (j % 2 ? -1 : 1) * amp * (0.5 + Math.random()); tag.push([tx - Math.sin(a) * side, ty + Math.cos(a) * side]); tx += Math.cos(a) * step; ty += Math.sin(a) * step; }
     strokes.push({ c: art.tag || '#f1eee7', w: (16 + Math.random() * 14) * k, speed: 60 * r, path: curve(tag.map(map)) });
     // after the references: sometimes a soft airbrushed form behind, the main pass shifting colour at its edge, droplets
-    const c0 = art[0][0], NEXT = { '#ffd23f': '#ff8a00', '#f6c9de': '#ff7ab0', '#1f2a4d': '#3a2cff', '#2b6a3e': '#18c95a', '#ff7a2b': '#ff2f55', '#ff3a1a': '#e01fb0', '#1f3fd1': '#7a2cff' };
+    const c0 = art[0][0];
     const RING = ['#7a2cff', '#00b7c7', '#ffd400', '#ff2d55', '#18c95a'];
-    if (NEXT[c0] && Math.random() < 0.75) { const main = strokes.find(t => t.c === c0 && !t.soft); if (main) main.ramp = [c0, NEXT[c0], c0]; }
+
     if (RIM[c0] && Math.random() < 0.7) strokes[0].rim = RIM[c0];
     if (Math.random() < 0.6) strokes[0].drops = ['#1f2a4d', '#ff2f7a', '#f1eee7', '#1f3fd1'].filter(c => c !== c0)[Math.random() * 3 | 0];
     if (Math.random() < 0.85) { const b = blob(c0, 200 + Math.random() * 600, 200 + Math.random() * 600, 380 + Math.random() * 200);
@@ -367,7 +379,7 @@
   }
   // AI: full bleed, two airbrushed gradients overlapping (navy into green, magenta into orange), each with a couple of small
   // hotter glows in it, after Joe's references. Still.
-  function aiGlow(cv, spec, strength = 1, size = 1) {
+  function aiGlow(cv, spec, strength = 1, size = 1, mask = null) {
     const px = cv.clientWidth * cv.clientHeight, sc = Math.min(Math.min(devicePixelRatio || 1, 1.5), Math.sqrt(2.6e6 / Math.max(1, px)));
     const W = cv.width = Math.max(2, Math.round(cv.clientWidth * sc)), H = cv.height = Math.max(2, Math.round(cv.clientHeight * sc));
     const g = cv.getContext('2d'), img = g.createImageData(W, H), d = img.data, R1 = (a, b) => a + Math.random() * (b - a), U = Math.max(W, H);
@@ -425,7 +437,9 @@
         const na = a + A * (1 - a); if (na > 0) { R = (r * a + R * A * (1 - a)) / na; Gc = (gg * a + Gc * A * (1 - a)) / na; B = (b * a + B * A * (1 - a)) / na; } A = na;
       }
       const sh = 0.94 + n * 0.12;
-      d[j] = R * sh; d[j + 1] = Gc * sh; d[j + 2] = B * sh; d[j + 3] = A * strength * 255;
+      let mk = 1;
+      if (mask) { const px2 = i % W, py2 = (i / W) | 0, dx = (px2 - mask.x * W) / (mask.r * W), dy = (py2 - mask.y * H) / (mask.r * W * mask.k), dd = Math.sqrt(dx * dx + dy * dy); mk = 1 - ss(0.72, 1.02, dd + (n - 0.5) * 0.06); }
+      d[j] = R * sh; d[j + 1] = Gc * sh; d[j + 2] = B * sh; d[j + 3] = A * strength * mk * 255;
     } };
     const rows = Math.max(40, Math.ceil(H / 6));
     const next = y => { slice(y, Math.min(H, y + rows)); if (y + rows < H) later(() => next(y + rows)); else g.putImageData(img, 0, 0); };
@@ -435,7 +449,7 @@
   const wheelBg = document.getElementById('wheel-bg');
   if (wheelBg) {
     const cv = document.createElement('canvas'); cv.className = 'wheel-air'; cv.setAttribute('aria-hidden', 'true'); wheelBg.appendChild(cv); wheelBg.classList.add('sprayed');
-    const paint = () => aiGlow(cv, [{ core: '#7fb4d4', mid: '#c4bdea', rim: '#d3e6ec', heat: '#a8d2ea', x: 0.02, y: 0.45 }, { core: '#f5e3d6', mid: '#f6d0dd', rim: '#f8eee7', heat: '#f2d6c4', x: 0.52, y: 1.06 }], 0.55, 1.9);
+    const paint = () => aiGlow(cv, [{ core: '#7fb4d4', mid: '#c4bdea', rim: '#d3e6ec', heat: '#a8d2ea', x: 0.02, y: 0.48 }], 0.6, 1.9, { x: -0.02, y: 0.5, r: 0.4, k: 1.15 });   // kept within the wheel's half-circle
     (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(() => later(paint), 300));
   }
   const aiPat = document.querySelector('.hv-half[data-k=ai] .hv-grad');
@@ -498,15 +512,16 @@
     const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.round(box.width * r), H = cv.height = Math.round(box.height * r);
     const P = (x, y) => [(x - box.left) * r, (y - box.top) * r], R1 = (a, b) => a + Math.random() * (b - a);
     const cx = tb.left + tb.width / 2, cy = tb.top + tb.height / 2, rx = Math.min(tb.width * 0.5, box.width * 0.44), ry = Math.min(tb.height * 0.95, box.height * 0.42), th = tb.height * r;
-    const ramps = [['#1f5bff', '#7a2cff', '#ff2f7a'], ['#ff6a1f', '#ff2f7a', '#7a2cff'], ['#0f8a3a', '#1f3dff', '#8a1fff'], ['#ff2f7a', '#ff8a00', '#ffd400']];
-    const ramp = ramps[Math.random() * ramps.length | 0], c = ramp[0], w = th * R1(0.13, 0.16);   // the colour travels along each stroke (after Erlich)
-    const ring = [], a0 = R1(-2.2, -1.6);   // the face, a hand-drawn loop that overlaps itself a little
-    for (let t = 0; t <= 6.283 + 0.45; t += 0.2) { const k = 1 + 0.05 * Math.sin(t * 2 + a0); ring.push(P(cx + Math.cos(t + a0) * rx * k, cy + Math.sin(t + a0) * ry * k)); }
-    const eye = sx => [P(cx + sx * rx * 0.3, cy - ry * 0.42), P(cx + sx * rx * 0.31, cy - ry * 0.18)];
-    const grin = [P(cx - rx * 0.52, cy + ry * 0.12), P(cx - rx * 0.22, cy + ry * 0.52), P(cx + rx * 0.2, cy + ry * 0.55), P(cx + rx * 0.5, cy + ry * 0.1)];
-    const S = (pts, ww, sp) => ({ c, ramp, exact: true, w: ww, speed: sp * r, path: curve(pts) });   // round brush: no taper, no flick
-    const eyes = [S(eye(-1), w * 1.5, 12), S(eye(1), w * 1.5, 12)], g2 = S(grin, w * 1.2, 30); eyes.forEach(e => e.solid = true); g2.solid = true;   // the eyes and smile denser, so they read through the type
-    run(cv, W, H, null, [S(ring, w, 44), ...eyes, g2], 160);
+    const c = ['#2f63ff', '#ff2f7a', '#ff6a1f'][Math.random() * 3 | 0], w = th * R1(0.13, 0.16);
+    // just two eyes and a smile, in a thick round brush, at a tilt over the text (no face outline, not stretched to the sentence)
+    const sz = Math.min(tb.height * 1.55, tb.width * 0.42), tilt = R1(0.18, 0.32) * (Math.random() < 0.5 ? -1 : 1), co = Math.cos(tilt), si = Math.sin(tilt);
+    const F = (u, v) => P(cx + (u * co - v * si) * sz, cy + (u * si + v * co) * sz);
+    const S = (pts, ww, sp) => ({ c, rim: RIM[c], exact: true, w: ww, speed: sp * r, path: curve(pts) });   // round brush: no taper, no flick
+    const W2 = Math.min(th * 0.19, sz * r * 0.15);   // a thick round brush, but the features still stand apart
+    const eyeL = [F(-0.3, -0.4), F(-0.29, -0.2)], eyeR = [F(0.3, -0.4), F(0.31, -0.2)];
+    const smileP = [F(-0.55, 0.1), F(-0.3, 0.42), F(0.02, 0.52), F(0.33, 0.4), F(0.56, 0.08)];
+    const st = [S(eyeL, W2 * 1.1, 12), S(eyeR, W2 * 1.1, 12), S(smileP, W2, 30)]; st.forEach(t => t.solid = true);
+    run(cv, W, H, null, st, 160);
   }
   watch('canvas.spray-over', smile, 700);
 
