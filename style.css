@@ -214,6 +214,9 @@ html.intro-dark .notch-fill path{fill:#0b0b0b}
 .nb:hover,.nb.on{color:var(--ink)}
 .nb[data-k="studio"]{min-width:6.6rem;text-align:center;overflow:hidden}
 .say{display:inline-block;white-space:nowrap}
+/* on the opening film the middle button reads "Scroll down" with a chevron */
+.nb .chev{display:none;width:.7em;height:.7em;margin-left:.3em;vertical-align:.02em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+html.nb-down .nb .chev{display:inline-block}
 .nbt{white-space:nowrap}
 .hw{white-space:nowrap}
 .hl{display:inline-block;text-align:center;line-height:0;vertical-align:baseline;white-space:nowrap}

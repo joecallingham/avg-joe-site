@@ -192,7 +192,7 @@
   /* ---------- nav: stays on Studio ---------- */
   // The middle button talks: its words change with where you are (and with what you hover).
   // the middle of the notch always books a call now (hovering it says "Pick a time")
-  const SAYS = { top: 'Book call', big: 'Book call', wheel: 'Book call', pick: 'Book call', work: 'Book call', end: 'Book call', soon: 'Book call', play: 'Pick a time', beat: 'Book call', info: 'Book call' };
+  const SAYS = { top: 'Scroll down', big: 'Book call', wheel: 'Book call', pick: 'Book call', work: 'Book call', end: 'Book call', soon: 'Book call', play: 'Pick a time', beat: 'Book call', info: 'Book call' };
   let saying = 'Studio', sayTl = null, hoverSay = null;
   function say(text) {
     if (document.documentElement.classList.contains('bk-on')) text = 'Close';   // while the form is open, the middle button closes it
@@ -209,9 +209,12 @@
     const t = tl ? tl.time() : 0;
     const past = cur - endPx - room;
     const where = past > VH() * 0.4 ? 'end' : t >= WE + 0.5 ? 'work' : t >= 3.6 ? 'wheel' : t >= 2.6 ? 'big' : 'top';
-    say(beatOpen ? SAYS.beat : SAYS[hoverSay && (hoverSay !== 'pick' || where === 'wheel') ? hoverSay : where]);
+    say(beatOpen ? SAYS.beat : SAYS[hoverSay && (hoverSay !== 'pick' || where === 'wheel') && (hoverSay !== 'play' || where !== 'top') ? hoverSay : where]);
+    const down = where === 'top' && !beatOpen;   // on the opening film the middle button points on down, with a chevron
+    if (downOn !== down) { downOn = down; document.documentElement.classList.toggle('nb-down', down); el.say.parentNode.setAttribute('aria-label', down ? 'Scroll down' : 'Book a call'); }
     if (workBtn._on !== (where === 'work')) { workBtn._on = where === 'work'; workBtn.classList.toggle('on', workBtn._on); }
   }
+  let downOn = null;
   const workBtn = $('.nb[data-k="work"]');
   function setNav() { navState(); }
 
@@ -589,6 +592,7 @@
   $$('.nb').forEach(a => a.addEventListener('click', e => {
     if (a.dataset.k === 'info' || a.dataset.k === 'work') return;   // Work and Info go to their pages
     e.preventDefault();
+    if (a.dataset.k === 'studio' && downOn) { const f = Math.max(2, tOf(lenis.targetScroll)), next = RESTS.find(s => s > f + 0.01); /* on to the big sentence */ if (next !== undefined) goTo(next); return; }
     if (a.dataset.k === 'studio' && window.AvgBook) AvgBook.open(a);   // the middle button books a call
   }));
   const hov = (n, key) => { n.addEventListener('mouseenter', () => { hoverSay = key; navState(); }); n.addEventListener('mouseleave', () => { hoverSay = null; navState(); }); };
@@ -794,7 +798,12 @@
     addEventListener('pointerdown', playFilm, { once: true }); addEventListener('wheel', playFilm, { once: true, passive: true });
     requestAnimationFrame(() => requestAnimationFrame(startReveal));
     gsap.fromTo('.logo', { opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0px)', duration: RM ? 0.01 : 1.2, ease: 'power2.out', stagger: 0.12, clearProps: 'filter' });
-    if (cur <= 2) gsap.delayedCall(RM ? 0 : 1.1, () => { if (cur <= 2) introStart(); });
+    // on arrival, glide on down to the opening film: the image fully open and Avg and Joe settled
+    const OPEN_AT = 2;
+    if (cur <= 2 && !location.hash) {
+      if (RM) lenis.scrollTo(pxOf(OPEN_AT), { immediate: true, force: true });
+      else gsap.delayedCall(0.9, () => { if (cur <= 2) lenis.scrollTo(pxOf(OPEN_AT), { duration: 2.4, easing: inOut }); });
+    } else if (cur <= 2) gsap.delayedCall(RM ? 0 : 1.1, () => { if (cur <= 2) introStart(); });
   });
 
   // for testing in the console
