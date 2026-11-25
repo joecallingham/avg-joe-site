@@ -48,11 +48,13 @@
       p.push([x + Math.cos(dir) * rad * 0.35 * u + Math.cos(a) * rr, y + Math.sin(dir) * rad * 0.35 * u + Math.sin(a) * rr]); }
     return p; };
   // a splat: a drop of paint that hit and spread a little unevenly, with a few tiny flecks thrown off it
-  const splat = (g, x, y, size, col) => {
-    g.fillStyle = col; const a0 = Math.random() * 6.283;
-    for (let k = 0; k < 4; k++) { const a = a0 + k * 1.7, d = size * 0.3 * Math.random(); g.globalAlpha = 0.85 + Math.random() * 0.15; g.beginPath(); g.arc(x + Math.cos(a) * d, y + Math.sin(a) * d, size * (0.45 + Math.random() * 0.35), 0, 6.283); g.fill(); }
-    for (let k = 0; k < 2 + (Math.random() * 6 | 0); k++) { const a = Math.random() * 6.283, d = size * (1 + Math.random() * 2.5); g.globalAlpha = 0.7 + Math.random() * 0.3; g.beginPath(); g.arc(x + Math.cos(a) * d, y + Math.sin(a) * d, size * (0.06 + Math.random() * 0.18), 0, 6.283); g.fill(); }
-    if (Math.random() < 0.35) { const a = Math.random() * 6.283; g.globalAlpha = 0.9; g.beginPath(); g.ellipse(x + Math.cos(a) * size, y + Math.sin(a) * size, size * 0.9, size * 0.16, a, 0, 6.283); g.fill(); }   // sometimes a short streak
+  const splat = (g, x, y, size, col) => {   // a sparse scatter of spray grit: fine dots, the odd slightly bigger fleck
+    g.fillStyle = col; const n = 14 + (Math.random() * 36 | 0), px = Math.max(1, Math.min(devicePixelRatio || 1, 1.5));
+    for (let k = 0; k < n; k++) {
+      const a = Math.random() * 6.283, d = size * 3 * Math.abs((Math.random() + Math.random() + Math.random() - 1.5) / 1.5), big = Math.random() < 0.06;
+      const z = (big ? 1.6 + Math.random() * 1.2 : 0.5 + Math.random() * 1.1) * px;
+      g.globalAlpha = 0.35 + Math.random() * 0.55; g.fillRect(x + Math.cos(a) * d, y + Math.sin(a) * d, z, z);
+    }
     g.globalAlpha = 1;
   };
   // a line as a hand sprays it: it settles at the start, drifts and wobbles off its course, and overshoots at the end
@@ -102,6 +104,7 @@
       for (let i = 0; i < d.length; i += 4) { const v = (Math.random() - 0.5) * 26; d[i] += v; d[i + 1] += v; d[i + 2] += v; }
       bgc.putImageData(im, 0, 0);
     }
+    const halo = document.createElement('canvas'); halo.width = W; halo.height = H; const hg = halo.getContext('2d', { willReadFrequently: true });   // where the paint blooms into a lighter tint off its edge
     const dens = document.createElement('canvas'); dens.width = W; dens.height = H; const dg = dens.getContext('2d', { willReadFrequently: true });
     const lay = document.createElement('canvas'); lay.width = W; lay.height = H; const lg = lay.getContext('2d');
     const show = () => { g.clearRect(0, 0, W, H); g.drawImage(base, 0, 0); g.drawImage(lay, 0, 0); };
@@ -112,21 +115,27 @@
     const ink = (s, x0, y0, x1, y1) => {
       x0 = Math.max(0, x0 | 0); y0 = Math.max(0, y0 | 0); x1 = Math.min(W, Math.ceil(x1)); y1 = Math.min(H, Math.ceil(y1));
       const w = x1 - x0, h = y1 - y0; if (w <= 0 || h <= 0) return;
-      const dd = dg.getImageData(x0, y0, w, h).data, out = lg.createImageData(w, h), o = out.data, [r, gg, b] = s.rgb, rim = s.rimRgb;
+      const dd = dg.getImageData(x0, y0, w, h).data, hd = hg.getImageData(x0, y0, w, h).data, out = lg.createImageData(w, h), o = out.data, [r, gg, b] = s.rgb, rim = s.rimRgb;
+      const tn = s.rgb.map(v => v + (255 - v) * 0.5);   // the lighter tint of the same colour
       for (let yy = 0; yy < h; yy++) for (let xx = 0; xx < w; xx++) {
-        const i = (yy * w + xx) * 4, dv = dd[i + 3] / 255; if (!dv) continue;
+        const i = (yy * w + xx) * 4, dv = dd[i + 3] / 255, hv = hd[i + 3] / 255; if (!dv && !hv) continue;
         const n = grain[(y0 + yy) * W + x0 + xx];
-        let a;
-        if (s.brush) { const t = dv + (rough[(y0 + yy) * W + x0 + xx] - 0.5) * 0.5 + (n - 0.5) * 0.04; a = t > 0.44 ? 1 : t > 0.4 ? (t - 0.4) / 0.04 : 0; }   // dry brush: flat paint with a hard, ragged edge
-        else if (s.soft) { a = (dv * 1.1 - n * 0.2) * 1.2; if (a > 0.97) a = 0.97; }   // airbrush: a smooth soft form with fine grain, no hard core
-        else { a = (dv * (s.solid ? 1.9 : 1.25) - n * 0.62) * 2.4; if (a > 1) a = 1;
-          const mist = (dv - n * 0.32) * 0.42; if (mist > a) a = mist; }   // the blowout: thin paint carried wide of the line
-        if (a <= 0) continue;
+        let a = 0;
+        if (dv) {
+          if (s.brush) { const t = dv + (rough[(y0 + yy) * W + x0 + xx] - 0.5) * 0.5 + (n - 0.5) * 0.04; a = t > 0.44 ? 1 : t > 0.4 ? (t - 0.4) / 0.04 : 0; }   // dry brush: flat paint with a hard, ragged edge
+          else if (s.soft) { a = (dv * 1.1 - n * 0.2) * 1.2; if (a > 0.97) a = 0.97; }   // airbrush: a smooth soft form with fine grain, no hard core
+          else { a = (dv * (s.solid ? 1.9 : 1.25) - n * 0.62) * 2.4; if (a > 1) a = 1;
+            const mist = (dv - n * 0.32) * 0.42; if (mist > a) a = mist; }   // the blowout: thin paint carried wide of the line
+          if (a < 0) a = 0;
+        }
+        let ha = (hv * 1.7 - n * 0.35) * 0.6; if (ha < 0) ha = 0; if (ha > 0.6) ha = 0.6;
+        if (a <= 0 && ha <= 0) continue;
         const sh = s.brush ? 1 : 0.9 + n * 0.2;
-        if (rim) {   // two-tone: the edge of the paint shifts to a second colour, the dense middle keeps the first
-          const t = Math.min(1, dv * (s.soft ? 1.25 : 1.6)) ** 1.6;
-          o[i] = (rim[0] + (r - rim[0]) * t) * sh; o[i + 1] = (rim[1] + (gg - rim[1]) * t) * sh; o[i + 2] = (rim[2] + (b - rim[2]) * t) * sh;
-        } else { o[i] = r * sh; o[i + 1] = gg * sh; o[i + 2] = b * sh; } o[i + 3] = a * (s.solid || s.brush ? 255 : 222);   // never quite opaque, so passes that cross build up on each other
+        let cr = r, cg = gg, cb = b;
+        if (rim) { const t = Math.min(1, dv * (s.soft ? 1.25 : 1.6)) ** 1.6; cr = rim[0] + (r - rim[0]) * t; cg = rim[1] + (gg - rim[1]) * t; cb = rim[2] + (b - rim[2]) * t; }
+        const A = a + ha * (1 - a), wa = a / A, wh = 1 - wa;   // the paint over its lighter bloom
+        o[i] = (cr * wa + tn[0] * wh) * sh; o[i + 1] = (cg * wa + tn[1] * wh) * sh; o[i + 2] = (cb * wa + tn[2] * wh) * sh;
+        o[i + 3] = A * (s.solid || s.brush ? 255 : 222);   // never quite opaque, so passes that cross build up on each other
       }
       lg.putImageData(out, x0, y0);
     };
@@ -146,11 +155,17 @@
           dg.globalAlpha = 0.1 + Math.random() * 0.25; const a = Math.random() * 6.283, d = R * (0.8 + Math.random() * Math.random() * 3.5), rr = R * (0.08 + Math.random() * 0.3);
           dg.drawImage(PUFF, x + Math.cos(a) * d - rr, y + Math.sin(a) * d - rr, 2 * rr, 2 * rr);
         }
+        if (!s.soft && !s.brush && !s.solid) {   // the lighter bloom: where the hand turns a corner or moves fast, not all the way round
+          const pa = s.path[Math.max(0, at - 8)], pb = s.path[Math.min(n - 1, at + 8)], ax = x - pa[0], ay = y - pa[1], bx = pb[0] - x, by = pb[1] - y;
+          const turn = 1 - (ax * bx + ay * by) / ((Math.hypot(ax, ay) * Math.hypot(bx, by)) || 1), fast = Math.max(0, (0.3 + 2.2 * (at / n) ** 2) - 1.2);
+          const wgt = Math.min(1, turn * 3 + fast * 0.6) * (0.6 + 0.4 * Math.sin(at * 0.05 + s.w));
+          if (wgt > 0.05) { const HR = R * (1.55 + 0.4 * wgt); hg.globalAlpha = 0.09 * wgt; hg.drawImage(PUFF, x - HR, y - HR, 2 * HR, 2 * HR); }
+        }
         x0 = Math.min(x0, x - 3.2 * R); y0 = Math.min(y0, y - 3.2 * R); x1 = Math.max(x1, x + 3.2 * R); y1 = Math.max(y1, y + 3.2 * R);
       }
       ink(s, x0, y0, x1, y1); show();
       if (at >= n - 1) {   // this pass is done: fix it into the base and start the next on a clean density layer
-        bgc.drawImage(lay, 0, 0); lg.clearRect(0, 0, W, H); dg.clearRect(0, 0, W, H); dg.globalAlpha = 1;
+        bgc.drawImage(lay, 0, 0); lg.clearRect(0, 0, W, H); dg.clearRect(0, 0, W, H); hg.clearRect(0, 0, W, H); dg.globalAlpha = 1;
         if (s.drops) {   // a few hard droplets of a second colour, flicked off the can
           bgc.fillStyle = s.drops; const nd = 8 + (Math.random() * 18 | 0), sz = Math.max(1.2, s.w / 60);
           for (let d = 0; d < nd; d++) {
@@ -201,7 +216,7 @@
     sq.push([x, cy + R1(-0.2, 0.3) * th]);
     while (x < cx + tw * 0.48) {
       x += tw * (Math.random() < 0.4 ? R1(0.025, 0.06) : R1(0.08, 0.17));   // tight or loose
-      up = !up; sq.push([x, cy + (up ? -1 : 1) * th * R1(0.2, 1.1) + R1(-0.1, 0.1) * th]);
+      up = !up; sq.push([x, cy + (up ? -1 : 1) * Math.min(th * R1(0.2, 1.1), H * 0.5 - th * 0.75) + R1(-0.1, 0.1) * th]);
     }
     const strokes = [{ taper: true, c: '#2f63ff', w: th * R1(0.22, 0.28), speed: 44 * r, path: curve(sq) }];
     let strike = null;
@@ -241,8 +256,8 @@
     [['#1f3fd1', 90, [[130, 260], [870, 250], [880, 760], [120, 770], [135, 255]]], ['#1f3fd1', 60, [[140, 370], [860, 360]]], ['#1f3fd1', 110, [[450, 450], [460, 760], [540, 660], [660, 760]]]],   // Digital: a window and a pointer
   ];
   // spray an art list over an SVG picture, on a canvas the same size as the SVG, in the SVG's own coordinates
-  const overSvg = (svg, cv, art, done, instant) => {
-    const box = cv.getBoundingClientRect(), m = svg.getScreenCTM(); if (!box.width || !m) return false;
+  const overSvg = (svg, cv, art, done, instant, area) => {
+    const box = area || cv.getBoundingClientRect(), m = svg.getScreenCTM();   // area: paint a given screen rectangle instead of the canvas's own if (!box.width || !m) return false;
     const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.round(box.width * r), H = cv.height = Math.round(box.height * r);
     const vb = svg.viewBox.baseVal, vy = vb.y, vH = vb.height || 1000;
     // cropped in and tilted a different way each time, with a little wobble in the hand, so no two sit square
@@ -266,7 +281,7 @@
     const c0 = art[0][0];
     if (RIM[c0] && Math.random() < 0.7) strokes[0].rim = RIM[c0];
     if (Math.random() < 0.6) strokes[0].drops = ['#1f2a4d', '#ff2f7a', '#f1eee7', '#1f3fd1'].filter(c => c !== c0)[Math.random() * 3 | 0];
-    if (Math.random() < 0.6) { const b = blob(c0, 200 + Math.random() * 600, 200 + Math.random() * 600, 380 + Math.random() * 200);
+    if (Math.random() < 0.85) { const b = blob(c0, 200 + Math.random() * 600, 200 + Math.random() * 600, 380 + Math.random() * 200);
       strokes.unshift({ ...b, w: b.w * k, speed: 14 * r, path: curve(b.pts.map(map)) }); }
     run(cv, W, H, null, strokes, 160, done && (() => done({ url: cv.toDataURL('image/png'), x: (box.left - m.e) / m.a, y: (box.top - m.f) / m.d, w: box.width / m.a, h: box.height / m.d })), instant);
     return true;
@@ -281,19 +296,23 @@
     const last = i === pics.length - 1, fly = copies.find(t => t.closest('.wd-fly')), dest = copies.find(t => !t.closest('.wd-fly'));
     const go = () => {
       if (pic.dataset.sprayed) return;
-      if (last && dest) {
-        // Digital: painted once at the size of step 01 (Listen), which shows all of it; the picture here shows its middle,
-        // and the copy that flies between them shows it in the same place, so the hand-off is seamless
-        let cvD = dest.parentElement.querySelector('.st-spray');
-        if (!cvD) { cvD = document.createElement('canvas'); cvD.className = 'st-spray'; cvD.setAttribute('aria-hidden', 'true'); dest.after(cvD);
-          const place = () => { cvD.style.gridColumn = getComputedStyle(dest).gridColumnStart; cvD.style.gridRow = dest.style.gridRow = '1'; }; place(); addEventListener('resize', place); }
-        if (overSvg(dest, cvD, art, ({ url, x, y, w, h }) => {
-          if (fly && !fly.querySelector('image.wd-paint')) { const im = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-            im.setAttribute('class', 'wd-paint'); im.setAttribute('href', url); im.setAttribute('x', x); im.setAttribute('y', y); im.setAttribute('width', w); im.setAttribute('height', h); im.setAttribute('preserveAspectRatio', 'none'); fly.appendChild(im); }
-          const bx = pic.getBoundingClientRect(), r = Math.min(devicePixelRatio || 1, 1.5); cv.width = Math.round(bx.width * r); cv.height = Math.round(bx.height * r);
-          const sc = Math.max(cv.width / cvD.width, cv.height / cvD.height), dw = cvD.width * sc, dh = cvD.height * sc;
-          cv.getContext('2d').drawImage(cvD, (cv.width - dw) / 2, (cv.height - dh) / 2, dw, dh);
-        }, true)) pic.dataset.sprayed = '1';
+      if (last) {
+        // Digital: one painting, placed in the drawing's own coordinates (as the old flat shapes were), so this picture, the copy
+        // that flies down and step 01 all look through their frames at the same image and nothing jumps between them
+        const m = svg.getScreenCTM(), b1 = pic.getBoundingClientRect(); if (!m || !b1.width) return;
+        const U = [b1], md = dest && dest.getScreenCTM(); if (md) U.push(dest.getBoundingClientRect());
+        const us = U.map((b, j) => { const q = j ? md : m; return [(b.left - q.e) / q.a, (b.top - q.f) / q.d, (b.right - q.e) / q.a, (b.bottom - q.f) / q.d]; });
+        let x0 = Math.min(...us.map(v => v[0])), y0 = Math.min(...us.map(v => v[1])), x1 = Math.max(...us.map(v => v[2])), y1 = Math.max(...us.map(v => v[3]));
+        const pad = (y1 - y0) * 0.25; y0 -= pad; y1 += pad;   // room for the drift as it flies
+        const area = { left: m.a * x0 + m.e, top: m.d * y0 + m.f, width: (x1 - x0) * m.a, height: (y1 - y0) * m.d };
+        area.right = area.left + area.width; area.bottom = area.top + area.height;
+        const off = document.createElement('canvas');
+        if (overSvg(svg, off, art, ({ url, x, y, w, h }) => [svg, fly, dest].forEach(t => {
+          if (!t || t.querySelector('image.wd-paint')) return;
+          const im = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+          im.setAttribute('class', 'wd-paint'); im.setAttribute('href', url); im.setAttribute('x', x); im.setAttribute('y', y); im.setAttribute('width', w); im.setAttribute('height', h); im.setAttribute('preserveAspectRatio', 'none');
+          t.appendChild(im); t.classList.add('sprayed');
+        }), true, area)) { pic.dataset.sprayed = '1'; cv.remove(); }
         return;
       }
       if (overSvg(svg, cv, art, null, !ANIM)) pic.dataset.sprayed = '1';
@@ -337,19 +356,8 @@
     const svg = craft.querySelector('svg.hv-pat'), cv = document.createElement('canvas'); cv.className = 'hv-spray'; cv.setAttribute('aria-hidden', 'true');
     if (svg) { svg.after(cv); svg.classList.add('sprayed'); onPick(craft, () => setTimeout(() => overSvg(svg, cv, CRAFT, null, !ANIM), ANIM ? 150 : 0)); }
   }
-  const aiPat = document.querySelector('.hv-half[data-k=ai] .hv-grad');
-  if (aiPat) {
-    const cv = document.createElement('canvas'); cv.className = 'hv-air'; cv.setAttribute('aria-hidden', 'true'); aiPat.appendChild(cv);   // the clean gradient stays; only a few splats go over it
-    onPick(aiPat.closest('.hv-half'), () => setTimeout(() => {
-      const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.round(cv.clientWidth * r), H = cv.height = Math.round(cv.clientHeight * r), u = Math.min(W, H);
-      const at = (x, y, size, c, rim) => ({ c, rim, soft: true, w: size * u, speed: 10 * r, path: curve(spiral(x * W + (Math.random() - 0.5) * W * 0.12, y * H + (Math.random() - 0.5) * H * 0.12, size * u * 0.14)) });
-      const g = cv.getContext('2d'), R1 = (a, b) => a + Math.random() * (b - a);
-      for (let k = 0; k < 3 + (Math.random() * 3 | 0); k++) {   // small clusters of splats, mostly towards the edges
-        const edge = Math.random() < 0.75, x0 = edge ? (Math.random() < 0.5 ? R1(0.03, 0.2) : R1(0.8, 0.97)) * W : R1(0.3, 0.7) * W, y0 = R1(0.08, 0.92) * H, col = ['#ff5200', '#ff2f7a', '#2f63ff', '#1f2a4d'][Math.random() * 4 | 0];
-        for (let d = 0; d < 1 + (Math.random() * 4 | 0); d++) splat(g, x0 + R1(-0.05, 0.05) * W, y0 + R1(-0.05, 0.05) * H, u * R1(0.004, 0.014), col);
-      }
-    }, 150));
-  }
+  // AI keeps its clean gradient: no paint over it
+
 
   /* ---------- odd bits of photography get a sprayed mark over them: a few at random on each visit, the 620 picture always
      (its lime shapes now go on as spray). Only pictures that fill a positioned box, so the paint can sit over them. ---------- */
