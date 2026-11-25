@@ -6,6 +6,7 @@
    Each draws itself the first time it comes into view. */
 (() => {
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ANIM = location.pathname.startsWith('/information');   // spray animates in on Information and over text; on imagery elsewhere it is simply there
   const FAT = 1.8;   // how fat every line is, over the widths set below
   const ART = {
     re: { bg: '#1f2a4d', strokes: [
@@ -41,6 +42,25 @@
     out.push(pts[pts.length - 1]);
     return out;
   };
+  // a dot as a hand sprays it: starts in the middle and spirals out, drifting a little as it goes (points in the units given)
+  const spiral = (x, y, rad) => { const p = [], T = 2 + Math.random() * 1.2, dir = Math.random() * 6.283, ph = Math.random() * 6;
+    for (let t = 0; t <= T; t += 0.06) { const u = t / T, rr = rad * (0.12 + 0.88 * u) * (1 + 0.14 * Math.sin(t * 9 + ph)), a = t * 6.283 + ph;
+      p.push([x + Math.cos(dir) * rad * 0.35 * u + Math.cos(a) * rr, y + Math.sin(dir) * rad * 0.35 * u + Math.sin(a) * rr]); }
+    return p; };
+  // a line as a hand sprays it: it settles at the start, drifts and wobbles off its course, and overshoots at the end
+  const human = (path, w) => {
+    if (path.length < 6) return path;
+    const out = [], A = w * (0.12 + Math.random() * 0.12), f1 = 6.283 / (120 + Math.random() * 260), f2 = 6.283 / (40 + Math.random() * 60), p1 = Math.random() * 6, p2 = Math.random() * 6;
+    for (let k = 0; k < 9; k++) out.push(path[0]);   // the can pauses as the paint starts
+    path.forEach((pt, i) => {
+      const a = path[Math.max(0, i - 3)], b = path[Math.min(path.length - 1, i + 3)], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1;
+      const o = A * (Math.sin(i * f1 + p1) + 0.4 * Math.sin(i * f2 + p2)) * Math.min(1, i / 30);
+      out.push([pt[0] - dy / l * o, pt[1] + dx / l * o]);
+    });
+    const e = out[out.length - 1], q = out[Math.max(0, out.length - 8)], dx = e[0] - q[0], dy = e[1] - q[1], l = Math.hypot(dx, dy) || 1, ov = w * Math.random() * 0.9, bend = (Math.random() - 0.5) * 0.8;
+    for (let d = 2; d < ov; d += 2) out.push([e[0] + dx / l * d - dy / l * d * bend * d / ov, e[1] + dy / l * d + dx / l * d * bend * d / ov]);   // overshoot, curling off
+    return out;
+  };
   const wob = () => { const a = Math.random() * 6, b = Math.random() * 6, c = Math.random() * 6;
     // the hand's pressure: slow swells plus the odd dip where the paint thins right out, so a line is never even
     return t => Math.max(0.04, Math.min(1, 0.55 + 0.32 * Math.sin(t * 0.011 + a) + 0.22 * Math.sin(t * 0.037 + b) - 0.45 * Math.max(0, Math.sin(t * 0.006 + c)) ** 6)); };
@@ -51,7 +71,8 @@
     x.fillStyle = gr; x.fillRect(0, 0, 128, 128); return b; })();
 
   /* the engine: spray strokes [{c, w(px), speed, path:[[x,y]...]}] onto canvas cv, over an optional background */
-  function run(cv, W, H, bg, strokes, gap = 220, done) {
+  function run(cv, W, H, bg, strokes, gap = 220, done, instant) {
+    const Q = RM || instant;   // all at once, no animation
     const g = cv.getContext('2d');
     // the grain the paint has to beat: fine speckle plus a coarser blotch, so coverage is uneven
     const grain = new Float32Array(W * H);
@@ -103,9 +124,9 @@
     };
     const step = () => {
       const s = strokes[si]; if (!s) return done && done();
-      if (!s.rgb) { s.rgb = rgb(s.c); if (s.rim) s.rimRgb = rgb(s.rim); }
+      if (!s.rgb) { s.rgb = rgb(s.c); if (s.rim) s.rimRgb = rgb(s.rim); if (!s.soft && !s.exact) s.path = human(s.path, s.w * FAT); }
       const n = s.path.length, u = at / n, ease = 0.3 + 2.2 * u * u;   // each pass starts slow and finishes quick, like a confident hand
-      const adv = RM ? n : Math.max(3, Math.round(s.speed * ease * (0.6 + 0.8 * sp(at))));
+      const adv = Q ? n : Math.max(3, Math.round(s.speed * ease * (0.6 + 0.8 * sp(at))));
       let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
       for (let e = Math.min(n - 1, at + adv); at <= e; at += 3) {
         const [x, y] = s.path[at], f = Math.min(1, at / 24, (n - at) / 24), p = pr(at) * (0.35 + 0.65 * f) * Math.min(1, 1.25 / Math.sqrt(0.3 + 2.2 * (at / n) ** 2));   // and thins out as it speeds up
@@ -131,10 +152,10 @@
           bgc.globalAlpha = 1; show();
         }
         si++; at = 0; pr = wob(); sp = wob();
-        if (RM) return step();
+        if (Q) return step();
         return setTimeout(() => requestAnimationFrame(step), gap + Math.random() * 160);
       }
-      RM ? step() : requestAnimationFrame(step);
+      Q ? step() : requestAnimationFrame(step);
     };
     step();
   }
@@ -143,7 +164,7 @@
   const RIM = { '#ff6a1f': '#ff2f7a', '#ff7a2b': '#ff2f7a', '#ffd23f': '#ff8a1f', '#ff3a1a': '#ff2f7a', '#2f63ff': '#22c55e', '#1f3fd1': '#3ad06a',
                 '#5bb8e6': '#1f3fd1', '#2b6a3e': '#9be15d', '#1f2a4d': '#5b6cff', '#f6c9de': '#ffffff', '#ff8a1f': '#ff2f7a' };
   // an airbrushed soft form: a few slow turns of the can on one spot (x, y, size in the art's 0-1000 units)
-  const blob = (c, x, y, size) => ({ c, rim: RIM[c], soft: true, w: size, speed: 14, pts: [[x - size * 0.12, y], [x, y - size * 0.1], [x + size * 0.12, y + size * 0.02], [x, y + size * 0.1], [x - size * 0.06, y + size * 0.02]] });
+  const blob = (c, x, y, size) => ({ c, rim: RIM[c], soft: true, w: size, speed: 14, pts: spiral(x, y, size * 0.16) });
 
   // placeholder pictures
   function picture(cv) {
@@ -151,7 +172,11 @@
     const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.max(2, Math.round(cv.clientWidth * r)), H = cv.height = Math.max(2, Math.round(cv.clientHeight * r));
     const SY = Math.max(H, W / 1.6), k = Math.min(W, SY) / 1000;   // wide boxes crop into the middle of the piece rather than squashing it
     const map = ([x, y]) => [x / 1000 * W, H / 2 + (0.76 * y / 1000 - 0.38) * SY];
-    run(cv, W, H, art.bg, art.strokes.map(s => ({ ...s, w: s.w * k, speed: (s.speed || 30) * Math.max(1, k * 1.5), path: curve(s.pts.map(map)) })));
+    const J = () => (Math.random() - 0.5) * 80;
+    run(cv, W, H, art.bg, art.strokes.map(s => {
+      const pts = s.soft ? spiral(s.pts.reduce((a, p) => a + p[0], 0) / s.pts.length + J(), s.pts.reduce((a, p) => a + p[1], 0) / s.pts.length + J(), s.w * 0.16) : s.pts.map(([x, y]) => [x + J(), y + J()]);
+      return { ...s, w: s.w * k * (0.85 + Math.random() * 0.3), speed: (s.speed || 30) * Math.max(1, k * 1.5), path: curve(pts.map(map)) };
+    }), 220, null, !ANIM);   // painted as it is, except on Information
   }
 
   // letters sprayed over the statement, and a ring round one word
@@ -162,13 +187,15 @@
     const tb = txt.getBoundingClientRect(), h = Math.min(tb.height * 1.45, tb.width * 0.62) * r, [cx, cy] = C(tb.left + tb.width / 2, tb.top + tb.height / 2);
     // one big squiggle across the whole statement
     // fat flat brush strokes scrubbed back and forth across it, each landing at the top and flicking off at the bottom
-    const tw = Math.min(tb.width * r, W * 0.8), th = tb.height * r, strokes = [], nS = 5 + (Math.random() * 2 | 0), J = v => (Math.random() - 0.5) * v;
-    for (let k = 0; k < nS; k++) {
-      const x0 = cx - tw * 0.42 + k * tw * 0.8 / (nS - 1) + J(tw * 0.05), top = cy - th * (0.55 + Math.random() * 0.25), bot = cy + th * (0.55 + Math.random() * 0.35);
-      const lean = tw * (0.03 + Math.random() * 0.09) * (Math.random() < 0.25 ? -1 : 1);
-      strokes.push({ taper: true, c: '#2f63ff', w: th * (0.27 + Math.random() * 0.1), speed: 46 * r, path: curve([[x0 - lean, top], [x0 + J(th * 0.1), cy + J(th * 0.1)], [x0 + lean, bot]]) });
+    // one squiggle, sprayed in a single go across it: tight zigs and loose ones, never the same height twice
+    const tw = Math.min(tb.width * r, W * 0.82), th = tb.height * r, R1 = (a, b) => a + Math.random() * (b - a), sq = [];
+    let x = cx - tw * 0.5, up = Math.random() < 0.5;
+    sq.push([x, cy + R1(-0.2, 0.3) * th]);
+    while (x < cx + tw * 0.48) {
+      x += tw * (Math.random() < 0.4 ? R1(0.025, 0.06) : R1(0.08, 0.17));   // tight or loose
+      up = !up; sq.push([x, cy + (up ? -1 : 1) * th * R1(0.2, 1.1) + R1(-0.1, 0.1) * th]);
     }
-    strokes.unshift({ taper: true, c: '#2f63ff', w: th * 0.2, speed: 30 * r, path: curve([[cx - tw * 0.52, cy - th * 0.1], [cx - tw * 0.49, cy + th * 0.25], [cx - tw * 0.46, cy + th * 0.4]]) });
+    const strokes = [{ taper: true, c: '#2f63ff', w: th * R1(0.22, 0.28), speed: 44 * r, path: curve(sq) }];
     let strike = null;
     if (word) {   // and a bold strike through "never"
       const b = word.getBoundingClientRect(), [x0, y0] = C(b.left - b.width * 0.12, b.top + b.height * 0.62), [x1, y1] = C(b.right + b.width * 0.12, b.top + b.height * 0.48);
@@ -178,20 +205,23 @@
     run(cv, W, H, null, strokes, 120, strike && (() => { const c2 = cv.cloneNode(); c2.className = 'spray-over spray-strike'; cv.after(c2); c2.width = W; c2.height = H; setTimeout(() => run(c2, W, H, null, [strike], 0), 200); }));
   }
 
-  const watch = (sel, fn, delay) => {
+  const watch = (sel, fn, delay, margin) => {
     const els = [...document.querySelectorAll(sel)]; if (!els.length) return;
     if (!('IntersectionObserver' in window)) return els.forEach(fn);
     const io = new IntersectionObserver(es => es.forEach(e => {
       if (!e.isIntersecting || !e.target.clientWidth) return;
       io.unobserve(e.target);
       (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(() => fn(e.target), RM ? 0 : delay));
-    }), { threshold: 0.4 });
+    }), margin ? { rootMargin: margin } : { threshold: 0.4 });
     els.forEach(c => io.observe(c));
   };
   /* ---------- What We Do (Information): each service's picture is sprayed over its colour the first time it comes up.
      The pictures are SVGs that wd.js crops and clones, so the paint goes on a canvas laid over each one, lined up with
      the SVG's own coordinates; the last picture's paint is then copied into the clone that flies down into step 01. ---------- */
-  const ring = (cx, cy, rx, ry, a0 = -0.6, a1 = 5.9) => { const p = []; for (let t = a0; t <= a1; t += 0.32) p.push([cx + Math.cos(t) * rx, cy + Math.sin(t) * ry]); return p; };
+  const ring = (cx, cy, rx, ry) => {   // never a true circle: the radius breathes, the centre drifts, the ends don't meet neatly
+    const p = [], a0 = Math.random() * 6.283, a1 = a0 + 6.283 + (Math.random() - 0.4) * 1.2, ph = Math.random() * 6, dx = (Math.random() - 0.5) * rx * 0.4, dy = (Math.random() - 0.5) * ry * 0.4;
+    for (let t = a0; t <= a1; t += 0.26) { const u = (t - a0) / (a1 - a0), k = 1 + 0.12 * Math.sin(t * 2 + ph) + 0.06 * Math.sin(t * 5 + ph); p.push([cx + dx * u + Math.cos(t) * rx * k, cy + dy * u + Math.sin(t) * ry * k]); }
+    return p; };
   const WD = [
     [['#ffd23f', 110, ring(570, 470, 230, 230)], ['#ffd23f', 90, [[110, 840], [300, 700], [470, 560]]], ['#ffd23f', 80, [[350, 540], [480, 545], [470, 670]]]],   // Strategy: on target
     [['#f6c9de', 120, [[500, 140], [505, 500], [498, 860]]], ['#f6c9de', 120, [[190, 300], [500, 500], [810, 690]]], ['#f6c9de', 120, [[190, 700], [500, 500], [815, 300]]]],   // Branding: a mark
@@ -203,17 +233,17 @@
     [['#1f3fd1', 90, [[130, 260], [870, 250], [880, 760], [120, 770], [135, 255]]], ['#1f3fd1', 60, [[140, 370], [860, 360]]], ['#1f3fd1', 110, [[450, 450], [460, 760], [540, 660], [660, 760]]]],   // Digital: a window and a pointer
   ];
   // spray an art list over an SVG picture, on a canvas the same size as the SVG, in the SVG's own coordinates
-  const overSvg = (svg, cv, art, done) => {
+  const overSvg = (svg, cv, art, done, instant) => {
     const box = cv.getBoundingClientRect(), m = svg.getScreenCTM(); if (!box.width || !m) return false;
     const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.round(box.width * r), H = cv.height = Math.round(box.height * r);
     const vb = svg.viewBox.baseVal, vy = vb.y, vH = vb.height || 1000;
     // cropped in and tilted a different way each time, with a little wobble in the hand, so no two sit square
-    const rot = (Math.random() - 0.5) * 0.5, zoom = 1.15 + Math.random() * 0.2, ox = (Math.random() - 0.5) * 120, oy = (Math.random() - 0.5) * 120;
+    const rot = (Math.random() - 0.5) * 0.5, zoom = 1.15 + Math.random() * 0.2, sxg = Math.random() < 0.5 ? -1 : 1, syg = Math.random() < 0.5 ? -1 : 1, ox = sxg * (120 + Math.random() * 90), oy = syg * (100 + Math.random() * 90);   // asymmetric: the mass sits on a thirds point, not the middle
     const map = ([x0, y0]) => {
       const dx = (x0 - 500) * zoom, dy = (y0 - 500) * zoom, x = 500 + ox + dx * Math.cos(rot) - dy * Math.sin(rot), y = 500 + oy + dx * Math.sin(rot) + dy * Math.cos(rot);
       return [x / 1000 * W, y / 1000 * H];   // over the whole picture box, whatever band of the drawing shows
     };
-    const jig = pts => pts.map(([x, y]) => [x + (Math.random() - 0.5) * 50, y + (Math.random() - 0.5) * 50]);
+    const jig = pts => pts.map(([x, y]) => [x + (Math.random() - 0.5) * 110, y + (Math.random() - 0.5) * 110]);
     // mixed technique, as on the Work thumbnails: the first pass fat and slow, the rest a mix of medium and thin quick ones,
     // and a thin cream tag scrawled across a corner to finish
     const k = m.a * r * zoom * 0.8, strokes = art.map(([c, w, pts], i) => {
@@ -221,7 +251,7 @@
       return { c, w: w * t * k, speed: (i === 0 ? 26 : 32 + (1.5 - t) * 30) * r, path: curve(jig(pts).map(map)) };
     });
     const n = 3 + (Math.random() * 4 | 0), a = Math.random() * 6.283, step = 40 + Math.random() * 50, amp = 30 + Math.random() * 80, tag = [];
-    let tx = 150 + Math.random() * 700, ty = 150 + Math.random() * 700;
+    let tx = 500 - sxg * (230 + Math.random() * 120) - ox, ty = 500 - syg * (200 + Math.random() * 120) - oy;   // and the tag is its counterweight, in the opposite corner
     for (let j = 0; j < n; j++) { const side = (j % 2 ? -1 : 1) * amp * (0.5 + Math.random()); tag.push([tx - Math.sin(a) * side, ty + Math.cos(a) * side]); tx += Math.cos(a) * step; ty += Math.sin(a) * step; }
     strokes.push({ c: art.tag || '#f1eee7', w: (16 + Math.random() * 14) * k, speed: 60 * r, path: curve(tag.map(map)) });
     // after the references: sometimes a soft airbrushed form behind, the main pass shifting colour at its edge, droplets
@@ -230,7 +260,7 @@
     if (Math.random() < 0.6) strokes[0].drops = ['#1f2a4d', '#ff2f7a', '#f1eee7', '#1f3fd1'].filter(c => c !== c0)[Math.random() * 3 | 0];
     if (Math.random() < 0.6) { const b = blob(c0, 200 + Math.random() * 600, 200 + Math.random() * 600, 380 + Math.random() * 200);
       strokes.unshift({ ...b, w: b.w * k, speed: 14 * r, path: curve(b.pts.map(map)) }); }
-    run(cv, W, H, null, strokes, 160, done && (() => done({ url: cv.toDataURL('image/png'), x: (box.left - m.e) / m.a, y: (box.top - m.f) / m.d, w: box.width / m.a, h: box.height / m.d })));
+    run(cv, W, H, null, strokes, 160, done && (() => done({ url: cv.toDataURL('image/png'), x: (box.left - m.e) / m.a, y: (box.top - m.f) / m.d, w: box.width / m.a, h: box.height / m.d })), instant);
     return true;
   };
   const pics = [...document.querySelectorAll('.wd-pic')];
@@ -247,8 +277,13 @@
         const im = document.createElementNS('http://www.w3.org/2000/svg', 'image');
         im.setAttribute('class', 'wd-paint'); im.setAttribute('href', url); im.setAttribute('x', x); im.setAttribute('y', y); im.setAttribute('width', w); im.setAttribute('height', h); im.setAttribute('preserveAspectRatio', 'none');
         t.appendChild(im);
-      }) : null)) pic.dataset.sprayed = '1';
+      }) : null, i === pics.length - 1)) pic.dataset.sprayed = '1';
     };
+    if (i === pics.length - 1) {   // Digital is painted already (all at once, before you get there), so its hand-off into Listen is smooth
+      const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { go(); if (pic.dataset.sprayed) io.disconnect(); } }, { rootMargin: '100% 0px' });
+      io.observe(pic.closest('.wd') || pic);
+      return;
+    }
     new MutationObserver(() => { if (pic.classList.contains('on')) go(); }).observe(pic, { attributes: true, attributeFilter: ['class'] });
     if (pic.classList.contains('on')) go();
   });
@@ -287,7 +322,7 @@
     const cv = document.createElement('canvas'); cv.className = 'hv-air'; cv.setAttribute('aria-hidden', 'true'); aiPat.appendChild(cv); aiPat.classList.add('sprayed');
     onPick(aiPat.closest('.hv-half'), () => setTimeout(() => {
       const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.round(cv.clientWidth * r), H = cv.height = Math.round(cv.clientHeight * r), u = Math.min(W, H);
-      const at = (x, y, size, c, rim) => ({ c, rim, soft: true, w: size * u, speed: 10 * r, path: curve([[x * W - size * u * 0.1, y * H], [x * W, y * H - size * u * 0.08], [x * W + size * u * 0.1, y * H + size * u * 0.02], [x * W - size * u * 0.04, y * H + size * u * 0.06]]) });
+      const at = (x, y, size, c, rim) => ({ c, rim, soft: true, w: size * u, speed: 10 * r, path: curve(spiral(x * W + (Math.random() - 0.5) * W * 0.12, y * H + (Math.random() - 0.5) * H * 0.12, size * u * 0.14)) });
       run(cv, W, H, null, [at(0.36, 0.4, 0.42, '#ff5200', '#ff2f7a'), at(0.52, 0.24, 0.26, '#ff6e32', '#ffb000'), at(0.7, 0.5, 0.24, '#fa5c8c', '#ffc2d4'), at(0.6, 0.76, 0.3, '#ffb3c4', '#fff0f3'), at(0.3, 0.72, 0.14, '#2f63ff', '#22c55e')], 60);
     }, 150));
   }
@@ -307,7 +342,7 @@
     const pick = a => a[Math.random() * a.length | 0], strokes = [];
     if (lime) {   // 620: the lime shapes, sprayed
       const L = '#d6ffa3';
-      [[0.15, 0.3, 0.2], [0.5, 0.6, 0.42], [0.82, 0.55, 0.24], [0.18, 0.85, 0.3]].forEach(([x, y, z]) => strokes.push({ c: L, rim: '#b5f06a', soft: true, w: z * u, speed: 12 * r, path: curve([[x * W - z * u * 0.12, y * H], [x * W, y * H - z * u * 0.12], [x * W + z * u * 0.12, y * H + z * u * 0.03], [x * W - z * u * 0.05, y * H + z * u * 0.08]]) }));
+      [[0.15, 0.3, 0.2], [0.5, 0.6, 0.42], [0.82, 0.55, 0.24], [0.18, 0.85, 0.3]].forEach(([x, y, z]) => strokes.push({ c: L, rim: '#b5f06a', soft: true, w: z * u, speed: 12 * r, path: curve(spiral(x * W + (Math.random() - 0.5) * W * 0.1, y * H + (Math.random() - 0.5) * H * 0.1, z * u * 0.14)) }));
       strokes.push({ c: L, rim: '#b5f06a', w: 0.1 * u, speed: 30 * r, drops: '#ff2f7a', path: curve(MARKS.loop(W, H)) });
     } else {
       const c = pick(BRIGHT), kind = pick(['loop', 'squiggle', 'smile', 'strike', 'eyes']);
@@ -315,7 +350,7 @@
         strokes.push({ c, w: 0.09 * u, speed: 22 * r, path: curve([[0.38 * W, 0.24 * H], [0.385 * W, 0.42 * H]]) }, { c, w: 0.09 * u, speed: 22 * r, path: curve([[0.6 * W, 0.24 * H], [0.605 * W, 0.42 * H]]) }, { c, w: 0.09 * u, speed: 26 * r, path: curve(MARKS.smile(W, H)) });
       } else strokes.push({ c, rim: RIM[c], w: (kind === 'strike' ? 0.08 : 0.1) * u, speed: 30 * r, drops: Math.random() < 0.5 ? pick(BRIGHT.filter(x => x !== c)) : null, path: curve(MARKS[kind](W, H)) });
     }
-    run(cv, W, H, null, strokes, 140);
+    run(cv, W, H, null, strokes, 140, null, true);   // on photography the paint is simply there
   }
   const imgs = [...document.querySelectorAll('img')].filter(img => {
     if (img.closest('.logo, #intro, .wc-slot, .wd-pic, header, nav') || /swallow|portrait|cow/.test(img.src)) return false;
@@ -326,10 +361,10 @@
     const lime = /620-clean/.test(img.src);
     if (!lime && Math.random() > 0.22) return;
     const cv = document.createElement('canvas'); cv.className = 'photo-spray'; cv.setAttribute('aria-hidden', 'true'); img.after(cv);
-    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && cv.clientWidth > 60) { io.disconnect(); setTimeout(() => photo(img, cv, lime), 300); } }), { threshold: 0.4 });
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && cv.clientWidth > 60) { io.disconnect(); photo(img, cv, lime); } }), { rootMargin: '60% 0px' });   // painted just before it scrolls in
     io.observe(cv);
   });
 
-  watch('canvas.spray', picture, 0);
+  watch('canvas.spray', picture, 0, ANIM ? null : '60% 0px');
   watch('canvas.spray-over', over, 900);
 })();
