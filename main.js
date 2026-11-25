@@ -495,15 +495,16 @@
 
   /* ---------- smooth scroll: Lenis (same settings as sumojoestudio.com) ---------- */
   const lenis = new Lenis({
-    // the browser's own scrolling (Safari stuck on the eased wheel); Lenis only runs the glides for the buttons
-    smoothWheel: false, autoRaf: false,
+    // wheel and trackpad: the browser's own scrolling. Touch: Lenis drives it at its standard feel (no custom speeds),
+    // so the iPhone Safari bar sliding in and out can't make it stick. Lenis also runs the glides for the buttons.
+    smoothWheel: false, syncTouch: true, autoRaf: false,
   });
   gsap.ticker.add(t => lenis.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
 
   const spacer = $('#scroll-space');
   const foot = $('#foot');
-  let room = 0, unit = 1, endPx = 0, maxPx = 0, cur = 0, ready = false, veiling = false, brandOn = false, travel = 0;
+  let room = 0, footExtra = 0, unit = 1, endPx = 0, maxPx = 0, cur = 0, ready = false, veiling = false, brandOn = false, travel = 0;
   // scroll position <-> timeline time; section 1->2 is OPEN_LEN screens long, every other section one screen
   // knots of [timeline time, screens scrolled]: section 1-2 is OPEN_LEN long, and there is a HOLD at 3 (a pause on the big sentence)
   const KNOTS = () => { const a = LEN_PART, b = a + OPEN_LEN, c = b + LEN_SHRINK, d = c + HOLD; return [[0, 0], [1, a], [2, b], [3, c], [3, d], [END, d + END - 3]]; };
@@ -514,8 +515,10 @@
     unit = VH() * UNIT;
     endPx = pxOf(END);
     room = Math.max(0, el.cases.scrollHeight - el.cases.clientHeight);
-    maxPx = endPx + room + VH();   // + one screen so the work slides up off
-    spacer.style.height = (maxPx + innerHeight) + 'px';
+    // phones: the footer can be taller than the screen you can see, so leave room to scroll the rest of it into view
+    footExtra = foot ? Math.max(0, Math.max(...[...foot.children].map(c => c.offsetTop + c.offsetHeight)) - SVH()) : 0;
+    maxPx = endPx + room + VH() + footExtra;   // + one screen so the work slides up off
+    spacer.style.height = (maxPx + VH()) + 'px';   // the tallest the screen gets, so the end is reachable with the browser bars showing or hidden
     lenis.resize();
     const to = t < END ? pxOf(t) : endPx + past;
     lenis.scrollTo(to, { immediate: true, force: true });
@@ -532,7 +535,8 @@
     if (foot) {
       const up = Math.max(0, past - room), p = Math.min(1, up / VH());
       foot.style.visibility = up > 1 ? 'visible' : 'hidden';   // ...uncovering the footer behind it
-      foot.style.setProperty('--fy', (0.75 * (1 - p) * VH()).toFixed(1) + 'px');   // its contents rise into place a little behind the work (as on Malvah)
+      const rest = Math.min(footExtra, Math.max(0, up - VH()));   // then the rest of a tall footer scrolls up into view
+      foot.style.setProperty('--fy', (0.75 * (1 - p) * VH() - rest).toFixed(1) + 'px');   // its contents rise into place a little behind the work (as on Malvah)
       document.documentElement.classList.toggle('cases-off', up > 0);   // the work is solid while it slides off, so the footer never shows through it
     }
     document.documentElement.classList.toggle('foot-in', past > room + VH() * 0.35);   // and the notch drops away
