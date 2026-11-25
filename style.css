@@ -200,7 +200,7 @@ html.intro-run .nb{transition:none}
 /* the bar + notch are cut out of images in main.js (cutImages), so only images show them */
 #nav{position:fixed;left:50%;bottom:calc(var(--frame) - 1px);transform:translateX(-50%);z-index:50}
 /* one soft shape: big rounded shoulders that flare out into the bottom edge */
-.notch{position:relative;width:38rem;height:3.2rem;display:flex;align-items:center;justify-content:center;gap:1.6rem;padding-top:.3rem}
+.notch{position:relative;width:35rem;height:2.9rem;display:flex;align-items:center;justify-content:center;gap:1.6rem;padding-top:.3rem}
 /* a solid cream bar along the bottom edge, so the notch's curves run into it (over everything, like the notch) */
 #frame-bottom{position:fixed;left:0;right:0;bottom:0;height:var(--frame);background:var(--notch-bg);z-index:49;pointer-events:none}
 html.intro-dark #frame-bottom{background:#0b0b0b}
@@ -210,9 +210,9 @@ html.intro-dark #frame-bottom{background:#0b0b0b}
 html.intro-dark .notch-fill path{fill:#0b0b0b}
 .notch>.nb{position:relative}
 /* three plain buttons; the middle one changes its words with where you are */
-.nb{position:relative;font-size:var(--fs-sm);letter-spacing:-.02em;line-height:1.6;padding:.2rem 0;color:#8e8b86;transition:color .35s}
+.nb{position:relative;font-size:1.04rem;letter-spacing:-.02em;line-height:1.6;padding:.2rem 0;color:#8e8b86;transition:color .35s}
 .nb:hover,.nb.on{color:var(--ink)}
-.nb[data-k="studio"]{min-width:9rem;text-align:center;overflow:hidden}
+.nb[data-k="studio"]{min-width:7.8rem;text-align:center;overflow:hidden}
 .say{display:inline-block;white-space:nowrap}
 /* a wide chevron just above the notch from the start; it goes once the image starts expanding */
 .down-chev{position:absolute;left:50%;bottom:100%;transform:translate(-50%,-.9rem);width:3.4rem;height:1.2rem;padding:0;border:0;background:none;color:var(--ink);cursor:pointer;opacity:0;pointer-events:none;transition:opacity .4s,color .35s}
@@ -263,8 +263,8 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:3px;filter:none}
   .case-620{padding-bottom:9rem}
   .case-620 h2{font-size:3.6rem}
   .notch{width:44rem;height:4.9rem;gap:1.6rem;padding-top:.5rem}   /* taller on phones: an easier tap */
-  .nb[data-k="studio"]{min-width:11rem}
-  .nb{font-size:1.6rem}   /* phones: bigger than the label step so the nav reads clearly */
+  .nb[data-k="studio"]{min-width:10.2rem}
+  .nb{font-size:1.4rem}   /* phones: a little over the label step so the nav reads clearly */
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -555,7 +555,7 @@ html.cases-off #s-cases{background:var(--cream)}
   #frame-bottom{box-shadow:0 -1px 14px rgba(11,11,11,.09)}
   .notch-fill{filter:drop-shadow(0 -2px 8px rgba(11,11,11,.09))}
 }
-@media (min-width:761px){.notch-fill{clip-path:inset(-40px -40px calc(100% - 3.2rem + 1px) -40px)}}   /* the notch's shadow stops at the bar's top edge, so it doesn't fall on the bar */
+@media (min-width:761px){.notch-fill{clip-path:inset(-40px -40px calc(100% - 2.9rem + 1px) -40px)}}   /* the notch's shadow stops at the bar's top edge, so it doesn't fall on the bar */
 /* the shadow sits around the notch only, and softer (the bottom bar has none) */
 @media (min-width:761px){
   #frame-bottom{box-shadow:none}
