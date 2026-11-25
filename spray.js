@@ -109,7 +109,7 @@
       let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
       for (let e = Math.min(n - 1, at + adv); at <= e; at += 3) {
         const [x, y] = s.path[at], f = Math.min(1, at / 24, (n - at) / 24), p = pr(at) * (0.35 + 0.65 * f) * Math.min(1, 1.25 / Math.sqrt(0.3 + 2.2 * (at / n) ** 2));   // and thins out as it speeds up
-        const R = s.w * FAT * 0.5 * (s.brush ? Math.max(0.12, Math.min(1, (n - at) / (n * 0.4), 0.7 + at / (n * 0.3))) : 0.8 + 0.45 * (1 - p));   // a brush stroke lands blunt and flicks off to a point
+        const R = s.w * FAT * 0.5 * (s.brush || s.taper ? Math.max(0.12, Math.min(1, (n - at) / (n * 0.4), 0.7 + at / (n * 0.3))) : 0.8 + 0.45 * (1 - p));   // a brush stroke lands blunt and flicks off to a point
         dg.globalAlpha = s.soft ? Math.min(0.6, (1 - Math.pow(0.04, 3 / n)) * (0.7 + 0.5 * p)) : Math.min(0.5, (1 - Math.pow(0.08, 3 / R)) * (0.4 + p) * 1.05);
         dg.drawImage(PUFF, x - R, y - R, 2 * R, 2 * R);   // (an airbrushed form builds to a full core over its few turns)
         const B = R * (2 + 0.8 * p); if (!s.brush) { dg.globalAlpha = Math.min(0.08, (1 - Math.pow(0.6, 3 / B)) * (0.3 + p)); dg.drawImage(PUFF, x - B, y - B, 2 * B, 2 * B); }   // the wider mist round the nozzle; build to the same body
@@ -166,9 +166,9 @@
     for (let k = 0; k < nS; k++) {
       const x0 = cx - tw * 0.42 + k * tw * 0.8 / (nS - 1) + J(tw * 0.05), top = cy - th * (0.55 + Math.random() * 0.25), bot = cy + th * (0.55 + Math.random() * 0.35);
       const lean = tw * (0.03 + Math.random() * 0.09) * (Math.random() < 0.25 ? -1 : 1);
-      strokes.push({ brush: true, c: '#4a86e8', w: th * (0.27 + Math.random() * 0.1), speed: 46 * r, path: curve([[x0 - lean, top], [x0 + J(th * 0.1), cy + J(th * 0.1)], [x0 + lean, bot]]) });
+      strokes.push({ taper: true, c: '#2f63ff', w: th * (0.27 + Math.random() * 0.1), speed: 46 * r, path: curve([[x0 - lean, top], [x0 + J(th * 0.1), cy + J(th * 0.1)], [x0 + lean, bot]]) });
     }
-    strokes.unshift({ brush: true, c: '#4a86e8', w: th * 0.2, speed: 30 * r, path: curve([[cx - tw * 0.52, cy - th * 0.1], [cx - tw * 0.49, cy + th * 0.25], [cx - tw * 0.46, cy + th * 0.4]]) });
+    strokes.unshift({ taper: true, c: '#2f63ff', w: th * 0.2, speed: 30 * r, path: curve([[cx - tw * 0.52, cy - th * 0.1], [cx - tw * 0.49, cy + th * 0.25], [cx - tw * 0.46, cy + th * 0.4]]) });
     let strike = null;
     if (word) {   // and a bold strike through "never"
       const b = word.getBoundingClientRect(), [x0, y0] = C(b.left - b.width * 0.12, b.top + b.height * 0.62), [x1, y1] = C(b.right + b.width * 0.12, b.top + b.height * 0.48);
