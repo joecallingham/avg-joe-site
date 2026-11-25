@@ -21,15 +21,15 @@
   svProbe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:100vh;height:100svh;pointer-events:none;visibility:hidden';
   document.documentElement.appendChild(svProbe);
   const SVH = () => TOUCH ? Math.min(svProbe.offsetHeight || innerHeight, VH()) : innerHeight;
-  const UNIT = TOUCH ? 0.75 : 1.0;   // screens of scrolling per section (higher = slower)
+  const UNIT = 1;   // screens of scrolling per section (higher = slower)
   const CROP = 0.5;          // how much the frame crops (vs scales) mid-move: 0 = only scales, 1 = only crops; none at the ends
   // scroll lengths (in sections) for the first three moves, which need a slower pace than the rest
-  const LEN_PART = TOUCH ? 0.75 : 1.0;      // Avg Joe parting to the sentence
-  const OPEN_LEN = TOUCH ? 1.6 : 1.8;      // the image opening + Avg/Joe dropping
-  const LEN_SHRINK = TOUCH ? 0.8 : 1.2;    // the image cropping in to the big sentence
-  const EXPAND = LEN_SHRINK / OPEN_LEN;   // share of the open section the image expand takes: same scroll length as the shrink
+  const LEN_PART = 1;      // Avg Joe parting to the sentence
+  const OPEN_LEN = 1;      // the image opening + Avg/Joe dropping
+  const LEN_SHRINK = 1;    // the image cropping in to the big sentence
+  const EXPAND = 0.6;   // share of the open section the image expand takes; the rest is Avg and Joe settling
   const HOLD = 0;            // screens of scrolling where nothing moves once the image has settled into the big sentence
-  const WS = TOUCH ? 0.26 : 0.2;            // screens of scrolling per word on the wheel (matched to the page's scroll speed)
+  const WS = 0.2;            // screens of scrolling per word on the wheel (matched to the page's scroll speed)
   const SWAP_EVERY = 85;     // px of scrolling between typeface changes in the rotation words
   const TRACK = 0.05;        // rotation words: tracking -50
 
@@ -211,7 +211,7 @@
     const where = past > VH() * 0.4 ? 'end' : t >= WE + 0.5 ? 'work' : t >= 3.6 ? 'wheel' : t >= 2.6 ? 'big' : 'top';
     const down = where === 'top' && !beatOpen && cur <= 2;   // before any scrolling the middle button says Scroll down; Book call as soon as they scroll
     say(beatOpen ? SAYS.beat : down ? 'Scroll down' : SAYS[hoverSay && (hoverSay !== 'pick' || where === 'wheel') ? hoverSay : where === 'top' ? 'big' : where]);
-    const film = where === 'top' && !beatOpen && t >= 1 + EXPAND - 0.02;   // the image fills the frame: show the chevron over it
+    const film = !beatOpen && t < 1;   // the chevron shows from the start and goes once the image starts expanding
     if (filmOn !== film) { filmOn = film; document.documentElement.classList.toggle('nb-film', film); }
     if (downOn !== down) { downOn = down; document.documentElement.classList.toggle('nb-down', down); el.say.parentNode.setAttribute('aria-label', down ? 'Scroll down' : 'Book a call'); }
     if (workBtn._on !== (where === 'work')) { workBtn._on = where === 'work'; workBtn.classList.toggle('on', workBtn._on); }
@@ -495,7 +495,7 @@
 
   /* ---------- smooth scroll: Lenis (same settings as sumojoestudio.com) ---------- */
   const lenis = new Lenis({
-    lerp: 0.09, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.11, touchInertiaExponent: 1.45, touchMultiplier: 1.15,   // touch: between the original (felt slow) and 1.5x (felt too fast)
+    // standard smooth scrolling: Lenis defaults (phones keep their own native scrolling)
     autoRaf: false,
   });
   gsap.ticker.add(t => lenis.raf(t * 1000));
