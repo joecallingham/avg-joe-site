@@ -202,31 +202,7 @@
     }), 220, null, !ANIM);   // painted as it is, except on Information
   }
 
-  // letters sprayed over the statement, and a ring round one word
-  function over(cv) {
-    const wrap = cv.parentElement, txt = wrap.querySelector('.ca-state'), word = wrap.querySelector('.ca-nv');
-    const r = Math.min(devicePixelRatio || 1, 1.5), W = cv.width = Math.round(cv.clientWidth * r), H = cv.height = Math.round(cv.clientHeight * r);
-    const box = cv.getBoundingClientRect(), C = (x, y) => [(x - box.left) * r, (y - box.top) * r];
-    const tb = txt.getBoundingClientRect(), h = Math.min(tb.height * 1.45, tb.width * 0.62) * r, [cx, cy] = C(tb.left + tb.width / 2, tb.top + tb.height / 2);
-    // one big squiggle across the whole statement
-    // fat flat brush strokes scrubbed back and forth across it, each landing at the top and flicking off at the bottom
-    // one squiggle, sprayed in a single go across it: tight zigs and loose ones, never the same height twice
-    const tw = Math.min(tb.width * r, W * 0.82), th = tb.height * r, R1 = (a, b) => a + Math.random() * (b - a), sq = [];
-    let x = cx - tw * 0.5, up = Math.random() < 0.5;
-    sq.push([x, cy + R1(-0.2, 0.3) * th]);
-    while (x < cx + tw * 0.48) {
-      x += tw * (Math.random() < 0.4 ? R1(0.025, 0.06) : R1(0.08, 0.17));   // tight or loose
-      up = !up; sq.push([x, cy + (up ? -1 : 1) * Math.min(th * R1(0.2, 1.1), H * 0.5 - th * 0.75) + R1(-0.1, 0.1) * th]);
-    }
-    const strokes = [{ taper: true, c: '#2f63ff', w: th * R1(0.22, 0.28), speed: 44 * r, path: curve(sq) }];
-    let strike = null;
-    if (word) {   // and a bold strike through "never"
-      const b = word.getBoundingClientRect(), [x0, y0] = C(b.left - b.width * 0.12, b.top + b.height * 0.62), [x1, y1] = C(b.right + b.width * 0.12, b.top + b.height * 0.48);
-      strike = { solid: true, c: '#ff2f7a', w: b.height * r * 0.3, speed: 18 * r, path: curve([[x0, y0], [(x0 + x1) / 2, (y0 + y1) / 2 + b.height * r * 0.04], [x1, y1]]) };
-    }
-    // the squiggle sits into the type; the strike goes over the word, on a layer of its own
-    run(cv, W, H, null, strokes, 120, strike && (() => { const c2 = cv.cloneNode(); c2.className = 'spray-over spray-strike'; cv.after(c2); c2.width = W; c2.height = H; setTimeout(() => run(c2, W, H, null, [strike], 0), 200); }));
-  }
+
 
   const watch = (sel, fn, delay, margin) => {
     const els = [...document.querySelectorAll(sel)]; if (!els.length) return;
@@ -406,5 +382,4 @@
   });
 
   watch('canvas.spray', picture, 0, ANIM ? null : '60% 0px');
-  watch('canvas.spray-over', over, 900);
 })();
