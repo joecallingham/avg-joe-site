@@ -26,7 +26,7 @@
      strokes: [{r, p:[[x,y]...]}] in its pixels; blit(picture): draws a frame where it belongs. ---------- */
   const NZ = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'), gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
     gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(0.45, 'rgba(0,0,0,.65)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = gr; x.fillRect(0, 0, 64, 64); return c; })();
-  const PASS = [[2.6, 0.22, 0.4], [1.9, 0.5, 0.33], [1.45, 0.85, 0.27]];   /* [nozzle width x stroke, coverage the pass adds, share of the time] */
+  const PASS = [[3.8, 0.55, 0.38], [2.7, 0.7, 0.32], [1.8, 0.92, 0.3]];   /* wide enough that the glow round each stroke builds with it, not after */   /* [nozzle width x stroke, coverage the pass adds, share of the time] */
   function sprayOn(ready, strokes, blit, done) {
     if (RM) { blit(ready); return done && done(); }
     const W = ready.width, H = ready.height, mk = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; };
@@ -35,12 +35,14 @@
     const S = strokes.map(({ r, p }) => { const out = [], step = Math.max(1, r * 0.25);
       for (let i = 0; i < p.length - 1; i++) { const [ax, ay] = p[i], [bx, by] = p[i + 1], n = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay) / step)); for (let k = 0; k < n; k++) out.push([ax + (bx - ax) * k / n, ay + (by - ay) * k / n]); }
       out.push(p[p.length - 1]); return { r, p: out, t: Math.min(620, Math.max(220, out.length * step / W * 1500)) }; });
-    let si = 0, pi = 0, st = 0, done2 = 0, fade = 0;
+    let si = 0, pi = 0, st = 0, done2 = 0, fade = 0, m0 = null;
     const frame = () => { tg.globalCompositeOperation = 'copy'; tg.drawImage(ready, 0, 0); tg.globalCompositeOperation = 'destination-in'; tg.drawImage(m, 0, 0); blit(tmp); };
     const step = now => {
       if (si >= S.length) {   /* last, settle into the finished picture */
-        if (!fade) fade = now; const f = Math.min(1, (now - fade) / 280);
-        tg.globalCompositeOperation = 'source-over'; tg.globalAlpha = f * f; tg.drawImage(ready, 0, 0); tg.globalAlpha = 1; blit(tmp);
+        if (!fade) { fade = now; m0 = mk(); m0.getContext('2d').drawImage(m, 0, 0); }
+        const f = Math.min(1, (now - fade) / 200);   /* the last of the mask fills in: never more paint than the finished picture */
+        mg.globalAlpha = 1; mg.globalCompositeOperation = 'copy'; mg.drawImage(m0, 0, 0); mg.globalCompositeOperation = 'source-over'; mg.globalAlpha = f; mg.fillStyle = '#000'; mg.fillRect(0, 0, W, H); mg.globalAlpha = 1;
+        frame();
         if (f < 1) return requestAnimationFrame(step);
         blit(ready); return done && done();
       }
@@ -119,12 +121,12 @@
     const path = []; { const k2 = sm(sm(key)); for (let i = 0; i < k2.length - 1; i++) { const [ax, ay] = k2[i], [bx, by] = k2[i + 1], n = Math.ceil(Math.hypot(bx - ax, by - ay) / (1.5 * K)); for (let j = 0; j < n; j++) path.push([ax + (bx - ax) * j / n, ay + (by - ay) * j / n]); } }
     const mk = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; };
     const wob = () => { const a = Math.random() * 6, b = Math.random() * 6, c = Math.random() * 6; return t => 0.5 + 0.28 * Math.sin(t * 0.009 + a) + 0.16 * Math.sin(t * 0.027 + b) + 0.08 * Math.sin(t * 0.07 + c); };
-    const sharp = mk(), soft = mk(), gm = mk(), sg = sharp.getContext('2d'), fg = soft.getContext('2d'), gg = gm.getContext('2d'), width = wob(), dense = wob(), glow = wob();
+    const sharp = mk(), soft = mk(), gm = mk(), sg = sharp.getContext('2d'), fg = soft.getContext('2d'), gg = gm.getContext('2d'), width = wob(), dense = wob(), glow = wob(), bloomAt = 0.2 + Math.random() * 0.6;
     [sg, fg, gg].forEach(x => x.fillStyle = '#000');
     path.forEach(([x, y], k) => {
-      const t = k * 1.5, end = Math.min(1, k / 18, (path.length - k) / 18), r = 26 * K * (0.8 + 0.35 * width(t)) * (0.88 + 0.12 * end), a = Math.max(0.55, Math.min(1, 1.3 * dense(t) - 0.25)) * (0.7 + 0.3 * end);
+      const t = k * 1.5, end = Math.min(1, k / 18, (path.length - k) / 18), r = 26 * K * (0.45 + 0.75 * width(t)) * (0.88 + 0.12 * end), a = Math.max(0.28, Math.min(1, 1.3 * dense(t) - 0.25)) * (0.7 + 0.3 * end);   /* as signed off, but never fading right out: thicker and thinner, denser and faded */
       for (const x2 of [sg, fg]) { x2.globalAlpha = a * 0.24; x2.beginPath(); x2.arc(x, y, r, 0, 6.283); x2.fill(); }
-      const gw = Math.max(0, glow(t) * 1.7 - 0.85) ** 1.6;
+      const gw = Math.max(0, glow(t) * 1.7 - 0.85) ** 1.6 + 0.9 * Math.exp(-((((k / path.length) - bloomAt) / 0.12) ** 2));   /* blooms in a stretch or two, and always somewhere */
       if (gw > 0.01) { gg.globalAlpha = Math.min(1, gw) * 0.28; gg.beginPath(); gg.arc(x + (Math.random() - 0.5) * 6 * K, y + (Math.random() - 0.5) * 6 * K, r * 0.95, 0, 6.283); gg.fill(); }
     });
     const blur = (c, px) => { const o = mk(), x = o.getContext('2d'); x.filter = 'blur(' + px * K + 'px)'; x.drawImage(c, 0, 0); return o; };
