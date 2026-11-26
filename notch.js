@@ -1,6 +1,7 @@
 /* The notch's ink shape, on every page: one soft-shouldered tab drawn to fit the nav, flush with the screen's bottom edge.
    It redraws itself whenever the notch changes size (fonts loading, a resize, phone vs desktop). */
 (() => {
+  if (/CriOS/.test(navigator.userAgent)) document.documentElement.classList.add('crios');   // Chrome on iPhone: the notch takes its toolbar's grey (style.css)
   const FLANK = 2.1;   // each curved side is this many notch-heights wide (fixed, so a wider notch never stretches them)
   const NS = 'http://www.w3.org/2000/svg', f = v => v.toFixed(1);
   function draw(notch) {

@@ -812,3 +812,9 @@ html.cases-off #s-cases{background:transparent!important}
 @supports (-webkit-touch-callout: none){
   body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:4px;background:var(--ink);z-index:49;pointer-events:none}   /* Safari only samples elements at least ~3px tall and 80% wide */
 }
+/* Chrome on iPhone draws its own grey toolbar under the page (dark mode #343739) and it can't be tinted, so there the notch
+   and the form that joins it take that grey instead, and read as one piece with the toolbar */
+@media (prefers-color-scheme:dark){
+  html.crios .notch-fill path{fill:#343739}
+  html.crios .bk{background:#343739}
+}
