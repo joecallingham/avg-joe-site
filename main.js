@@ -597,6 +597,8 @@
   $$('.nb').forEach(a => a.addEventListener('click', e => {
     if (a.dataset.k === 'info' || a.dataset.k === 'work') return;   // Work and Info go to their pages
     e.preventDefault();
+    if (a.dataset.k === 'home') { if (window.AvgBook && document.documentElement.classList.contains('bk-on')) AvgBook.close && AvgBook.close(); goTo(0); return; }   // Studio: back to the top
+    if (a.dataset.k === 'book') { window.AvgBook && AvgBook.open(a); return; }
     if (a.dataset.k === 'studio' && downOn) { goDown(); return; }
     if (a.dataset.k === 'studio' && window.AvgBook) AvgBook.open(a);   // the middle button books a call
   }));

@@ -102,7 +102,9 @@
     const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = '/beat/beat.css'; document.head.appendChild(l);
     const s = document.createElement('script'); s.src = '/beat/beat.js'; s.async = true; document.body.appendChild(s);
   }
-  studio.addEventListener('click', e => { e.preventDefault(); window.AvgBook && AvgBook.open(studio); });   // the middle button books a call
+  studio.addEventListener('click', e => { e.preventDefault(); window.AvgBook && AvgBook.open(studio); });
+  const bookNb = $('.nb[data-k="book"]');   // desktop: Book a call at the notch's right end
+  if (bookNb) bookNb.addEventListener('click', e => { e.preventDefault(); window.AvgBook && AvgBook.open(bookNb); });   // the middle button books a call
   addEventListener('avgbook', e => { if (e.detail) lenis.stop(); else lenis.start(); });
   addEventListener('avgbook', setSay);   // reads Close while the form is open
   studio.addEventListener('mouseenter', () => { hovering = true; setSay(); });
