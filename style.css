@@ -812,3 +812,7 @@ html.cases-off #s-cases{background:transparent!important}
 .foot-bk .bk-in input::placeholder{color:rgba(11,11,11,.3)}
 .foot-bk .bk-foot{margin-top:1.2em!important}
 @media (max-width:760px){.foot-bk{border-top:1px solid var(--ink);padding-top:var(--s2)!important}}   /* the divider back, now above the form section */
+@media (max-width:760px){.foot-bk{margin-left:calc(-1 * var(--margin));margin-right:calc(-1 * var(--margin));padding-left:var(--margin);padding-right:var(--margin)}}   /* the divider runs edge to edge */
+/* the form sits low in the footer, just above the robot line */
+@media (min-width:761px){.foot-bk{align-self:end;padding-bottom:var(--s3)}}
+@media (max-width:760px){.foot-cols{grid-template-rows:auto auto 1fr auto auto}.foot-bk{align-self:end}.foot-tag{align-self:start}}
