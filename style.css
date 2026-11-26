@@ -726,3 +726,15 @@ html.intro-dark .nb-ic{color:rgba(241,238,231,.5)}
 html.intro-dark .nb-ic:hover{color:var(--cream)}
 .nb-ic:focus-visible{outline:2px solid currentColor;outline-offset:3px}
 @media (max-width:760px){.nb-soc{display:none}}
+
+/* the Featured Work title and the Case Studies bar let go together, once the last case study has gone fully under the bar:
+   the title's run ends one bar earlier than the case studies (negative margin), and the form starts where the cases end */
+.fw-wrap{display:flow-root}
+.fw-wrap > .cases-over{margin-bottom:calc(-1 * var(--cs-bar, 0px))}
+.fw-wrap + .bk-home{margin-top:var(--cs-bar, 0px)}
+/* Let's Chat fills the rest of the screen under the Case Studies bar, so the case studies' own scroll runs until the form
+   reaches the bar; only then does the whole layer (title, bar and form) move up together */
+.fw-wrap + .bk-home{min-height:calc(var(--sc-h, 100vh) - var(--fw-side, 0px) - var(--cs-bar, 0px));display:flex;flex-direction:column;justify-content:center}
+/* Work: the projects don't stack; each one simply slides up under the held Case / Studies title */
+.wk-fw .hf{position:relative;top:auto}
+.wk-fw .hf-hold{display:none}

@@ -829,6 +829,7 @@
     stack.style.setProperty('--hf-bar', bh.toFixed(2) + 'px');
     rows.forEach((r, i) => r.style.setProperty('--i', i));
     stack.dataset.bar = bh;
+    { const cb = document.querySelector('.cases-over > .sec-title'); if (cb) (scroller || sec).style.setProperty('--cs-bar', cb.getBoundingClientRect().height.toFixed(2) + 'px');  if (scroller) scroller.style.setProperty('--sc-h', scroller.clientHeight + 'px'); }   // the Case Studies bar, so the title lets go with it
     (scroller || sec).style.setProperty('--fw-side', (base + th - 1).toFixed(2) + 'px');   // Good to know holds just under the big title
     tick();
   };
