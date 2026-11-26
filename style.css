@@ -816,3 +816,4 @@ html.cases-off #s-cases{background:transparent!important}
 /* the form sits low in the footer, just above the robot line */
 @media (min-width:761px){.foot-bk{align-self:end;padding-bottom:var(--s3)}}
 @media (max-width:760px){.foot-cols{grid-template-rows:auto auto 1fr auto auto}.foot-bk{align-self:end}.foot-tag{align-self:start}}
+@media (max-width:760px){.foot-bk{align-self:stretch;display:flex;flex-direction:column;justify-content:flex-end}}   /* the divider stays under Good to know; the form drops to the bottom of its section */
