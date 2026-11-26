@@ -1088,7 +1088,6 @@ a.clp-more:hover{text-decoration:underline;text-underline-offset:.2em}
 }
 
 /* the last picture in each stack fills to the foot of the (small) screen, set in CSS so it never resizes as a phone's browser bar moves */
-.cl-stack .clp:last-child .clp-img{height:max(33.333vh, calc(100vh - var(--cl-top,3rem) - var(--cl-n,1) * var(--cl-bar,36px) - var(--frame) - 1px))!important;height:max(33.333svh, calc(100svh - var(--cl-top,3rem) - var(--cl-n,1) * var(--cl-bar,36px) - var(--frame) - 1px))!important}
 .wk-list .wk.wk-feat:last-of-type .wk-img{height:max(33.333vh, calc(100vh - var(--wk-base,0px) - var(--wk-ih,0px) - var(--wk-n,1) * var(--wk-bar,36px) - var(--frame) - 1px))!important;height:max(33.333svh, calc(100svh - var(--wk-base,0px) - var(--wk-ih,0px) - var(--wk-n,1) * var(--wk-bar,36px) - var(--frame) - 1px))!important}
 
 /* placeholder projects: abstract graphics fill the picture slot like a photo */
