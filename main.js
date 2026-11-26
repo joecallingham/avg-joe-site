@@ -264,6 +264,7 @@
     if (t > 0.9 && t < 3.3) want.push(el.hero);                          // the film, while it's big
     if (shown >= 0) want.push(...cards[shown].map(a => a.firstElementChild));   // the work cards beside the wheel
     if (cur > endPx - VH() * 1.2) want.push(...caseImgs());                // the work section
+    if (document.documentElement.classList.contains('foot-in')) want.length = 0;   // the notch has dropped away: no cut-outs left behind on the images
     cutNodes.forEach(n => { if (!want.includes(n) && n._cut) { n.style.clipPath = ''; n._cut = false; n._path = ''; } });
     cutNodes = want;
     const top = cutGeo.y;
