@@ -84,7 +84,7 @@
 (() => {
   const title = document.querySelector('.cl-title'), stack = document.querySelector('.cl-stack'), sec = document.querySelector('.cl-sec');
   if (!title || !stack) return;
-  // once the last client has landed, the title and the stack move up together (as on the Work page)
+  // once the last client has landed, the stack moves up together under the held title (as the case studies do on Home)
   let base = 0, th = 0, raf = 0;
   const pin = () => {
     lastOff = null; title.style.top = ''; base = parseFloat(getComputedStyle(title).top) || 0; th = title.getBoundingClientRect().height;
@@ -106,7 +106,7 @@
     const landed = (base + th - 1) + (n - 1) * barPx + (lastEl ? lastEl.offsetHeight : 0);
     const off = Math.min(0, Math.round((stack.getBoundingClientRect().bottom - landed) * 2) / 2);
     const stuck = sec.getBoundingClientRect().top < base - 0.5;
-    if (off !== lastOff) { lastOff = off; title.style.top = (base + off) + 'px'; stack.style.setProperty('--cl-off', off + 'px'); }
+    if (off !== lastOff) { lastOff = off; stack.style.setProperty('--cl-off', off + 'px'); }   // the title stays held: the whole stack slides up under it, and the title only leaves when the section ends
     if (stuck !== lastStuck) { lastStuck = stuck; title.classList.toggle('stuck', stuck); }
   };
   addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(tick); }, { passive: true });
