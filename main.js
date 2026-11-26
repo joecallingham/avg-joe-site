@@ -496,7 +496,7 @@
   const lenis = new Lenis({
     // wheel and trackpad (desktop): the smooth glide from before 25 Nov evening, lerp 0.055. Touch: Lenis drives it at its standard feel (no custom speeds),
     // so the iPhone Safari bar sliding in and out can't make it stick. Lenis also runs the glides for the buttons.
-    smoothWheel: !TOUCH, lerp: 0.055, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.07, touchInertiaExponent: 1.7, touchMultiplier: 1.3, autoRaf: false,   // touch feel Joe set on his iPhone (25 Nov)
+    smoothWheel: !TOUCH, lerp: 0.055, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.07, touchInertiaExponent: 1.7, touchMultiplier: 1.1, autoRaf: false,   // touch feel Joe set on his iPhone (25 Nov)
   });
   gsap.ticker.add(t => lenis.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
@@ -506,7 +506,7 @@
   let room = 0, sroom = 0, footExtra = 0, unit = 1, endPx = 0, maxPx = 0, cur = 0, ready = false, veiling = false, brandOn = false, travel = 0;
   // scroll position <-> timeline time; section 1->2 is OPEN_LEN screens long, every other section one screen
   // knots of [timeline time, screens scrolled]: section 1-2 is OPEN_LEN long, and there is a HOLD at 3 (a pause on the big sentence)
-  const KNOTS = () => { const a = LEN_PART, b = a + OPEN_LEN, c = b + LEN_SHRINK, d = c + HOLD; return [[0, 0], [1, a], [2, b], [3, c], [3, d], [END, d + END - 3]]; };
+  const KNOTS = () => { const a = LEN_PART, b = a + OPEN_LEN, c = b + LEN_SHRINK, d = c + HOLD; const e = d + 0.6; return [[0, 0], [1, a], [2, b], [3, c], [3, d], [4, e], [END, e + END - 4]]; };   // the big sentence -> wheel step is 0.6 of a screen, so there's no long empty gap between them
   const pxOf = t => { const k = KNOTS(); for (let i = 1; i < k.length; i++) { const [t0, s0] = k[i - 1], [t1, s1] = k[i]; if (t <= t1 && t1 > t0) return unit * (s0 + (t - t0) / (t1 - t0) * (s1 - s0)); } const [tl1, sl1] = k[k.length - 1]; return unit * (sl1 + t - tl1); };
   const tOf = px => { const s = px / unit, k = KNOTS(); for (let i = 1; i < k.length; i++) { const [t0, s0] = k[i - 1], [t1, s1] = k[i]; if (s <= s1) return s1 > s0 ? t0 + (s - s0) / (s1 - s0) * (t1 - t0) : t1; } const [tl1, sl1] = k[k.length - 1]; return tl1 + s - sl1; };
   function metrics() {
