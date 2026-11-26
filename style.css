@@ -819,3 +819,4 @@ html.cases-off #s-cases{background:transparent!important}
   html.crios .bk{background:#343739}
 }
 html.crios body::after{display:none}   /* Chrome on iPhone shares Safari's engine but not its toolbar tinting: no ink strip there */
+.cases-over > .sec-title::before{display:none!important}   /* the Case Studies bar sits right under the Featured Work title: no cream cap above it (it hid the last picture and made the bar look tall) */
