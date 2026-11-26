@@ -214,13 +214,14 @@ html.intro-dark .notch-fill path{fill:#0b0b0b}
 .nb:hover,.nb.on{color:var(--ink)}
 .nb[data-k="studio"]{min-width:7.8rem;text-align:center;overflow:hidden}
 .say{display:inline-block;white-space:nowrap}
-/* a wide chevron just above the notch from the start; it goes once the image starts expanding */
-.down-chev{position:absolute;left:50%;bottom:100%;transform:translate(-50%,-.9rem);width:3.4rem;height:1.2rem;padding:0;border:0;background:none;color:var(--ink);cursor:pointer;opacity:0;pointer-events:none;transition:opacity .4s,color .35s}
-html.intro-dark .down-chev{color:var(--cream)}
-html.intro-run .down-chev{transition:opacity .4s}
-.down-chev svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
-html.nb-film .down-chev{opacity:.9;pointer-events:auto}
-@media (max-width:760px){.down-chev{width:4.4rem;height:1.5rem;transform:translate(-50%,-1.1rem)}}
+/* before any scrolling the middle button loops: "Scroll down" slides down and a chevron slides in where it was, then back */
+.nb-chev{position:absolute;left:50%;top:50%;width:2.2rem;height:.7rem;margin:-.35rem 0 0 -1.1rem;opacity:0;pointer-events:none}
+.nb-chev svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+html.nb-down .nb[data-k="studio"] .say{animation:nbSay 3.4s cubic-bezier(.65,0,.35,1) infinite}
+html.nb-down .nb-chev{animation:nbChev 3.4s cubic-bezier(.65,0,.35,1) infinite}
+@keyframes nbSay{0%,52%{transform:translateY(0);opacity:1}64%,88%{transform:translateY(120%);opacity:0}88.01%{transform:translateY(-120%);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes nbChev{0%,52%{transform:translateY(-180%);opacity:0}64%,88%{transform:translateY(0);opacity:1}100%{transform:translateY(180%);opacity:0}}
+@media (prefers-reduced-motion:reduce){html.nb-down .nb[data-k="studio"] .say,html.nb-down .nb-chev{animation:none}}
 .nbt{white-space:nowrap}
 .hw{white-space:nowrap}
 .hl{display:inline-block;text-align:center;line-height:0;vertical-align:baseline;white-space:nowrap}

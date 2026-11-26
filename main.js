@@ -21,13 +21,13 @@
   svProbe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:100vh;height:100svh;pointer-events:none;visibility:hidden';
   document.documentElement.appendChild(svProbe);
   const SVH = () => TOUCH ? Math.min(svProbe.offsetHeight || innerHeight, VH()) : innerHeight;
-  const UNIT = 1;   // screens of scrolling per section (higher = slower)
+  const UNIT = TOUCH ? 1 : 1.2;   // desktop back to the pace before 25 Nov evening; screens of scrolling per section (higher = slower)
   const CROP = 0.5;          // how much the frame crops (vs scales) mid-move: 0 = only scales, 1 = only crops; none at the ends
   // scroll lengths (in sections) for the first three moves, which need a slower pace than the rest
-  const LEN_PART = 1;      // Avg Joe parting to the sentence
-  const OPEN_LEN = 1;      // the image opening + Avg/Joe dropping
-  const LEN_SHRINK = 1;    // the image cropping in to the big sentence
-  const EXPAND = 0.6;   // share of the open section the image expand takes; the rest is Avg and Joe settling
+  const LEN_PART = TOUCH ? 1 : 1.5;      // Avg Joe parting to the sentence
+  const OPEN_LEN = TOUCH ? 1 : 2.5;      // the image opening + Avg/Joe dropping
+  const LEN_SHRINK = TOUCH ? 1 : 1.6;    // the image cropping in to the big sentence
+  const EXPAND = TOUCH ? 0.6 : LEN_SHRINK / OPEN_LEN;   // share of the open section the image expand takes; the rest is Avg and Joe settling
   const HOLD = 0;            // screens of scrolling where nothing moves once the image has settled into the big sentence
   const WS = 0.2;            // screens of scrolling per word on the wheel (matched to the page's scroll speed)
   const SWAP_EVERY = 85;     // px of scrolling between typeface changes in the rotation words
@@ -211,12 +211,10 @@
     const where = past > VH() * 0.4 ? 'end' : t >= WE + 0.5 ? 'work' : t >= 3.6 ? 'wheel' : t >= 2.6 ? 'big' : 'top';
     const down = where === 'top' && !beatOpen && cur <= 2;   // before any scrolling the middle button says Scroll down; Book call as soon as they scroll
     say(beatOpen ? SAYS.beat : down ? 'Scroll down' : SAYS[hoverSay && (hoverSay !== 'pick' || where === 'wheel') ? hoverSay : where === 'top' ? 'big' : where]);
-    const film = !beatOpen && t < 1;   // the chevron shows from the start and goes once the image starts expanding
-    if (filmOn !== film) { filmOn = film; document.documentElement.classList.toggle('nb-film', film); }
     if (downOn !== down) { downOn = down; document.documentElement.classList.toggle('nb-down', down); el.say.parentNode.setAttribute('aria-label', down ? 'Scroll down' : 'Book a call'); }
     if (workBtn._on !== (where === 'work')) { workBtn._on = where === 'work'; workBtn.classList.toggle('on', workBtn._on); }
   }
-  let downOn = null, filmOn = null;
+  let downOn = null;
   const workBtn = $('.nb[data-k="work"]');
   function setNav() { navState(); }
 
@@ -495,9 +493,9 @@
 
   /* ---------- smooth scroll: Lenis (same settings as sumojoestudio.com) ---------- */
   const lenis = new Lenis({
-    // wheel and trackpad: the browser's own scrolling. Touch: Lenis drives it at its standard feel (no custom speeds),
+    // wheel and trackpad (desktop): the smooth glide from before 25 Nov evening, lerp 0.055. Touch: Lenis drives it at its standard feel (no custom speeds),
     // so the iPhone Safari bar sliding in and out can't make it stick. Lenis also runs the glides for the buttons.
-    smoothWheel: false, syncTouch: true, syncTouchLerp: 0.07, touchInertiaExponent: 1.7, touchMultiplier: 1.3, autoRaf: false,   // touch feel Joe set on his iPhone (25 Nov)
+    smoothWheel: !TOUCH, lerp: 0.055, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.07, touchInertiaExponent: 1.7, touchMultiplier: 1.3, autoRaf: false,   // touch feel Joe set on his iPhone (25 Nov)
   });
   gsap.ticker.add(t => lenis.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
@@ -596,7 +594,6 @@
 
   addEventListener('avgbook', e => { if (e.detail) lenis.stop(); else lenis.start(); navState(); });
   const goDown = () => { const f = tOf(lenis.targetScroll), next = f < 1.99 ? 2 : RESTS.find(s => s > Math.max(2, f) + 0.01); if (next !== undefined) goTo(next); };   // to the open film, then the big sentence
-  $('.down-chev').addEventListener('click', goDown);
   $$('.nb').forEach(a => a.addEventListener('click', e => {
     if (a.dataset.k === 'info' || a.dataset.k === 'work') return;   // Work and Info go to their pages
     e.preventDefault();
