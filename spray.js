@@ -69,12 +69,12 @@
   const onView = (el, fn, thr = 0.35) => { if (!('IntersectionObserver' in window)) return fn(); const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); fn(); } }, { threshold: thr }); io.observe(el); };
 
   /* ---------- the footer: a doodle between Extra and Ordinary, sprayed on as the footer comes up ---------- */
-  const fm = document.querySelector('.foot-mark'), fa = fm && fm.querySelector('.fm-avg'), fj = fm && fm.querySelector('.fm-joe');
+  document.querySelectorAll('.foot-mark, .fw-mark').forEach(fm => { const fa = fm.querySelector('.fm-avg'), fj = fm.querySelector('.fm-joe');   /* the footer and the Featured Work title */
   if (fa && fj) {
     const cv = document.createElement('canvas'); cv.className = 'foot-draw'; cv.setAttribute('aria-hidden', 'true'); fm.appendChild(cv);
     const di = pickD(); let pic = null, shown = false;
     const place = () => {   /* from the layout, so it holds while the footer slides in */
-      const l = fa.offsetLeft + fa.offsetWidth, gap = Math.max(fj.offsetLeft - l, 0), w = Math.max(gap * 1.6, fm.clientWidth * 0.36), h = w * 0.625, d = Math.min(devicePixelRatio || 1, 2);
+      const l = fa.offsetLeft + fa.offsetWidth, gap = Math.max(fj.offsetLeft - l, 0), w = Math.min(Math.max(gap * 1.6, fm.clientWidth * 0.36), fm.classList.contains('fw-mark') ? fm.clientWidth * 0.26 : 1e9), h = w * 0.625, d = Math.min(devicePixelRatio || 1, 2);
       cv.style.width = w + 'px'; cv.style.height = h + 'px'; cv.style.left = (l + gap / 2 - w / 2) + 'px'; cv.style.top = (fa.offsetTop + fa.offsetHeight * 0.5 - h / 2) + 'px';
       const W = Math.round(w * d), H = Math.round(h * d); if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; if (shown && pic) cv.getContext('2d').drawImage(pic, 0, 0, W, H); }
     };
@@ -85,7 +85,7 @@
           if (!meta) { g.drawImage(img, 0, 0, cv.width, cv.height); shown = true; } else go(); }, 0.5);
       }).catch(() => {}); }, { rootMargin: '60% 0px' });
     near.observe(fm);
-  }
+  } });
 
   /* odd bits of photography get a sprayed mark off one corner: a few at random each visit, the 620 picture always in lime */
   const imgs = [...document.querySelectorAll('img')].filter(img => {

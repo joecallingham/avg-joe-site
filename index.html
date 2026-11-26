@@ -7,7 +7,7 @@
 <meta name="description" content="Avg Joe is a studio blending craft and AI, putting the extra into ordinary.">
 <meta name="theme-color" content="#f1eee7">
 <link rel="preload" href="img/out-of-office.jpg" as="image">
-<link rel="stylesheet" href="style.css?v=20261126c">
+<link rel="stylesheet" href="style.css?v=20261126e">
 <script>try{var q=location.search;if(/[?&]fs\b/.test(q))sessionStorage.fs=1;if(/[?&]nofs\b/.test(q))sessionStorage.removeItem('fs');if(sessionStorage.fs)document.write('<link rel="stylesheet" href="/lab/fs.css?v=5"><script src="/lab/fs.js?v=5"><\/script>')}catch(e){}</script>
 </head>
 <body>
@@ -50,22 +50,37 @@
   <section id="s-cases" class="layer" aria-label="Work">
     <!-- featured work: the title holds, the projects stack beneath it like the Work page -->
     <section class="featured" aria-labelledby="fw-title">
-      <h3 class="sec-title" id="fw-title"><span>Featured Work</span><a class="all-work" href="/work/">All work ↘</a></h3>
-      <!-- rows that stack under the title like the Work page; each picture a third of the screen (main.js) -->
-      <div class="hf-stack">
-        <article class="hf">
-          <div class="hf-bar"><span class="hf-name"><span class="hf-no">01</span>620 Tennis Multicamp</span><a class="hf-more" href="#case-620">View case study ↘</a></div>
-          <a class="hf-img" href="#case-620" tabindex="-1" aria-hidden="true"><img src="img/620-clean.jpg" alt="" width="1800" height="1805"></a>
-        </article>
-        <article class="hf">
-          <div class="hf-bar"><span class="hf-name"><span class="hf-no">02</span>Brewed by Boon</span><a class="hf-more" href="#case-boon">View case study ↘</a></div>
-          <a class="hf-img" href="#case-boon" tabindex="-1" aria-hidden="true"><img src="img/boon-sign.jpg" alt="" width="2200" height="1004" style="object-position:42% 50%"></a>
-        </article>
-        <article class="hf">
-          <div class="hf-bar"><span class="hf-name"><span class="hf-no">03</span>Bison Coffee</span><a class="hf-more" href="/work/bison/">View case study ↘</a></div>
-          <a class="hf-img" href="/work/bison/" tabindex="-1" aria-hidden="true"><img src="img/bison.jpg" alt="" width="1100" height="1650" style="object-position:50% 50%"></a>
-        </article>
-        <div class="hf-hold" aria-hidden="true"></div>
+      <!-- the big pair, like the footer, with a sprayed doodle between; it holds while five projects slide up beneath it on the left, and Good to know stays still on the right -->
+      <h3 class="fw-mark" id="fw-title" aria-label="Featured Work"><span class="fm-avg" aria-hidden="true">Featured</span><span class="fm-joe" aria-hidden="true">Work</span></h3>
+      <div class="fw-body">
+        <div class="hf-stack">
+          <article class="hf">
+            <div class="hf-bar"><span class="hf-name"><span class="hf-no">01</span>620 Tennis Multicamp</span><a class="hf-more" href="#case-620">View case study ↘</a></div>
+            <a class="hf-img" href="#case-620" tabindex="-1" aria-hidden="true"><img src="img/620-clean.jpg" alt="" width="1800" height="1805" loading="lazy"></a>
+          </article>
+          <article class="hf">
+            <div class="hf-bar"><span class="hf-name"><span class="hf-no">02</span>Brewed by Boon</span><a class="hf-more" href="#case-boon">View case study ↘</a></div>
+            <a class="hf-img" href="#case-boon" tabindex="-1" aria-hidden="true"><img src="img/boon-sign.jpg" alt="" width="2200" height="1004" loading="lazy" style="object-position:42% 50%"></a>
+          </article>
+          <article class="hf">
+            <div class="hf-bar"><span class="hf-name"><span class="hf-no">03</span>Bison Coffee</span><a class="hf-more" href="/work/bison/">View case study ↘</a></div>
+            <a class="hf-img" href="/work/bison/" tabindex="-1" aria-hidden="true"><img src="img/bison.jpg" alt="" width="1100" height="1650" loading="lazy" style="object-position:50% 50%"></a>
+          </article>
+          <article class="hf">
+            <div class="hf-bar"><span class="hf-name"><span class="hf-no">04</span>The Hunna</span><a class="hf-more" href="#case-hunna">View case study ↘</a></div>
+            <a class="hf-img" href="#case-hunna" tabindex="-1" aria-hidden="true"><img src="img/the-hunna-hero.jpg" alt="" width="1200" height="1500" loading="lazy" style="object-position:50% 0%"></a>
+          </article>
+          <article class="hf">
+            <div class="hf-bar"><span class="hf-name"><span class="hf-no">05</span>Download x Mary Wyatt</span><a class="hf-more" href="#case-download">View case study ↘</a></div>
+            <a class="hf-img" href="#case-download" tabindex="-1" aria-hidden="true"><img src="img/download-hero.jpg" alt="" width="1080" height="1920" loading="lazy" style="object-position:50% 38%"></a>
+          </article>
+          <div class="hf-hold" aria-hidden="true"></div>
+        </div>
+        <aside class="fw-side">
+          <h4>Good to know</h4>
+          <p>We tell you where AI was used.<br>Your data stays yours.<br>If it's better by hand, it's done by hand.</p>
+          <a class="all-work" href="/work/">All work ↘</a>
+        </aside>
       </div>
     </section>
 
@@ -149,8 +164,8 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
-<script src="main.js?v=20261126c"></script>
-<script src="spray.js?v=109" defer></script>
+<script src="main.js?v=20261126d"></script>
+<script src="spray.js?v=20261126e" defer></script>
 <script src="booking.js?v=20261130x"></script>
 <script src="transition.js?v=20261130x"></script>
 <script src="footer.js?v=20261130x"></script>

@@ -598,3 +598,25 @@ img.spray{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;disp
 #frame-bottom{box-shadow:none!important}
 html.bk-on .logo{opacity:0;pointer-events:none}   /* the corner logos step aside while the form is open, so they don't sit on it */
 .logo{transition:opacity .3s ease}
+
+/* Home Featured Work (26 Nov): the big Featured / Work pair holds at the top; the five projects slide up and stack on the left,
+   each bar settling under the one before; Good to know stays still on the right */
+.fw-mark{position:sticky;top:0;z-index:4;display:flex;justify-content:space-between;align-items:baseline;margin:0;padding:calc(var(--s2) + 1.6vw) var(--margin) .1em;background:var(--cream);border-bottom:1px solid var(--ink);line-height:1;white-space:nowrap;font-size:9.4vw;font-weight:600}
+.fw-mark .foot-draw{z-index:-1}
+.fw-body{position:relative;z-index:3}
+.fw-body{display:grid;grid-template-columns:3fr 1fr;align-items:start}
+.fw-body .hf-img{margin:0;height:calc(100vh - var(--hf-top,10rem) - var(--hf-bar,36px));height:calc(100svh - var(--hf-top,10rem) - var(--hf-bar,36px))}
+.fw-body .hf{border-top:1px solid var(--ink)}
+.fw-body .hf:first-child{border-top-color:transparent}
+.fw-side{position:sticky;top:var(--fw-side,10rem);align-self:start;border-left:1px solid var(--ink);padding:.9rem var(--gutter) 0;min-height:calc(100vh - var(--fw-side,10rem));font-size:var(--small);font-weight:500;line-height:1.35;letter-spacing:-.02em}
+.fw-side h4{font:inherit;margin:0 0 1.1em}
+.fw-side p{color:#8e8b86;margin:0 0 1.6em}
+.fw-side .all-work{color:var(--ink)}
+.fw-side .all-work:hover{text-decoration:underline;text-underline-offset:.2em}
+@media (max-width:760px){
+  .fw-mark{top:3.4rem;font-size:12.4vw;padding-top:var(--s2)}
+  .fw-mark::before{content:'';position:absolute;left:0;right:0;bottom:100%;height:3.5rem;background:var(--cream)}
+  .fw-body{grid-template-columns:1fr}
+  .fw-side{display:none}
+  .fw-body .hf-img{height:calc(100svh - var(--hf-top,10rem) - var(--hf-bar,36px) - 5rem)}
+}
