@@ -20,23 +20,6 @@
   const raf = t => { lenis.raf(t); requestAnimationFrame(raf); };
   requestAnimationFrame(raf);
 
-  /* ---------- the notch (same outline as the home page) ---------- */
-  const NOTCH_FLANK = 2.1, notch = $('.notch');
-  function drawNotch() {
-    const b = notch.getBoundingClientRect(), w = b.width, h = b.height, fr = cssPx('--frame');
-    let svg = notch.querySelector('svg.notch-fill');
-    if (!svg) {
-      svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.setAttribute('class', 'notch-fill'); svg.setAttribute('aria-hidden', 'true');
-      svg.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
-      notch.prepend(svg);
-    }
-    const B = h - 1, F = NOTCH_FLANK * (h - 1), H = h + fr + 4, n = v => v.toFixed(1);
-    svg.setAttribute('viewBox', `0 0 ${n(w)} ${n(H)}`);
-    svg.style.width = w + 'px'; svg.style.height = H + 'px';
-    svg.firstChild.setAttribute('d', `M0 ${n(B)}C${n(0.55 * F)} ${n(B)} ${n(0.42 * F)} 0 ${n(F)} 0H${n(w - F)}C${n(w - 0.42 * F)} 0 ${n(w - 0.55 * F)} ${n(B)} ${n(w)} ${n(B)}V${n(H)}H0Z`);
-  }
-
   /* ---------- hover: letters run through the rotation faces, each locked to its own width ---------- */
   const SIZE = { avebury: 0.919, campground: 1.665, 'gilroy-heavy': 1.136, kelsi: 0.687, postoni: 1.289, 'iowan-black': 1.148, 'iowan-black-italic': 1.164, 'snell-black': 1.521 };
   const ROT = Object.keys(SIZE);
@@ -479,11 +462,11 @@
   let heroW = 0;
   const sizeHero = () => { if (!hero || (TOUCH && innerWidth === heroW)) return; heroW = innerWidth; hero.style.setProperty('--hero-h', Math.max(0, innerHeight - hero.offsetTop) + 'px'); };
   sizeHero();
-  let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { adv.clear(); drawNotch(); sizeHero(); }, 120); });
+  let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { adv.clear(); sizeHero(); }, 120); });
   // the letter boxes are measured in Nuckle, so wait for it (not just "fonts ready", which can fire before it is asked for)
   const fonts = Promise.all([document.fonts.load('500 1em Nuckle'), document.fonts.load('500 1em Nuckle', '↘↗'), document.fonts.ready]);
   Promise.race([fonts, new Promise(r => setTimeout(r, 2500))]).then(() => {
-    drawNotch(); letters(say); rotators.forEach(l => { if (l !== say) letters(l); });
+    letters(say); rotators.forEach(l => { if (l !== say) letters(l); });
     document.documentElement.classList.add('ready');
   });
   window.__page = { lenis };

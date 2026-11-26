@@ -218,66 +218,6 @@
   const workBtn = $('.nb[data-k="work"]');
   function setNav() { navState(); }
 
-  /* ---------- the notch: cut out of images only ---------- */
-  // The bar along the bottom and the notch are not drawn on top of the page; they are cut out of any image
-  // that reaches them, so text and backgrounds pass underneath untouched and images get soft curves.
-  const NOTCH_FLANK = 2.1;   // how wide each curved side of the notch is, in notch-heights
-  let cutGeo = null;
-  function notchGeo() {
-    const b = el.notch.getBoundingClientRect(), fr = cssPx('--frame');
-    // the notch follows the nav, which sits on the visible bottom edge
-    cutGeo = { x: b.left, y: b.top, w: b.width, h: b.height, base: b.bottom - 1, vw: innerWidth, vh: Math.max(VH(), innerHeight) };
-    drawNotch(b.width, b.height, fr);
-  }
-  // The notch itself is a solid shape on top of everything (same outline as the cut-outs), filled down to the screen edge.
-  function drawNotch(w, h, fr) {
-    let svg = el.notch.querySelector('svg.notch-fill');
-    if (!svg) {
-      svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.setAttribute('class', 'notch-fill'); svg.setAttribute('aria-hidden', 'true');
-      svg.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
-      el.notch.prepend(svg);
-    }
-    const B = h - 1, F = NOTCH_FLANK * (h - 1), H = h + fr + 4, n = v => v.toFixed(1);
-    svg.setAttribute('viewBox', `0 0 ${n(w)} ${n(H)}`);
-    svg.style.width = w + 'px'; svg.style.height = H + 'px';
-    svg.firstChild.setAttribute('d', `M0 ${n(B)}C${n(0.55 * F)} ${n(B)} ${n(0.42 * F)} 0 ${n(F)} 0H${n(w - F)}C${n(w - 0.42 * F)} 0 ${n(w - 0.55 * F)} ${n(B)} ${n(w)} ${n(B)}V${n(H)}H0Z`);
-  }
-  function cutPath(ox, oy) {          // bar + notch outline, in an element's own coordinates
-    // The flanks are drawn at a fixed size from the notch height, so a wider notch never stretches them:
-    // each side is one long soft S, from the bottom edge up into a rounded shoulder.
-    const g = cutGeo, far = 4000;
-    const top = g.y - oy, B = g.base - oy, F = NOTCH_FLANK * (g.base - g.y);
-    const L = g.x - ox, R = g.x + g.w - ox, bottom = g.vh + 10 - oy;
-    const n = v => v.toFixed(1);
-    let d = `M${n(-far - ox)} ${n(bottom)}V${n(B)}H${n(L)}`;
-    d += `C${n(L + 0.55 * F)} ${n(B)} ${n(L + 0.42 * F)} ${n(top)} ${n(L + F)} ${n(top)}`;
-    d += `H${n(R - F)}C${n(R - 0.42 * F)} ${n(top)} ${n(R - 0.55 * F)} ${n(B)} ${n(R)} ${n(B)}`;
-    d += `H${n(g.vw + far - ox)}V${n(bottom)}Z`;
-    return d;
-  }
-  const caseImgs = () => $$('.case figure img, .fw-img');
-  let cutNodes = [];
-  function cutImages() {
-    if (!cutGeo || !tl) return;
-    const t = tl.time(), want = [];
-    if (t > 0.9 && t < 3.3) want.push(el.hero);                          // the film, while it's big
-    if (shown >= 0) want.push(...cards[shown].map(a => a.firstElementChild));   // the work cards beside the wheel
-    if (cur > endPx - VH() * 1.2) want.push(...caseImgs());                // the work section
-    if (document.documentElement.classList.contains('foot-in')) want.length = 0;   // the notch has dropped away: no cut-outs left behind on the images
-    cutNodes.forEach(n => { if (!want.includes(n) && n._cut) { n.style.clipPath = ''; n._cut = false; n._path = ''; } });
-    cutNodes = want;
-    const top = cutGeo.y;
-    const rects = want.map(n => n.getBoundingClientRect());              // all reads first, then all writes
-    want.forEach((n, i) => {
-      const b = rects[i];
-      if (b.bottom <= top || b.top >= cutGeo.vh || b.width < 1) { if (n._cut) { n.style.clipPath = ''; n._cut = false; n._path = ''; } return; }
-      const p = `path(evenodd, "M0 0H${b.width.toFixed(1)}V${b.height.toFixed(1)}H0Z ${cutPath(b.left, b.top)}")`;
-      if (p !== n._path) { n.style.clipPath = p; n._path = p; }
-      n._cut = true;
-    });
-  }
-
   /* ---------- the timeline ---------- */
   let tl, geo = null;
   const heroImg = $('#hero video');
@@ -545,7 +485,6 @@
       document.documentElement.classList.toggle('cases-off', up > 0);   // the work is solid while it slides off, so the footer never shows through it
     }
     document.documentElement.classList.toggle('foot-in', past > room + VH() * 0.35);   // and the notch drops away
-    cutImages();
     navState();
   }
   lenis.on('scroll', l => {
@@ -567,7 +506,6 @@
     }
   });
   // the work cards pop in on their own clock, so keep their cut-outs current while they animate
-  gsap.ticker.add(() => { if (ready && shown >= 0) cutImages(); });
 
   const inOut = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
   function goTo(t) { lenis.scrollTo(Math.min(maxPx, pxOf(t)), { duration: 1.1, easing: inOut }); }
@@ -788,11 +726,11 @@
         // just the browser bars sliding in or out: the layout uses a stable height, so only the notch follows.
         // (If that stable height itself ever changes, re-place everything once, keeping the scroll position.)
         if (VH() !== lastVH) { lastVH = VH(); build(); }
-        notchGeo(); cutImages(); render(); return;
+        render(); return;
       }
       lastW = innerWidth;
       advCache.clear(); Object.values(cy).forEach(c => c.measure());
-      resplit(); build(); metrics(); notchGeo(); render(); setNav('studio');
+      resplit(); build(); metrics(); render(); setNav('studio');
     }, TOUCH ? 60 : 120);
   });
 
@@ -804,7 +742,7 @@
   Promise.race([loaded, new Promise(r => setTimeout(r, 2500))]).then(() => {
     Object.values(cy).forEach(c => c.measure());
     resplit();
-    build(); metrics(); setNav('studio'); notchGeo(); ready = true; render(); lastVH = VH();
+    build(); metrics(); setNav('studio'); ready = true; render(); lastVH = VH();
     // start the film (autoplay alone isn't always honoured); keep it playing if the browser pauses it
     heroImg.muted = true; heroImg.playsInline = true;
     const playFilm = () => { if (heroImg.paused) heroImg.play().catch(() => {}); };

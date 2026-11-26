@@ -197,16 +197,13 @@ html.intro-run .nb{transition:none}
 
 /* ---------- nav notch ---------- */
 /* the bar + notch are cut out of images in main.js (cutImages), so only images show them */
-#nav{position:fixed;left:50%;bottom:calc(var(--frame) - 1px);transform:translateX(-50%);z-index:50}
+#nav{position:fixed;left:50%;bottom:0;transform:translateX(-50%);z-index:50}
 /* one soft shape: big rounded shoulders that flare out into the bottom edge */
 .notch{position:relative;width:35rem;height:2.9rem;display:flex;align-items:center;justify-content:center;gap:1.6rem;padding-top:.3rem}
 /* a solid cream bar along the bottom edge, so the notch's curves run into it (over everything, like the notch) */
-#frame-bottom{position:fixed;left:0;right:0;bottom:0;height:var(--frame);background:var(--notch-bg);z-index:49;pointer-events:none}
-html.intro-dark #frame-bottom{background:#0b0b0b}
 /* the notch: a solid cream shape over everything, reaching down to the screen edge */
 .notch-fill{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;z-index:-1}
-.notch-fill path{fill:var(--notch-bg)}
-html.intro-dark .notch-fill path{fill:#0b0b0b}
+.notch-fill path{fill:var(--ink)}   /* the ink notch (26 Nov) */
 .notch>.nb{position:relative}
 /* desktop: a wider notch with Studio and Book a call either side; the middle button still changes with the section */
 @media (min-width:761px){.notch{width:50rem;gap:0;display:grid;grid-template-columns:repeat(5,1fr);justify-items:center;padding-left:4.5rem;padding-right:4.5rem}}
@@ -430,12 +427,10 @@ html.intro-dark .nb-ic{color:rgba(241,238,231,.5)}
 .bk-veil{position:fixed;inset:0;z-index:46;background:rgba(11,11,11,.25);opacity:0;pointer-events:none;transition:opacity .6s}
 .bk-veil.open{opacity:1;pointer-events:auto}
 /* the lid: the notch and the bottom bar ride up by the form's height (--bk-h, set by booking.js) */
-#frame-bottom{transition:transform .7s cubic-bezier(.22,1,.36,1)}
-html.bk-on #frame-bottom{transform:translateY(calc(-1 * var(--bk-h,0px)))}
 html.bk-on #nav{transform:translate(-50%,calc(-1 * var(--bk-h,0px)))}
 html.bk-on #nav,html.bk-shut #nav{transition:transform .7s cubic-bezier(.22,1,.36,1)}
 #nav{touch-action:none}   /* the notch is a thumb handle: drag it up for the form, down to put it away */
-html.bk-drag #nav,html.bk-drag #frame-bottom,html.bk-drag .bk,html.bk-drag .bk-veil{transition:none!important}
+html.bk-drag #nav,html.bk-drag .bk,html.bk-drag .bk-veil{transition:none!important}
 /* the form: its own dark strip right across the screen, under the lid */
 .bk{position:fixed;left:0;right:0;bottom:0;z-index:48;background:var(--notch-bg);color:var(--ink);max-height:80vh;max-height:80svh;overflow:auto;overscroll-behavior:contain;
   transform:translateY(100%);visibility:hidden;transition:transform .7s cubic-bezier(.22,1,.36,1),visibility 0s .7s}
@@ -469,7 +464,7 @@ html.bk-on .bk{transform:none;visibility:visible;transition:transform .7s cubic-
 .bk-home .bk-body,.bk-home .bk-done{padding:var(--in) var(--margin) calc(var(--in) * 1.5 + 56px)}   /* the bottom clears the notch */
 .bk-home .bk-in input:focus{background:rgba(11,11,11,.04)}
 @media (max-width:760px){.bk-say,.bk-go,.bk-meas,.bk-done-txt{font-size:var(--fs-title)}.bk-big,.bk-form,.bk-done-txt{grid-column:1/-1}.bk-big{margin-bottom:1.6rem}.bk-body,.bk-done{grid-template-columns:1fr}}
-@media (prefers-reduced-motion:reduce){.bk,html.bk-on .bk,#frame-bottom,html.bk-on #nav{transition-duration:0s}}
+@media (prefers-reduced-motion:reduce){.bk,html.bk-on .bk,html.bk-on #nav{transition-duration:0s}}
 
 /* ---------- moving between pages: everything blurs out, the next page blurs back into focus (transition.js) ----------
    A full-screen layer carries a real blur of what's under it. Its strength shows by fading the layer in and out
@@ -553,17 +548,6 @@ html.cases-off #s-cases{background:var(--cream)}
   .case.cp .more{margin-top:var(--in)}
 }
 .case.cp .cp-img{display:block!important}   /* an older phone rule flattened case figures; these keep their own box */
-/* desktop: a subtle shadow lifts the notch and the bottom bar off the page (the notch's follows its curves) */
-@media (min-width:761px){
-  #frame-bottom{box-shadow:0 -1px 14px rgba(11,11,11,.09)}
-  .notch-fill{filter:drop-shadow(0 -2px 8px rgba(11,11,11,.09))}
-}
-@media (min-width:761px){.notch-fill{clip-path:inset(-40px -40px calc(100% - 2.9rem + 1px) -40px)}}   /* the notch's shadow stops at the bar's top edge, so it doesn't fall on the bar */
-/* the shadow sits around the notch only, and softer (the bottom bar has none) */
-@media (min-width:761px){
-  #frame-bottom{box-shadow:none}
-  .notch-fill{filter:drop-shadow(0 -2px 12px rgba(11,11,11,.055))}
-}
 /* Information: Clients sits right under the last What We Do step, no extra run of space */
 .wd-sec{padding-bottom:0!important}
 @media (max-width:760px){.cl-title:not(.stuck)::before{display:none}}
@@ -590,9 +574,6 @@ canvas.spray{position:absolute;inset:0;display:block;width:100%;height:100%}
 .foot-draw{position:absolute;pointer-events:none;z-index:2;object-fit:contain}
 img.spray{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .wheel-air{position:absolute;inset:0;width:100%;height:100%}
-/* no shadow on the notch or the bar */
-.notch-fill{filter:none!important}
-#frame-bottom{box-shadow:none!important}
 html.bk-on .logo{opacity:0;pointer-events:none}   /* the corner logos step aside while the form is open, so they don't sit on it */
 .logo{transition:opacity .3s ease}
 
@@ -760,8 +741,6 @@ html.cases-off #s-cases{background:transparent!important}
 .credit{display:none!important}
 #more{display:none!important}   /* "Find out more" removed */
 /* 26 Nov: the notch inverted: ink notch and bar, light nav */
-#frame-bottom{background:var(--ink)}
-.notch-fill path{fill:var(--ink)}
 .nb,.nb-ic{color:rgba(241,238,231,.5)}
 .nb.on,.nb:hover,.nb-ic:hover,.nb-ic:focus-visible{color:var(--cream)}
 @media (max-width:760px){#wheel-desc{bottom:calc(var(--frame) + 11rem)}}   /* phones: lifted well clear of the notch (26 Nov) */
@@ -777,10 +756,6 @@ html.cases-off #s-cases{background:transparent!important}
 .bk .bk-go:focus-visible{outline-color:var(--cream)}
 .bk .bk-err,.bk .bk-in input.bad{color:#ff8a7e;border-bottom-color:#ff8a7e}
 .bk .bk-in input.bad{color:var(--cream)}
-/* 26 Nov: no bottom bar; the ink notch sits right on the screen's bottom edge */
-#frame-bottom{display:none!important}
-#nav{bottom:0}
-.notch-fill{clip-path:none!important}
 /* phones: Good to know sits beside Pages in the same section, no rule above it */
 @media (max-width:760px){.fc-side{grid-column:span 1;border-top:0;padding-top:var(--in)!important}}
 /* 26 Nov: the form sits in the footer's lower section as small text, on the cream, like everything else there */

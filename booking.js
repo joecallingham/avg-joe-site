@@ -1,4 +1,4 @@
-/* Book a call: the notch's middle button lifts the notch and the bottom bar, and a full-width form slides up
+/* Book a call: the notch's middle button lifts the notch, and a full-width form slides up
    underneath them: one sentence to fill in, then Send.
    It goes to /api/book, which emails Joe; if the email service isn't set up (or fails), a pre-filled email opens instead. */
 (() => {
@@ -28,7 +28,7 @@
   const home = $('.bk-home');   // the home page's own section under the case studies
   if (home) home.querySelector('.bk-body').insertAdjacentHTML('beforeend', FORM);
   const root = document.documentElement;
-  let opener = null, isOpen = false, settled = false;
+  let opener = null, isOpen = false;
 
   // each blank grows with what's typed in it (or its placeholder)
   const meas = el('span', 'bk-meas'); panel.appendChild(meas);
@@ -39,8 +39,8 @@
   allIn().forEach(i => i.addEventListener('input', () => { fit(i); i.classList.remove('bad'); const f = i.form; if (!f.querySelector('.bad')) f.querySelector('.bk-err').textContent = ''; }));
   const inputs = [...panel.querySelectorAll('.bk-in input')];
 
-  // the notch and the bottom bar lift by the form's height, and the form slides up under them
-  const size = () => { fitAll(); if (isOpen && settled) requestAnimationFrame(snap); else root.style.setProperty('--bk-h', panel.offsetHeight + 'px'); };
+  // the notch lifts by the form's height, and the form slides up under them
+  const size = () => { fitAll(); root.style.setProperty('--bk-h', panel.offsetHeight + 'px'); };   // the notch and the form are both pinned to the bottom edge, so lifting by the form's height keeps them joined
   const open = (on, from) => {
     if (on === isOpen) return;
     isOpen = on; if (on) size();
@@ -61,13 +61,13 @@
   (document.fonts?.ready || Promise.resolve()).then(size);
 
   /* ---------- thumb control: drag the notch up to open, down to close; it follows the finger, then a flick or past halfway decides ---------- */
-  const nav = $('#nav'), bar = $('#frame-bottom');
+  const nav = $('#nav');
   if (nav) {
     let d0 = 0, y0 = 0, H = 0, d = 0, dragging = false, down = false, hist = [], eat = false;
     const rubber = (x, lim) => x < 0 ? -rubberband(-x) : x > lim ? lim + rubberband(x - lim) : x;
     const rubberband = o => (o * 200 * 0.55) / (200 + 0.55 * o);
     const place = () => {
-      nav.style.transform = `translate(-50%,${-d}px)`; if (bar) bar.style.transform = `translateY(${-d}px)`;
+      nav.style.transform = `translate(-50%,${-d}px)`;
       panel.style.transform = `translateY(${Math.max(0, H - d)}px)`; veil.style.opacity = Math.max(0, Math.min(1, d / H));
     };
     nav.addEventListener('pointerdown', e => {
@@ -94,7 +94,7 @@
       const want = proj > H / 2;
       root.classList.remove('bk-drag');
       if (want !== isOpen) open(want, nav.querySelector('.nb[data-k="studio"]'));
-      [nav, bar, panel].forEach(x => x && (x.style.transform = '')); panel.style.visibility = ''; veil.style.opacity = '';
+      [nav, panel].forEach(x => x.style.transform = ''); panel.style.visibility = ''; veil.style.opacity = '';
     };
     addEventListener('pointerup', up); addEventListener('pointercancel', up);
     // iPhone: a drag that starts on the notch must never scroll or bounce the page (that would cancel the drag)
@@ -128,22 +128,6 @@
     size(); dispatchEvent(new Event('resize'));   // the home section changed height: let the page re-measure
   }));
 
-  /* ---------- keep the lid on the strip ----------
-     The notch and the strip are pinned to the bottom of the screen separately, and iPhone browsers can move one against the
-     other when their toolbar hides or shows. So while the form is open the page behind doesn't scroll, and once the strip
-     has settled, the lift is re-measured from where the strip really is. */
-  const barEl = $('#nav');   // the notch itself (the bottom bar is gone): its bottom edge should meet the form's top
-  const snap = () => {
-    if (!isOpen || !settled || !barEl || root.classList.contains('bk-drag')) return;
-    const gap = panel.getBoundingClientRect().top - barEl.getBoundingClientRect().bottom;
-    if (Math.abs(gap) < 0.5) return;
-    const h = parseFloat(getComputedStyle(root).getPropertyValue('--bk-h')) || panel.offsetHeight;
-    root.classList.add('bk-drag'); root.style.setProperty('--bk-h', (h - gap) + 'px');
-    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('bk-drag')));
-  };
-  panel.addEventListener('transitionend', e => { if (e.target === panel && e.propertyName === 'transform') { settled = isOpen; snap(); } });
-  addEventListener('avgbook', e => { if (!e.detail) settled = false; });
-  ['resize', 'scroll'].forEach(t => { addEventListener(t, () => requestAnimationFrame(snap), { passive: true }); window.visualViewport?.addEventListener(t, () => requestAnimationFrame(snap)); });
   veil.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
   veil.addEventListener('wheel', e => e.preventDefault(), { passive: false });
   panel.addEventListener('touchmove', e => { if (panel.scrollHeight <= panel.clientHeight + 1 && !e.target.closest('input')) e.preventDefault(); }, { passive: false });
