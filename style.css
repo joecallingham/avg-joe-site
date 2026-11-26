@@ -682,3 +682,26 @@ html.bk-on .logo{opacity:0;pointer-events:none}   /* the corner logos step aside
 }
 .cs-brief .copy .craft{display:inline-block;cursor:default}
 @media (max-width:760px){.if-front .info-hero,.info-top .info-hero{padding-top:calc(var(--s2) + 1.6vw + 6px)!important}}
+
+/* Work page (26 Nov): the Featured Work layout with filters down the right */
+.wk-fw .hf-hold{height:40vh;height:40svh}
+.wk-fw .hf.lead{border-top-color:transparent}
+.wk-fw .hf:first-child:not(.lead){border-top-color:var(--ink)}
+.wk-fw .hf[hidden]{display:none}
+.hf-bar .hf-cats{flex:1;color:#8e8b86;margin-left:var(--gutter);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.hf-more.soon{color:#8e8b86}
+.wk-side h3{font:inherit;margin:0 0 1.1em}
+.wk-fl{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:.45rem}
+.wk-fl button{appearance:none;font:inherit;font-size:var(--small);letter-spacing:-.02em;color:var(--ink);background:none;border:1px solid var(--ink);border-radius:999px;padding:.3em .85em .35em;cursor:pointer;transition:background .2s,color .2s}
+.wk-fl button:hover{background:rgba(11,11,11,.06)}
+.wk-fl button[aria-pressed="true"]{background:var(--ink);color:var(--cream)}
+.wk-fl button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.wk-fl .n{color:#8e8b86;margin-left:.35em}
+.wk-fl button[aria-pressed="true"] .n{color:rgba(241,238,231,.6)}
+.wk-fn{color:#8e8b86;margin:1.4em 0 0}
+.wk-clear{appearance:none;font:inherit;color:var(--ink);background:none;border:0;padding:0;margin-left:.8em;cursor:pointer;text-decoration:underline;text-underline-offset:.2em}
+@media (max-width:760px){
+  .hf-bar .hf-cats{display:none}
+  .wk-fw .fw-side{display:block;position:static;min-height:0;border-left:0;border-bottom:1px solid var(--ink);padding:1.2rem var(--margin) 1.4rem;order:-1}
+  .wk-fw .fw-body{display:flex;flex-direction:column;align-items:stretch}
+}

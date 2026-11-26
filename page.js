@@ -488,3 +488,38 @@
   });
   window.__page = { lenis };
 })();
+
+/* Work: the Featured Work layout. The big title holds, the projects stack under it, and the filters on the right
+   show any project that matches at least one picked category (pick as many as you like) */
+(() => {
+  const wrap = document.querySelector('.wk-fw'); if (!wrap) return;
+  const mark = wrap.querySelector('.fw-mark'), rows = [...wrap.querySelectorAll('.hf')], ul = wrap.querySelector('.wk-fl');
+  const nEl = wrap.querySelector('.wk-n'), clear = wrap.querySelector('.wk-clear'), on = new Set();
+  const cats = r => r.dataset.cats.split('|').filter(c => c !== 'Placeholder');
+  const pin = () => {
+    const top = parseFloat(getComputedStyle(mark).top) || 0, th = mark.getBoundingClientRect().height;
+    const bar = rows[0].querySelector('.hf-bar').getBoundingClientRect().height;
+    wrap.style.setProperty('--hf-top', (top + th - 1).toFixed(2) + 'px');
+    wrap.style.setProperty('--fw-side', (top + th - 1).toFixed(2) + 'px');
+    wrap.style.setProperty('--hf-bar', bar.toFixed(2) + 'px');
+    let i = 0; rows.forEach(r => { r.classList.remove('lead'); if (!r.hidden) { if (!i) r.classList.add('lead'); r.style.setProperty('--i', i++); } });
+  };
+  const count = new Map();
+  rows.forEach(r => cats(r).forEach(c => count.set(c, (count.get(c) || 0) + 1)));
+  [...count].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).forEach(([c, n]) => {
+    const li = document.createElement('li'), b = document.createElement('button');
+    b.type = 'button'; b.setAttribute('aria-pressed', 'false'); b.innerHTML = '';
+    b.append(c); const s = document.createElement('span'); s.className = 'n'; s.textContent = n; b.append(s);
+    b.addEventListener('click', () => { on.has(c) ? on.delete(c) : on.add(c); b.setAttribute('aria-pressed', String(on.has(c))); apply(); });
+    li.append(b); ul.append(li);
+  });
+  const apply = () => {
+    rows.forEach(r => { r.hidden = on.size > 0 && !cats(r).some(c => on.has(c)); });
+    nEl.textContent = rows.filter(r => !r.hidden).length; clear.hidden = !on.size;
+    pin();
+    const top = wrap.getBoundingClientRect().top + scrollY;   // if you're down the list, go back to its top so the new set is in view
+    if (scrollY > top + 2) { const l = window.__page && window.__page.lenis; l ? l.scrollTo(top, { duration: .8 }) : scrollTo(0, top); }
+  };
+  clear.addEventListener('click', () => { on.clear(); ul.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', 'false')); apply(); });
+  addEventListener('resize', pin); document.fonts && document.fonts.ready.then(pin); pin();
+})();
