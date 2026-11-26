@@ -132,7 +132,7 @@
      The notch and the strip are pinned to the bottom of the screen separately, and iPhone browsers can move one against the
      other when their toolbar hides or shows. So while the form is open the page behind doesn't scroll, and once the strip
      has settled, the lift is re-measured from where the strip really is. */
-  const barEl = $('#frame-bottom');
+  const barEl = $('#nav');   // the notch itself (the bottom bar is gone): its bottom edge should meet the form's top
   const snap = () => {
     if (!isOpen || !settled || !barEl || root.classList.contains('bk-drag')) return;
     const gap = panel.getBoundingClientRect().top - barEl.getBoundingClientRect().bottom;
