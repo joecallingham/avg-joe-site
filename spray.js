@@ -137,3 +137,30 @@
     near.observe(cv); vis.observe(cv);
   });
 })();
+
+/* Big two-word titles (Featured / Work, Extra / Ordinary, Made by / Hand, Hand / Picked): the letters' own side spacing
+   leaves the first word's ink inset from the text margin and the last word's ink past it. Measure the real ink and nudge
+   each word so its ink sits exactly on the margin, like the small text around it. */
+(() => {
+  const ctx = document.createElement('canvas').getContext('2d');
+  const ink = s => {
+    const st = getComputedStyle(s);
+    ctx.font = `${st.fontStyle} ${st.fontWeight} ${st.fontSize} ${st.fontFamily}`;
+    try { ctx.letterSpacing = st.letterSpacing; } catch (e) {}
+    const m = ctx.measureText(s.textContent), r = s.getBoundingClientRect();
+    return { l: r.left - m.actualBoundingBoxLeft, r: r.left + m.actualBoundingBoxRight };
+  };
+  const align = () => document.querySelectorAll('.foot-mark, .fw-mark, .info-mark').forEach(mk => {
+    const a = mk.querySelector('.fm-avg'), j = mk.querySelector('.fm-joe');
+    if (!a || !j) return;
+    a.style.translate = ''; j.style.translate = '';
+    const box = mk.getBoundingClientRect(), cs = getComputedStyle(mk);
+    const L = box.left + parseFloat(cs.paddingLeft), R = box.right - parseFloat(cs.paddingRight);
+    const dl = L - ink(a).l, dr = R - ink(j).r;
+    if (Math.abs(dl) > 0.3) a.style.translate = dl.toFixed(1) + 'px 0';
+    if (Math.abs(dr) > 0.3) j.style.translate = dr.toFixed(1) + 'px 0';
+  });
+  const go = () => document.fonts.ready.then(align);
+  go(); addEventListener('load', go);
+  let t; addEventListener('resize', () => { clearTimeout(t); t = setTimeout(align, 150); });
+})();
