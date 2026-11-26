@@ -681,4 +681,4 @@ html.bk-on .logo{opacity:0;pointer-events:none}   /* the corner logos step aside
   .if-front .info-hero,.info-top .info-hero{padding-bottom:2.23vw!important}
 }
 .cs-brief .copy .craft{display:inline-block;cursor:default}
-@media (max-width:760px){.if-front .info-hero,.info-top .info-hero{padding-top:calc(var(--s2) + 1.6vw + 9px)!important}}
+@media (max-width:760px){.if-front .info-hero,.info-top .info-hero{padding-top:calc(var(--s2) + 1.6vw + 11px)!important}}
