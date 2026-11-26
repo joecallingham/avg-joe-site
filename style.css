@@ -820,3 +820,4 @@ html.cases-off #s-cases{background:transparent!important}
 @media (min-width:761px){.foot-bk{grid-column:4/span 6}}   /* desktop: the form lines up with Say hello */
 @media (max-width:760px){.foot-bk{align-self:end;display:block;padding-top:calc(var(--s2) + var(--in))!important}}   /* the divider drops with the form; its gap to "Let's chat" matches the top rule to "Studio" */
 @media (min-width:761px){.foot-bk .bk-br{display:inline}}   /* desktop: "You can reach me on" starts its own line */
+@media (max-width:760px){.foot-bk{align-self:stretch;display:flex;flex-direction:column;justify-content:flex-end;margin-top:calc(var(--in) - var(--s2))}}   /* the divider sits as far under the text above as the top rule sits over "Studio"; the form stays low */
