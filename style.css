@@ -536,7 +536,7 @@ html.cases-off #s-cases{background:var(--cream)}
 .featured{padding-bottom:0}
 @media (max-width:760px){.fw-card + .fw-card{border-left:0;border-top:1px solid var(--ink)}}
 /* Case studies: one ruled panel each; image fills one half (alternating), copy in the other: label, headline, link at the foot */
-.case.cp{display:grid;grid-template-columns:1fr 1fr;min-height:0;height:calc(100vh - 3.5rem);height:calc(100svh - 3.5rem);padding:0;border-bottom:1px solid var(--ink);align-items:stretch}
+.case.cp{display:grid;grid-template-columns:1fr 1fr;min-height:0;height:70vh;height:70svh;min-height:34rem;padding:0;border-bottom:1px solid var(--ink);align-items:stretch}   /* 26 Nov: shorter, from a full screen to about 70% */
 .case.cp::before{display:none!important}
 .cp-img{grid-column:1;grid-row:1;margin:0;position:relative;overflow:hidden;border-right:1px solid var(--ink)}
 .cp-img .shot{position:absolute;inset:0;display:block}
@@ -549,7 +549,7 @@ html.cases-off #s-cases{background:var(--cream)}
 .case.cp .more{margin-top:auto;font-size:var(--small);letter-spacing:-.02em}
 @media (max-width:760px){
   .case.cp{grid-template-columns:1fr;height:auto}
-  .cp-img,.case.cp.flip .cp-img{grid-column:1;grid-row:1;height:55vh;height:55svh;border:0;border-bottom:1px solid var(--ink)}
+  .cp-img,.case.cp.flip .cp-img{grid-column:1;grid-row:1;height:42vh;height:42svh;border:0;border-bottom:1px solid var(--ink)}
   .cp-copy,.case.cp.flip .cp-copy{grid-column:1;grid-row:2;padding:var(--in) var(--margin) calc(var(--in) * 1.5)}
   .case.cp .more{margin-top:var(--in)}
 }
