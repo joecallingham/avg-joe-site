@@ -442,7 +442,7 @@
 
   const spacer = $('#scroll-space');
   const foot = $('#foot');
-  let room = 0, sroom = 0, footExtra = 0, unit = 1, endPx = 0, maxPx = 0, cur = 0, ready = false, veiling = false, brandOn = false, travel = 0;
+  let room = 0, sroom = 0, held = 0, footExtra = 0, unit = 1, endPx = 0, maxPx = 0, cur = 0, ready = false, veiling = false, brandOn = false, travel = 0;
   // scroll position <-> timeline time; section 1->2 is OPEN_LEN screens long, every other section one screen
   // knots of [timeline time, screens scrolled]: section 1-2 is OPEN_LEN long, and there is a HOLD at 3 (a pause on the big sentence)
   const KNOTS = () => { const a = LEN_PART, b = a + OPEN_LEN, c = b + LEN_SHRINK, d = c + HOLD; const e = d + (TOUCH ? 0.8 : 0.6), f = e + WE - 4; return [[0, 0], [1, a], [2, b], [3, c], [3, d], [4, e], [WE, f], [END, f + (END - WE) * (TOUCH ? 0.8 : 1)]]; };   // the steps into and out of the wheel are short (shorter still on phones), so no long empty gaps   // the big sentence -> wheel step is 0.6 of a screen, so there's no long empty gap between them
@@ -455,14 +455,14 @@
     // a see-through tail after the last case study, so it scrolls all the way up under the held Case Studies bar before the
     // title and bar move off; the footer shows through the tail, exactly as when the section slid up
     const tail = $('.cases-tail'), mk = $('.fw-mark'), cbar = $('.cases-over > .sec-title'), bkh = $('.bk-home');
-    let T = 0;
-    if (tail && mk && cbar) { tail.style.height = '0px'; const pinned = (parseFloat(getComputedStyle(mk).top) || 0) + mk.offsetHeight + cbar.offsetHeight - 1; T = Math.max(0, Math.round(el.cases.clientHeight - (bkh && el.cases.contains(bkh) ? bkh.offsetHeight : 0) - pinned)); const lc = [...el.cases.querySelectorAll('article.case')].pop(); if (lc) T += Math.max(0, Math.round(lc.getBoundingClientRect().bottom - tail.getBoundingClientRect().top));   // the last case study's box runs past the tail's start: add that, so all of it clears the bar
+    let T = 0; held = 0;
+    if (tail && mk && cbar) { tail.style.height = '0px'; const pinned = (parseFloat(getComputedStyle(mk).top) || 0) + mk.offsetHeight + cbar.offsetHeight - 1; held = pinned; T = Math.max(0, Math.round(el.cases.clientHeight - (bkh && el.cases.contains(bkh) ? bkh.offsetHeight : 0) - pinned)); const lc = [...el.cases.querySelectorAll('article.case')].pop(); if (lc) T += Math.max(0, Math.round(lc.getBoundingClientRect().bottom - tail.getBoundingClientRect().top));   // the last case study's box runs past the tail's start: add that, so all of it clears the bar
       tail.style.height = T + 'px'; }
     room = Math.max(0, el.cases.scrollHeight - el.cases.clientHeight - T);
     sroom = room + T;
     // phones: the footer can be taller than the screen you can see, so leave room to scroll the rest of it into view
     footExtra = foot ? Math.max(0, Math.max(...[...foot.children].map(c => c.offsetTop + c.offsetHeight)) - SVH()) : 0;
-    maxPx = endPx + room + VH() + footExtra;   // + one screen so the work slides up off
+    maxPx = endPx + sroom + Math.max(VH() - T, held + 2) + footExtra;   // after the tail: far enough that the held title and bar leave the screen completely   // + one screen so the work slides up off
     spacer.style.height = (maxPx + VH()) + 'px';   // the tallest the screen gets, so the end is reachable with the browser bars showing or hidden
     lenis.resize();
     const to = t < END ? pxOf(t) : endPx + past;
