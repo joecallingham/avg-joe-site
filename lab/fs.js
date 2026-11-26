@@ -8,15 +8,16 @@
   const build = () => {
     document.querySelectorAll('.sec-title').forEach(t => {
       if (t.closest('.bk-home')) return;
-      const span = t.querySelector('span') || t, txt = (span.textContent || '').trim(); if (!txt) return;
+      const span = t.firstElementChild || t, txt = (span.textContent || '').trim(); if (!txt || txt.split(/\s+/).length > 3) return;   // long titles (the case study headings) stay as they are
       const w = txt.split(/\s+/), last = w.length > 1 ? w.pop() : '';
       const m = document.createElement('p'); m.className = 'fs-mark'; m.setAttribute('aria-hidden', 'true');
       m.innerHTML = `<span class="fm-avg">${w.join(' ')}</span>${last ? `<span class="fm-joe">${last}</span>` : ''}`;
       const d = new Image(); d.className = 'fs-dood'; d.alt = ''; d.decoding = 'async'; d.loading = 'lazy'; d.src = '/img/spray/ft-' + pick() + '.webp?v=3'; m.appendChild(d);
-      t.parentNode.insertBefore(m, t); t.classList.add('fs-t'); marks.push({ m, t, d });
+      t.parentNode.insertBefore(m, t); t.classList.add('fs-t'); span.classList.add('fs-tt'); marks.push({ m, t, d });
     });
     place();
   };
+  const fit = () => { for (let i = marks.length - 1; i >= 0; i--) { const { m, t } = marks[i]; if (m.scrollWidth > m.clientWidth + 2) { m.remove(); t.classList.remove('fs-t', 'fs-on'); t.querySelector('.fs-tt')?.classList.remove('fs-tt'); marks.splice(i, 1); } } };
   const place = () => marks.forEach(({ m, t, d }) => {
     m.style.marginBottom = -(t.offsetHeight - 1) + 'px';   // the mark's foot sits on the title's hairline
     const a = m.querySelector('.fm-avg'), j = m.querySelector('.fm-joe');
@@ -55,7 +56,10 @@
       while ((m = re.exec(n.data))) { const st = m.index + m[1].length; f.append(n.data.slice(last, st)); const sp = document.createElement('span'); sp.className = 'fs-s'; sp.textContent = m[2]; f.append(sp); last = st + m[2].length; }
       f.append(n.data.slice(last)); n.replaceWith(f); });
   }));
-  const go = () => { serif(); grid(); build(); heroDood(); addEventListener('resize', heroDood); document.fonts && document.fonts.ready.then(heroDood); requestAnimationFrame(loop); addEventListener('resize', place); document.fonts && document.fonts.ready.then(place); addEventListener('load', place); };
+  // the form's measurer sits outside the sentence: give it the sentence's size, then re-fit the blanks
+  const bk = () => { const say = document.querySelector('.bk-say'); if (!say) return; H.style.setProperty('--bk-say', getComputedStyle(say).fontSize);
+    document.querySelectorAll('.bk-in input').forEach(i => i.dispatchEvent(new Event('input', { bubbles: true }))); };
+  const go = () => { serif(); bk(); addEventListener('resize', bk); document.fonts && document.fonts.ready.then(bk); addEventListener('click', e => { if (e.target.closest('a[href="#book"]')) setTimeout(bk, 60); }); grid(); build(); heroDood(); addEventListener('resize', heroDood); document.fonts && document.fonts.ready.then(heroDood); requestAnimationFrame(loop); addEventListener('resize', place); document.fonts && document.fonts.ready.then(() => { fit(); place(); }); addEventListener('load', place); };
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', go) : go();
   // the little switch, bottom left
   addEventListener('DOMContentLoaded', () => { const s = document.createElement('a'); s.className = 'fs-sw'; s.href = '?nofs'; s.textContent = 'Footer style: on'; document.body.appendChild(s); });
