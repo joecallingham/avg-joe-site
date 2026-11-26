@@ -759,3 +759,8 @@ html.cases-off #s-cases{background:transparent!important}
 /* 26 Nov: no credits on images, anywhere */
 .credit{display:none!important}
 #more{display:none!important}   /* "Find out more" removed */
+/* 26 Nov: the notch inverted: ink notch and bar, light nav */
+#frame-bottom{background:var(--ink)}
+.notch-fill path{fill:var(--ink)}
+.nb,.nb-ic{color:rgba(241,238,231,.5)}
+.nb.on,.nb:hover,.nb-ic:hover,.nb-ic:focus-visible{color:var(--cream)}
