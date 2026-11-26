@@ -777,3 +777,16 @@ html.cases-off #s-cases{background:transparent!important}
 .bk .bk-go:focus-visible{outline-color:var(--cream)}
 .bk .bk-err,.bk .bk-in input.bad{color:#ff8a7e;border-bottom-color:#ff8a7e}
 .bk .bk-in input.bad{color:var(--cream)}
+/* 26 Nov: the home page form inverted too, and it keeps "Let's chat" on phones */
+.bk-home{background:var(--ink);color:var(--cream)}
+.bk-home .bk-say{color:rgba(241,238,231,.82)}
+.bk-home .bk-lab,.bk-home .bk-done-txt,.bk-home .bk-big{color:var(--cream)}
+.bk-home .bk-in input{color:var(--cream);border-bottom-color:rgba(241,238,231,.3)}
+.bk-home .bk-in input::placeholder{color:rgba(241,238,231,.38)}
+.bk-home .bk-in input:focus{background:rgba(241,238,231,.08)}
+.bk-home .bk-go{color:var(--cream)}
+.bk-home .bk-go:disabled{color:rgba(241,238,231,.45)}
+.bk-home .bk-go:focus-visible{outline-color:var(--cream)}
+.bk-home .bk-err,.bk-home .bk-in input.bad{color:#ff8a7e;border-bottom-color:#ff8a7e}
+.bk-home .bk-in input.bad{color:var(--cream)}
+@media (max-width:760px){.bk-home .bk-lab{display:block;margin-bottom:1.6rem}}
