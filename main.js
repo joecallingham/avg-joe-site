@@ -817,7 +817,7 @@
 
 // Home Featured Work: rows stack under the held title like the Work page; the last picture runs to the foot of the screen
 (() => {
-  const sec = document.querySelector('.featured'), title = sec && sec.querySelector('.fw-mark'), stack = sec && sec.querySelector('.hf-stack');
+  const sec = document.querySelector('.featured'), title = document.querySelector('.fw-mark'), stack = sec && sec.querySelector('.hf-stack');
   if (!title || !stack) return;
   const rows = [...stack.querySelectorAll('.hf')], scroller = document.getElementById('s-cases');
   let base = 0, th = 0, raf = 0;
@@ -828,7 +828,7 @@
     stack.style.setProperty('--hf-bar', bh.toFixed(2) + 'px');
     rows.forEach((r, i) => r.style.setProperty('--i', i));
     stack.dataset.bar = bh;
-    sec.style.setProperty('--fw-side', (base + th - 1).toFixed(2) + 'px');   // Good to know holds just under the big title
+    (scroller || sec).style.setProperty('--fw-side', (base + th - 1).toFixed(2) + 'px');   // Good to know holds just under the big title
     tick();
   };
   const tick = () => {

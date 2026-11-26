@@ -620,3 +620,33 @@ html.bk-on .logo{opacity:0;pointer-events:none}   /* the corner logos step aside
   .fw-side{display:none}
   .fw-body .hf-img{height:calc(100svh - var(--hf-top,10rem) - var(--hf-bar,36px) - 5rem)}
 }
+
+/* the forms (26 Nov): the sentence in Riccione, the blanks in the sans with a fine grey rule, Send in the sans; centred on desktop, left on phones */
+:root{--bk-s:calc(var(--fs-body) * 1.25);--bk-i:var(--fs-body)}
+.bk-say{font-family:"Riccione",Georgia,serif;font-weight:300;font-size:var(--bk-s);line-height:1.22;letter-spacing:-.015em;color:#3b3a38}
+.bk-in input,.bk-meas{font-family:"Nuckle",system-ui,sans-serif;font-weight:500;font-size:var(--bk-i);letter-spacing:-.04em}
+.bk-in input{border-bottom:1px solid rgba(11,11,11,.22);color:var(--ink);line-height:1.15}
+.bk-in input::placeholder{color:rgba(11,11,11,.3)}
+.bk-go{font-size:var(--bk-s);text-decoration:none;letter-spacing:-.04em}
+.bk-go:hover{text-decoration:underline;text-decoration-thickness:1px}
+@media (min-width:761px){
+  .bk-form{grid-column:1/-1;text-align:center}
+  .bk-say{max-width:68rem;margin:0 auto}
+  .bk-foot{flex-direction:column;align-items:center;gap:.8rem;margin-top:3.2rem}
+  .bk-err{order:2}
+  .bk-big,.bk-done-txt{grid-column:1/-1;text-align:center}
+  .bk-done-txt{max-width:58rem;margin:1.2rem auto 0}
+}
+@media (max-width:760px){
+  :root{--bk-s:calc(var(--fs-title) * 1.1);--bk-i:calc(var(--fs-title) * .92)}
+  .bk-say,.bk-meas{font-size:var(--bk-s)}
+  .bk-meas{font-size:var(--bk-i)}
+  .bk-go{font-size:var(--bk-s)}
+}
+
+/* the Featured Work title holds over the case studies too: they slide up under it and their title sticks just beneath it */
+.fw-mark{z-index:7}
+.cases-over > .sec-title{top:var(--fw-side,0px)!important}
+.bk-home{z-index:6}
+.bk-br{display:none}
+@media (min-width:761px){.bk-br{display:inline}}

@@ -50,9 +50,6 @@
 /* key words inside the big sentences, in the serif (fs.js picks them) */
 .fs .fs-s{font-family:"Riccione",Georgia,serif;font-weight:300;letter-spacing:-.025em;font-size:1.14em;line-height:0}
 /* the booking form: the sentence stays sans, the visitor's answers (and the hints in the blanks) are in the serif */
-.fs .bk-in input,.fs .bk-meas{font-family:"Riccione",Georgia,serif!important;font-weight:300!important;font-size:1.14em!important;letter-spacing:-.025em!important}
-.fs .bk-meas{font-size:calc(var(--bk-say,var(--fs-body)) * 1.14)!important}   /* the measurer sits outside the sentence, so it gets the size outright */
-.fs .bk-in input{border-bottom-width:1px}
 .fs .bk-big{font-family:"Riccione",Georgia,serif;font-weight:300;letter-spacing:-.03em;font-size:calc(var(--fs-head) * 1.14)}
 /* titles: only the words that became the big mark wait for the stick; any hint beside them stays */
 .fs .sec-title.fs-t,.fs .sec-title.fs-t > *{color:inherit}
