@@ -820,3 +820,15 @@ html.cases-off #s-cases{background:transparent!important}
 }
 html.crios body::after{display:none}   /* Chrome on iPhone shares Safari's engine but not its toolbar tinting: no ink strip there */
 .cases-over > .sec-title::before{display:none!important}   /* the Case Studies bar sits right under the Featured Work title: no cream cap above it (it hid the last picture and made the bar look tall) */
+/* phones, footer: the spare height splits equally above the Studio / Say hello block and below the second divider, so
+   top rule -> "Studio" matches divider -> "Let's chat"; the divider stays one top-gap under Pages */
+@media (max-width:760px){
+  .foot-cols{row-gap:var(--s3);grid-template-rows:1fr auto auto 1fr auto auto auto}
+  .foot-cols::before{content:'';grid-column:1/-1;grid-row:1}
+  .foot-cols::after{content:'';grid-column:1/-1;grid-row:4;border-top:1px solid var(--ink);margin:calc(var(--s2) + var(--in) - var(--s3)) calc(-1 * var(--margin)) 0}
+  .foot-bk{grid-row:5;border-top:0!important;margin:0!important;display:block!important;align-self:start!important;
+    padding-top:calc(2 * var(--s2) + 2 * var(--in) - var(--s3))!important}
+  .foot-tag{grid-row:6;align-self:start}
+  .foot-c{grid-row:7}
+}
+@media (max-width:760px){.foot-bk{padding-left:0!important;padding-right:0!important}}   /* the form lines up with the rest of the footer text */
