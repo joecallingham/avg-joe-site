@@ -165,14 +165,3 @@
   let t; addEventListener('resize', () => { clearTimeout(t); t = setTimeout(align, 150); });
 })();
 
-/* Trial (26 Nov): the edge blur on the home page's Featured Work pictures. Eight stacked blur layers, each stronger and
-   starting lower, then a light haze and grain, so the bottom of each picture melts out like the reference. */
-(() => {
-  const K = [.04, .1, .18, .3, .45, .62, .8, 1];
-  document.querySelectorAll('.featured .hf-img').forEach(box => {
-    box.classList.add('eblur');
-    if (getComputedStyle(box).position === 'static') box.style.position = 'relative';
-    K.forEach((k, o) => { const i = document.createElement('i'); i.className = 'eb'; i.dataset.l = o; i.style.setProperty('--k', k); i.style.setProperty('--o', o); box.appendChild(i); });
-    ['hz', 'gr'].forEach(c => { const i = document.createElement('i'); i.className = 'eb ' + c; box.appendChild(i); });
-  });
-})();
