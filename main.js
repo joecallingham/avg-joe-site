@@ -456,7 +456,8 @@
     // title and bar move off; the footer shows through the tail, exactly as when the section slid up
     const tail = $('.cases-tail'), mk = $('.fw-mark'), cbar = $('.cases-over > .sec-title'), bkh = $('.bk-home');
     let T = 0;
-    if (tail && mk && cbar) { tail.style.height = '0px'; const pinned = (parseFloat(getComputedStyle(mk).top) || 0) + mk.offsetHeight + cbar.offsetHeight - 1; T = Math.max(0, Math.round(el.cases.clientHeight - (bkh && el.cases.contains(bkh) ? bkh.offsetHeight : 0) - pinned)); tail.style.height = T + 'px'; }
+    if (tail && mk && cbar) { tail.style.height = '0px'; const pinned = (parseFloat(getComputedStyle(mk).top) || 0) + mk.offsetHeight + cbar.offsetHeight - 1; T = Math.max(0, Math.round(el.cases.clientHeight - (bkh && el.cases.contains(bkh) ? bkh.offsetHeight : 0) - pinned)); const lc = [...el.cases.querySelectorAll('article.case')].pop(); if (lc) T += Math.max(0, Math.round(lc.getBoundingClientRect().bottom - tail.getBoundingClientRect().top));   // the last case study's box runs past the tail's start: add that, so all of it clears the bar
+      tail.style.height = T + 'px'; }
     room = Math.max(0, el.cases.scrollHeight - el.cases.clientHeight - T);
     sroom = room + T;
     // phones: the footer can be taller than the screen you can see, so leave room to scroll the rest of it into view
