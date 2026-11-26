@@ -806,3 +806,9 @@ html.cases-off #s-cases{background:transparent!important}
 .foot-mark .fm-joe{translate:-.073em 0}
 .fw-mark .fm-joe{translate:-.097em 0}
 .wk-fw .fw-mark .fm-joe,.info-mark .fm-joe{translate:-.0279em 0}
+/* iPhone/iPad Safari tints the strip behind its bottom toolbar from a solid fixed element touching the bottom edge.
+   The notch is a drawn shape (no background colour), so once it drops away and returns Safari loses the ink and falls back
+   to the cream. This 1px ink line never moves, so Safari always finds ink there. iOS only (no hairline on desktop). */
+@supports (-webkit-touch-callout: none){
+  body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:1px;background:var(--ink);z-index:49;pointer-events:none}
+}
