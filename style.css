@@ -749,4 +749,4 @@ html.cases-off #s-cases{background:transparent!important}
 /* phones: no "Let's chat" label on the booking forms */
 @media (max-width:760px){.bk-lab{display:none}}
 /* phones: the pop-up form sits higher from the start (room below it), so the keyboard never covers it */
-@media (max-width:760px){.bk .bk-body{padding-bottom:calc(var(--margin) + 40vh);padding-bottom:calc(var(--margin) + 40svh)}}
+@media (max-width:760px){.bk .bk-body{padding-bottom:calc(var(--margin) + 27vh);padding-bottom:calc(var(--margin) + 27svh)}}
