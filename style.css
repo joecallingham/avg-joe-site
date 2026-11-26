@@ -750,3 +750,11 @@ html.cases-off #s-cases{background:transparent!important}
 @media (max-width:760px){.bk-lab{display:none}}
 /* phones: the pop-up form sits higher from the start (room below it), so the keyboard never covers it */
 @media (max-width:760px){.bk .bk-body{padding-bottom:calc(var(--margin) + 27vh);padding-bottom:calc(var(--margin) + 27svh)}}
+/* the forms: Send sits on the same row as the sentence, at its end, centred on it top to bottom, a step smaller (26 Nov) */
+.bk-form{display:grid;grid-template-columns:minmax(0,auto) auto;column-gap:2.4rem;align-items:center;justify-content:center}
+.bk-form > .bk-lab{grid-column:1/-1}
+.bk-form > .bk-say{grid-column:1;margin:0}
+.bk-form > .bk-foot{grid-column:2;margin:0!important;align-self:center;flex-direction:column;align-items:flex-start;gap:.4rem}
+.bk-go{font-size:var(--bk-i)!important;white-space:nowrap}
+@media (max-width:760px){.bk-form{justify-content:stretch;column-gap:1.2rem}}
+@media (max-width:760px){.bk-form{display:block}.bk-form > .bk-foot{margin-top:1.6rem!important}}
