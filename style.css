@@ -790,3 +790,7 @@ html.cases-off #s-cases{background:transparent!important}
 .bk-home .bk-err,.bk-home .bk-in input.bad{color:#ff8a7e;border-bottom-color:#ff8a7e}
 .bk-home .bk-in input.bad{color:var(--cream)}
 @media (max-width:760px){.bk-home .bk-lab{display:block;margin-bottom:1.6rem}}
+/* 26 Nov: no bottom bar; the ink notch sits right on the screen's bottom edge */
+#frame-bottom{display:none!important}
+#nav{bottom:0}
+.notch-fill{clip-path:none!important}
