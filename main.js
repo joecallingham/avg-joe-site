@@ -313,7 +313,6 @@
 
     // WE → END: the work comes up
     ft(wp, { v: SERVICES.length - 1 }, { v: SERVICES.length - 1 + SPIN }, WE);   // keeps spinning as it leaves
-    ft(el.wheel, { y: 0 }, { y: -vh * 0.35 }, WE);
     ft(el.wheel, { autoAlpha: 1 }, { autoAlpha: 0 }, WE + 0.05, { duration: 0.4 });
     ft(el.wbg, { opacity: 1 }, { opacity: 0 }, WE, { duration: 0.75, ease: 'sine.inOut' });
     ft(el.cases, { y: vh }, { y: 0 }, WE);
@@ -453,11 +452,11 @@
     const t = unit > 1 ? Math.min(tOf(cur), END) : 0, past = Math.max(0, cur - endPx);
     unit = VH() * UNIT;
     endPx = pxOf(END);
-    // a see-through tail after the form, so the case studies keep scrolling under the held Case Studies bar until the form
-    // reaches it (the form keeps its own size); the footer shows through the tail, exactly as when the section slid up
+    // a see-through tail after the last case study, so it scrolls all the way up under the held Case Studies bar before the
+    // title and bar move off; the footer shows through the tail, exactly as when the section slid up
     const tail = $('.cases-tail'), mk = $('.fw-mark'), cbar = $('.cases-over > .sec-title'), bkh = $('.bk-home');
     let T = 0;
-    if (tail && mk && cbar && bkh) { tail.style.height = '0px'; const pinned = (parseFloat(getComputedStyle(mk).top) || 0) + mk.offsetHeight + cbar.offsetHeight - 1; T = Math.max(0, Math.round(el.cases.clientHeight - bkh.offsetHeight - pinned)); tail.style.height = T + 'px'; }
+    if (tail && mk && cbar) { tail.style.height = '0px'; const pinned = (parseFloat(getComputedStyle(mk).top) || 0) + mk.offsetHeight + cbar.offsetHeight - 1; T = Math.max(0, Math.round(el.cases.clientHeight - (bkh && el.cases.contains(bkh) ? bkh.offsetHeight : 0) - pinned)); tail.style.height = T + 'px'; }
     room = Math.max(0, el.cases.scrollHeight - el.cases.clientHeight - T);
     sroom = room + T;
     // phones: the footer can be taller than the screen you can see, so leave room to scroll the rest of it into view

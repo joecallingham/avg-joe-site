@@ -797,3 +797,4 @@ html.cases-off #s-cases{background:transparent!important}
 @media (min-width:761px){.foot-bk .bk-br{display:inline}}   /* desktop: "You can reach me on" starts its own line */
 @media (max-width:760px){.foot-bk{align-self:stretch;display:flex;flex-direction:column;justify-content:flex-end;margin-top:calc(var(--in) - var(--s2))}}   /* the divider sits as far under the text above as the top rule sits over "Studio"; the form stays low */
 @media (max-width:760px){#wheel-desc{top:calc(var(--margin) + 3.4rem);bottom:auto}}   /* phones: the description sits at the top, under Avg Joe */
+@media (max-width:760px){.fc-side{display:none!important}}   /* phones: no Good to know in the footer */
