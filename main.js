@@ -575,9 +575,10 @@
   }
 
   // G toggles the grid overlay (for checking alignment)
-  addEventListener('keydown', e => { if (beatOpen) return; if ((e.key === 'g' || e.key === 'G') && !e.metaKey && !e.ctrlKey && !e.altKey) $('#grid-ov').classList.toggle('on'); });
+  const typing = e => e.target.closest && e.target.closest('input, textarea, select, [contenteditable]');   // keys typed into the form are the visitor's words, not shortcuts
+  addEventListener('keydown', e => { if (beatOpen || typing(e)) return; if ((e.key === 'g' || e.key === 'G') && !e.metaKey && !e.ctrlKey && !e.altKey) $('#grid-ov').classList.toggle('on'); });
   addEventListener('keydown', e => {
-    if (beatOpen) return;
+    if (beatOpen || typing(e)) return;
     const down = ['ArrowDown', 'PageDown', ' '].includes(e.key), up = ['ArrowUp', 'PageUp'].includes(e.key);
     if (!down && !up) return;
     e.preventDefault();
