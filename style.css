@@ -678,7 +678,7 @@ html.bk-on .logo{opacity:0;pointer-events:none}   /* the corner logos step aside
 @media (max-width:760px){
   .info-hero .info-mark{font-size:12.4vw;white-space:normal}
   .info-mark .fm-avg{white-space:normal;max-width:72%}
-  .if-front .info-hero,.info-top .info-hero{padding-bottom:2.23vw!important}
+  .if-front .info-hero,.info-top .info-hero{padding-bottom:calc(2.23vw + 2px)!important}
 }
 .cs-brief .copy .craft{display:inline-block;cursor:default}
-@media (max-width:760px){.if-front .info-hero,.info-top .info-hero{padding-top:calc(var(--s2) + 1.6vw + 11px)!important}}
+@media (max-width:760px){.if-front .info-hero,.info-top .info-hero{padding-top:calc(var(--s2) + 1.6vw + 6px)!important}}
