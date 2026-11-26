@@ -665,3 +665,10 @@ html.bk-on .logo{opacity:0;pointer-events:none}   /* the corner logos step aside
 @media (max-width:760px){:root{--bk-s:calc(var(--fs-title) * 1.05)}}
 /* phones: Featured Work sits the same distance below the logos as Extra Ordinary does in the footer */
 @media (max-width:760px){.fw-mark{padding-top:calc(var(--s4) - 3.4rem);padding-bottom:.18em}}
+
+/* Information: the first screen's pair, like Extra / Ordinary: "Not your Average" in the sans, "Joe" in Riccione */
+.info-hero .info-mark{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;margin:0;white-space:nowrap;line-height:1;font-size:9.3vw;font-weight:600;letter-spacing:-.055em}
+.info-mark .fm-joe{font-weight:300;letter-spacing:-.03em}
+@media (max-width:760px){.info-hero .info-mark{font-size:7.9vw}}
+.info-mark{position:relative;isolation:isolate}
+.info-mark .foot-draw{z-index:-1}
