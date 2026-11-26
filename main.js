@@ -302,10 +302,10 @@
     const mid = (vs - h) / 2, low = phone ? pad * 0.95 : vh - pad * 0.95 - h;   // phones: Avg Joe live at the top, not the bottom
     const ax0 = (vw - (wa + gap + wj)) / 2;
     return {
-      vh, vw, wa, wj, gap, r, full: vw - 2 * fr, fullH: vh - 2 * fr,
+      vh, vw, wa, wj, gap, r, full: vw - 2 * fr, fullH: vs - 2 * fr,   // the visible height, so the border shows at the bottom too (no bar there now)
       avg: [{ x: ax0, y: mid }, { x: pad, y: mid }, { x: pad, y: low }],
       joe: [{ x: ax0 + wa + gap, y: mid + jy }, { x: vw - pad - wj, y: mid + jy }, { x: vw - pad - wj, y: low + jy }],
-      hero: [s1, s1, { x: fr, y: fr, width: vw - 2 * fr, height: vh - 2 * fr }, s2, { ...s2, y: s2.y - vh }],
+      hero: [s1, s1, { x: fr, y: fr, width: vw - 2 * fr, height: vs - 2 * fr }, s2, { ...s2, y: s2.y - vh }],
       bigFs: parseFloat(getComputedStyle($('.big')).fontSize),
     };
   }

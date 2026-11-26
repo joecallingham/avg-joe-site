@@ -794,3 +794,10 @@ html.cases-off #s-cases{background:transparent!important}
 #frame-bottom{display:none!important}
 #nav{bottom:0}
 .notch-fill{clip-path:none!important}
+/* 26 Nov: the form lives in the footer (every page), as an ink band under the big pair */
+.foot .foot-bk{z-index:auto}
+.fw-wrap + .bk-home{margin-top:0}
+.foot-bk .bk-body,.foot-bk .bk-done{padding:var(--s3) var(--margin)}
+@media (min-width:761px){.foot-bk .bk-body,.foot-bk .bk-done{padding:3.6rem var(--margin)}}
+/* phones: Good to know sits beside Pages in the same section, no rule above it */
+@media (max-width:760px){.fc-side{grid-column:span 1;border-top:0;padding-top:var(--in)!important}}
