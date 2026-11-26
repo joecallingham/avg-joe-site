@@ -142,6 +142,12 @@
     requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('bk-drag')));
   };
   panel.addEventListener('transitionend', e => { if (e.target === panel && e.propertyName === 'transform') { settled = isOpen; snap(); } });
+  // phones: when the keyboard comes up it covers the bottom of the screen, so the form rides up to sit just above it
+  // (the snap above then brings the notch along with it)
+  const vv = window.visualViewport;
+  const lift = () => { if (!vv) return; const kb = Math.max(0, Math.round(innerHeight - vv.height - vv.offsetTop)); const want = isOpen && kb > 80 ? kb : 0; if (parseFloat(panel.style.bottom || 0) !== want) { panel.style.bottom = want + 'px'; requestAnimationFrame(snap); } };
+  if (vv) { vv.addEventListener('resize', lift); vv.addEventListener('scroll', lift); }
+  addEventListener('avgbook', e => { if (!e.detail) panel.style.bottom = '0px'; });
   addEventListener('avgbook', e => { if (!e.detail) settled = false; });
   ['resize', 'scroll'].forEach(t => { addEventListener(t, () => requestAnimationFrame(snap), { passive: true }); window.visualViewport?.addEventListener(t, () => requestAnimationFrame(snap)); });
   veil.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
