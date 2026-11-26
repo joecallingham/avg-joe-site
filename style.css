@@ -777,27 +777,30 @@ html.cases-off #s-cases{background:transparent!important}
 .bk .bk-go:focus-visible{outline-color:var(--cream)}
 .bk .bk-err,.bk .bk-in input.bad{color:#ff8a7e;border-bottom-color:#ff8a7e}
 .bk .bk-in input.bad{color:var(--cream)}
-/* 26 Nov: the home page form inverted too, and it keeps "Let's chat" on phones */
-.bk-home{background:var(--ink);color:var(--cream)}
-.bk-home .bk-say{color:rgba(241,238,231,.82)}
-.bk-home .bk-lab,.bk-home .bk-done-txt,.bk-home .bk-big{color:var(--cream)}
-.bk-home .bk-in input{color:var(--cream);border-bottom-color:rgba(241,238,231,.3)}
-.bk-home .bk-in input::placeholder{color:rgba(241,238,231,.38)}
-.bk-home .bk-in input:focus{background:rgba(241,238,231,.08)}
-.bk-home .bk-go{color:var(--cream)}
-.bk-home .bk-go:disabled{color:rgba(241,238,231,.45)}
-.bk-home .bk-go:focus-visible{outline-color:var(--cream)}
-.bk-home .bk-err,.bk-home .bk-in input.bad{color:#ff8a7e;border-bottom-color:#ff8a7e}
-.bk-home .bk-in input.bad{color:var(--cream)}
-@media (max-width:760px){.bk-home .bk-lab{display:block;margin-bottom:1.6rem}}
 /* 26 Nov: no bottom bar; the ink notch sits right on the screen's bottom edge */
 #frame-bottom{display:none!important}
 #nav{bottom:0}
 .notch-fill{clip-path:none!important}
-/* 26 Nov: the form lives in the footer (every page), as an ink band under the big pair */
-.foot .foot-bk{z-index:auto}
-.fw-wrap + .bk-home{margin-top:0}
-.foot-bk .bk-body,.foot-bk .bk-done{padding:var(--s3) var(--margin)}
-@media (min-width:761px){.foot-bk .bk-body,.foot-bk .bk-done{padding:3.6rem var(--margin)}}
 /* phones: Good to know sits beside Pages in the same section, no rule above it */
 @media (max-width:760px){.fc-side{grid-column:span 1;border-top:0;padding-top:var(--in)!important}}
+/* 26 Nov: the form sits in the footer's lower section as small text, on the cream, like everything else there */
+.foot-bk{background:none;color:var(--ink);z-index:auto;--bk-s:var(--small);--bk-i:var(--small)}
+.foot-bk .bk-body,.foot-bk .bk-done{display:block;padding:0!important}
+.foot-bk .bk-form{display:block!important;text-align:left}
+.foot-bk .bk-lab{display:block!important;font-weight:500;font-size:inherit;margin:0 0 .9em}
+.foot-bk .bk-say{font-family:inherit;font-weight:400;font-size:var(--small)!important;line-height:1.6;letter-spacing:-.02em;color:var(--ink);max-width:none;margin:0}
+.foot-bk .bk-in input,.foot-bk .bk-meas{font-family:inherit;font-weight:400;font-size:var(--small)!important;letter-spacing:-.02em}
+.foot-bk .bk-in input{color:var(--ink);border-bottom:1px solid rgba(11,11,11,.22);line-height:1.3}
+.foot-bk .bk-in input::placeholder{color:#8e8b86}
+.foot-bk .bk-br{display:none}
+.foot-bk .bk-foot{display:flex;flex-direction:row;align-items:baseline;justify-content:flex-start;gap:1rem;margin:.9em 0 0!important}
+.foot-bk .bk-go{font-size:var(--small)!important;color:var(--ink);text-decoration:underline;text-underline-offset:.2em;text-decoration-thickness:1px}
+.foot-bk .bk-done-txt,.foot-bk .bk-big{font-size:var(--small);text-align:left;margin:0;max-width:none}
+@media (min-width:761px){
+  .foot-cols{grid-template-rows:auto 1fr auto}
+  .foot-bk{grid-column:1/span 6;grid-row:2;align-self:start;padding-top:var(--s3)}
+  .foot-tag,.foot-c{grid-row:3}
+  .fc-side{grid-row:1/span 3}
+}
+@media (max-width:760px){.foot-bk{grid-column:1/-1}}
+.foot-bk .bk-body[hidden],.foot-bk .bk-done[hidden]{display:none!important}
