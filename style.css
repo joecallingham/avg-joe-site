@@ -764,3 +764,4 @@ html.cases-off #s-cases{background:transparent!important}
 .notch-fill path{fill:var(--ink)}
 .nb,.nb-ic{color:rgba(241,238,231,.5)}
 .nb.on,.nb:hover,.nb-ic:hover,.nb-ic:focus-visible{color:var(--cream)}
+@media (max-width:760px){#wheel-desc{bottom:calc(var(--frame) + 11rem)}}   /* phones: lifted well clear of the notch (26 Nov) */
