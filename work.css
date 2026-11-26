@@ -7,7 +7,7 @@ html.page{overscroll-behavior:auto;--edge:calc(var(--s2) * .5)}
 .page .logo{opacity:1;top:auto;bottom:calc(var(--frame) + .5rem);will-change:auto}
 .page #logo-avg{left:var(--margin)}
 .page #logo-joe{left:auto;right:var(--margin)}
-.page .nb.here{color:var(--ink)}
+.page .nb.here{color:var(--cream)}   /* the page you are on, lit on the ink notch */
 .page main{display:block}
 .page ::selection{background:var(--ink);color:var(--cream)}
 
