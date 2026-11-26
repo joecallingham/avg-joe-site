@@ -491,8 +491,7 @@
 
 /* Work: the Featured Work layout. The big title holds, the projects stack under it, and the filters on the right
    show any project that matches at least one picked category (pick as many as you like) */
-(() => {
-  const wrap = document.querySelector('.wk-fw'); if (!wrap) return;
+document.querySelectorAll('.wk-fw').forEach(wrap => {
   const mark = wrap.querySelector('.fw-mark'), rows = [...wrap.querySelectorAll('.hf')], ul = wrap.querySelector('.wk-fl');
   const nEl = wrap.querySelector('.wk-n'), clear = wrap.querySelector('.wk-clear'), on = new Set();
   const cats = r => r.dataset.cats.split('|').filter(c => c !== 'Placeholder');
@@ -504,6 +503,7 @@
     wrap.style.setProperty('--hf-bar', bar.toFixed(2) + 'px');
     let i = 0; rows.forEach(r => { r.classList.remove('lead'); if (!r.hidden) { if (!i) r.classList.add('lead'); r.style.setProperty('--i', i++); } });
   };
+  if (!ul) { addEventListener('resize', pin); document.fonts && document.fonts.ready.then(pin); pin(); return; }   // no filters here (Information's clients)
   const count = new Map();
   rows.forEach(r => cats(r).forEach(c => count.set(c, (count.get(c) || 0) + 1)));
   [...count].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).forEach(([c, n]) => {
@@ -522,4 +522,4 @@
   };
   clear.addEventListener('click', () => { on.clear(); ul.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', 'false')); apply(); });
   addEventListener('resize', pin); document.fonts && document.fonts.ready.then(pin); pin();
-})();
+});

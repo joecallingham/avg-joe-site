@@ -6,7 +6,7 @@
 <title>Information — Avg Joe</title>
 <meta name="description" content="Avg Joe is a small studio blending proper craft with smart AI, so businesses can get back to what they do best.">
 <meta name="theme-color" content="#f1eee7">
-<link rel="stylesheet" href="/style.css?v=20261126zi">
+<link rel="stylesheet" href="/style.css?v=20261126zo">
 <link rel="stylesheet" href="/work.css?v=20261125q">
 <script>try{var q=location.search;if(/[?&]fs\b/.test(q))sessionStorage.fs=1;if(/[?&]nofs\b/.test(q))sessionStorage.removeItem('fs');if(sessionStorage.fs)document.write('<link rel="stylesheet" href="/lab/fs.css?v=6"><script src="/lab/fs.js?v=5"><\/script>')}catch(e){}</script>
 </head>
@@ -141,52 +141,61 @@
     </ol>
   </section>
 
-  <!-- clients: full-screen panels that stack under the held title, as at the top of the Work page -->
-  <section class="cs-sec cl-sec">
-    <h2 class="sec-title cl-title"><span>Clients</span></h2>
-    <div class="cl-stack">
-      <article class="clp">
-        <div class="clp-bar"><span class="clp-name"><span class="clp-no">01</span>620 Tennis Multicamp</span><span class="clp-more soon">Coming soon</span></div>
-        <div class="clp-img"><img src="/img/620-clean.jpg" alt="620 Tennis Multicamp" loading="lazy"></div>
-      </article>
-      <article class="clp">
-        <div class="clp-bar"><span class="clp-name"><span class="clp-no">02</span>Brewed by Boon</span><span class="clp-more soon">Coming soon</span></div>
-        <div class="clp-img"><img src="/img/boon-sign.jpg" alt="Brewed by Boon" loading="lazy" style="object-position:42% 50%"></div>
-      </article>
-      <article class="clp">
-        <div class="clp-bar"><span class="clp-name"><span class="clp-no">03</span><a href="/work/bison/">Bison Coffee</a></span><a class="clp-more" href="/work/bison/">View case study ↘</a></div>
-        <div class="clp-img"><img src="/img/work/bison/cup.jpg" alt="Bison Coffee" loading="lazy"></div>
-      </article>
-      <article class="clp">
-        <div class="clp-bar"><span class="clp-name"><span class="clp-no">04</span>The Hunna</span><span class="clp-more soon">Coming soon</span></div>
-        <div class="clp-img"><img src="/img/the-hunna-hero.jpg" alt="The Hunna" loading="lazy" style="object-position:50% 12%"></div>
-      </article>
-      <article class="clp">
-        <div class="clp-bar"><span class="clp-name"><span class="clp-no">05</span>Download Festival</span><span class="clp-more soon">Coming soon</span></div>
-        <div class="clp-img"><img src="/img/download-hero.jpg" alt="Download Festival" loading="lazy" style="object-position:50% 38%"></div>
-      </article>
-      <article class="clp">
-        <div class="clp-bar"><span class="clp-name"><span class="clp-no">06</span>Mary Wyatt</span><span class="clp-more soon">Coming soon</span></div>
-        <div class="clp-img"><img src="/img/download-hero.jpg" alt="Mary Wyatt" loading="lazy" style="object-position:50% 62%"></div>
-      </article>
-      <article class="clp">
-        <div class="clp-bar"><span class="clp-name"><span class="clp-no">07</span>Royal Enfield</span><span class="clp-more soon">Coming soon</span></div>
-        <div class="clp-img"><img class="spray" src="/img/spray/ph-re.avif" alt="" loading="lazy" decoding="async"></div>
-      </article>
-      <article class="clp">
-        <div class="clp-bar"><span class="clp-name"><span class="clp-no">08</span>Papa Salt</span><span class="clp-more soon">Coming soon</span></div>
-        <div class="clp-img"><img class="spray" src="/img/spray/ph-ps.avif" alt="" loading="lazy" decoding="async"></div>
-      </article>
-      <article class="clp">
-        <div class="clp-bar"><span class="clp-name"><span class="clp-no">09</span>Lower Than Atlantis</span><span class="clp-more soon">Coming soon</span></div>
-        <div class="clp-img"><img class="spray" src="/img/spray/ph-lta.avif" alt="" loading="lazy" decoding="async"></div>
-      </article>
-      <article class="clp">
-        <div class="clp-bar"><span class="clp-name"><span class="clp-no">10</span><a href="/work/figtree/">Figtree</a></span><a class="clp-more" href="/work/figtree/">View case study ↘</a></div>
-        <div class="clp-img"><img src="/img/work/figtree/card.jpg" alt="Figtree" loading="lazy"></div>
-      </article>
+  <!-- clients, laid out like Featured Work: the big Good / Company pair holds, the clients slide up and stack on the left,
+       and a short note stays still on the right (page.js) -->
+  <div class="wk-fw cl-fw">
+    <h2 class="fw-mark" aria-label="Good Company, our clients"><span class="fm-avg" aria-hidden="true">Good</span><span class="fm-joe" aria-hidden="true">Company</span></h2>
+    <div class="fw-body">
+      <div class="hf-stack">
+          <article class="hf">
+            <div class="hf-bar"><span class="hf-name"><span class="hf-no">01</span>620 Tennis Multicamp</span><span class="hf-more soon">Coming soon</span></div>
+            <span class="hf-img" aria-hidden="true"><img src="/img/620-clean.jpg" alt="620 Tennis Multicamp" loading="lazy"></span>
+          </article>
+          <article class="hf">
+            <div class="hf-bar"><span class="hf-name"><span class="hf-no">02</span>Brewed by Boon</span><span class="hf-more soon">Coming soon</span></div>
+            <span class="hf-img" aria-hidden="true"><img src="/img/boon-sign.jpg" alt="Brewed by Boon" loading="lazy" style="object-position:42% 50%"></span>
+          </article>
+          <article class="hf">
+            <div class="hf-bar"><span class="hf-name"><span class="hf-no">03</span>Bison Coffee</span><a class="hf-more" href="/work/bison/">View case study ↘</a></div>
+            <a class="hf-img" href="/work/bison/" tabindex="-1" aria-hidden="true"><img src="/img/work/bison/cup.jpg" alt="Bison Coffee" loading="lazy"></a>
+          </article>
+          <article class="hf">
+            <div class="hf-bar"><span class="hf-name"><span class="hf-no">04</span>The Hunna</span><span class="hf-more soon">Coming soon</span></div>
+            <span class="hf-img" aria-hidden="true"><img src="/img/the-hunna-hero.jpg" alt="The Hunna" loading="lazy" style="object-position:50% 12%"></span>
+          </article>
+          <article class="hf">
+            <div class="hf-bar"><span class="hf-name"><span class="hf-no">05</span>Download Festival</span><span class="hf-more soon">Coming soon</span></div>
+            <span class="hf-img" aria-hidden="true"><img src="/img/download-hero.jpg" alt="Download Festival" loading="lazy" style="object-position:50% 38%"></span>
+          </article>
+          <article class="hf">
+            <div class="hf-bar"><span class="hf-name"><span class="hf-no">06</span>Mary Wyatt</span><span class="hf-more soon">Coming soon</span></div>
+            <span class="hf-img" aria-hidden="true"><img src="/img/download-hero.jpg" alt="Mary Wyatt" loading="lazy" style="object-position:50% 62%"></span>
+          </article>
+          <article class="hf">
+            <div class="hf-bar"><span class="hf-name"><span class="hf-no">07</span>Royal Enfield</span><span class="hf-more soon">Coming soon</span></div>
+            <span class="hf-img" aria-hidden="true"><img class="spray" src="/img/spray/ph-re.avif" alt="" loading="lazy" decoding="async"></span>
+          </article>
+          <article class="hf">
+            <div class="hf-bar"><span class="hf-name"><span class="hf-no">08</span>Papa Salt</span><span class="hf-more soon">Coming soon</span></div>
+            <span class="hf-img" aria-hidden="true"><img class="spray" src="/img/spray/ph-ps.avif" alt="" loading="lazy" decoding="async"></span>
+          </article>
+          <article class="hf">
+            <div class="hf-bar"><span class="hf-name"><span class="hf-no">09</span>Lower Than Atlantis</span><span class="hf-more soon">Coming soon</span></div>
+            <span class="hf-img" aria-hidden="true"><img class="spray" src="/img/spray/ph-lta.avif" alt="" loading="lazy" decoding="async"></span>
+          </article>
+          <article class="hf">
+            <div class="hf-bar"><span class="hf-name"><span class="hf-no">10</span>Figtree</span><a class="hf-more" href="/work/figtree/">View case study ↘</a></div>
+            <a class="hf-img" href="/work/figtree/" tabindex="-1" aria-hidden="true"><img src="/img/work/figtree/card.jpg" alt="Figtree" loading="lazy"></a>
+          </article>
+        <div class="hf-hold" aria-hidden="true"></div>
+      </div>
+      <aside class="fw-side">
+        <h3>Clients</h3>
+        <p>Some of the people we've made things with.</p>
+        <a class="all-work" href="/work/">All work ↘</a>
+      </aside>
     </div>
-  </section>
+  </div>
 
 </main>
 
@@ -215,7 +224,7 @@
 </nav>
 
 <script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
-<script src="/page.js?v=20261126c"></script>
+<script src="/page.js?v=20261126zm"></script>
 <script src="/information/hv.js?v=20261130x"></script>
 <script src="/information/wd.js?v=20261125o"></script>
 <script src="/spray.js?v=20261126t" defer></script>

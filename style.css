@@ -735,7 +735,7 @@ html.intro-dark .nb-ic:hover{color:var(--cream)}
 /* Let's Chat fills the rest of the screen under the Case Studies bar, so the case studies' own scroll runs until the form
    reaches the bar; only then does the whole layer (title, bar and form) move up together */
 /* (26 Nov) Joe: the form stays its own size, not a full screen */
-/* Work: every project's picture runs exactly to the foot of the screen once its bar has stacked, so at the end of the
+/* Work and Information clients: every project's picture runs exactly to the foot of the screen once its bar has stacked, so at the end of the
    list they all move up together instead of the last one sliding over the rest */
 .wk-fw .fw-body .hf-img{height:calc(100vh - var(--hf-top,10rem) - (var(--i,0) + 1) * var(--hf-bar,36px) - 1px);height:calc(100svh - var(--hf-top,10rem) - (var(--i,0) + 1) * var(--hf-bar,36px) - 1px)}
 .wk-fw .hf-hold{height:30vh;height:30svh}
@@ -743,3 +743,8 @@ html.intro-dark .nb-ic:hover{color:var(--cream)}
    (every block in it has its own background), so the footer shows below the form */
 html.cases-off #s-cases{background:transparent!important}
 .cases-tail{pointer-events:none}
+.cl-fw .fw-side h3{font:inherit;margin:0 0 1.1em}
+.cl-fw{background:var(--cream);position:relative;z-index:1}
+@media (max-width:760px){.cl-fw .fw-side{display:none!important}}
+/* phones: no "Let's chat" label on the booking forms */
+@media (max-width:760px){.bk-lab{display:none}}
