@@ -150,13 +150,19 @@
     const m = ctx.measureText(s.textContent), r = s.getBoundingClientRect();
     return { l: r.left - m.actualBoundingBoxLeft, r: r.left + m.actualBoundingBoxRight };
   };
+  // each word's side spacing, as a share of its size, measured once (the fonts are the same in every browser, so these hold
+  // on iPhone too; the live canvas measure above is only the fallback for a word not in this list)
+  const L = { 'Extra': .073, 'Featured': .073, 'Made by': .073, 'Hand': .073 };
+  const R = { 'Ordinary': .073, 'Work': .097, 'Hand': .0279, 'Picked': .0279 };
   const align = () => document.querySelectorAll('.foot-mark, .fw-mark, .info-mark').forEach(mk => {
     const a = mk.querySelector('.fm-avg'), j = mk.querySelector('.fm-joe');
     if (!a || !j) return;
+    const ta = a.textContent.trim(), tj = j.textContent.trim();
+    if (ta in L && tj in R) { a.style.translate = `${-L[ta]}em 0`; j.style.translate = `${-R[tj]}em 0`; return; }
     a.style.translate = ''; j.style.translate = '';
     const box = mk.getBoundingClientRect(), cs = getComputedStyle(mk);
-    const L = box.left + parseFloat(cs.paddingLeft), R = box.right - parseFloat(cs.paddingRight);
-    const dl = L - ink(a).l, dr = R - ink(j).r;
+    const l = box.left + parseFloat(cs.paddingLeft), r = box.right - parseFloat(cs.paddingRight);
+    const dl = l - ink(a).l, dr = r - ink(j).r;
     if (Math.abs(dl) > 0.3) a.style.translate = dl.toFixed(1) + 'px 0';
     if (Math.abs(dr) > 0.3) j.style.translate = dr.toFixed(1) + 'px 0';
   });

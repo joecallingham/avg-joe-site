@@ -800,3 +800,9 @@ html.cases-off #s-cases{background:transparent!important}
 @media (max-width:760px){.fc-side{display:none!important}}   /* phones: no Good to know in the footer */
 @media (max-width:760px){.notch{display:grid;grid-template-columns:1fr auto 1fr;column-gap:2.4rem;justify-content:stretch}.notch > .nb[data-k="work"]{justify-self:end}.notch > .nb[data-k="info"]{justify-self:start}}   /* phones: Book call sits dead centre */
 .cases-over > .sec-title{padding:.9rem var(--margin) .8rem!important;line-height:1.35}   /* the Case Studies bar is as slim as the project bars above it */
+/* big two-word titles: each word's ink on the text margin (the letters' own side spacing taken off), in CSS so it holds
+   in every browser even before any script runs; spray.js applies the same values */
+.foot-mark .fm-avg,.fw-mark .fm-avg,.info-mark .fm-avg{translate:-.073em 0}
+.foot-mark .fm-joe{translate:-.073em 0}
+.fw-mark .fm-joe{translate:-.097em 0}
+.wk-fw .fw-mark .fm-joe,.info-mark .fm-joe{translate:-.0279em 0}
