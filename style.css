@@ -650,3 +650,16 @@ html.bk-on .logo{opacity:0;pointer-events:none}   /* the corner logos step aside
 .bk-home{z-index:6}
 .bk-br{display:none}
 @media (min-width:761px){.bk-br{display:inline}}
+/* the Case Studies bar under Featured Work: the same space above and below its words */
+.cases-over > .sec-title{padding-top:calc(var(--title-b) + .25em)!important;padding-bottom:calc(var(--title-b) - .25em)!important}
+/* the forms, closer to Joe's mockup: the serif no bigger than the sans blanks, tighter lines, Send kept at its size,
+   and on desktop the home form sits in the middle of its band (same space above Let's chat as below Send) */
+:root{--bk-s:calc(var(--fs-body) * 1.12)}
+.bk-say{line-height:1.12}
+.bk-go{font-size:calc(var(--fs-body) * 1.25)}
+@media (min-width:761px){
+  .bk-home .bk-body,.bk-home .bk-done{padding:4.2rem var(--margin) 3.4rem}
+  .bk-foot{margin-top:2.6rem}
+  .bk-lab{margin-bottom:2.2rem}
+}
+@media (max-width:760px){:root{--bk-s:calc(var(--fs-title) * 1.05)}}
