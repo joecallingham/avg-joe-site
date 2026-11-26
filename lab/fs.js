@@ -38,7 +38,24 @@
   const heroDood = () => document.querySelectorAll('.info-hero h1, .cs-hero h1').forEach(h => { const r = document.createRange(); r.selectNodeContents(h); const rs = r.getClientRects(), last = rs[rs.length - 1], hb = h.getBoundingClientRect(); if (!last) return;
     let d = h.querySelector('.fs-hd'); if (!d) { d = new Image(); d.className = 'fs-hd'; d.alt = ''; d.src = '/img/spray/ft-' + pick() + '.webp?v=3'; h.appendChild(d); }
     d.style.left = (last.right - hb.left) + 'px'; d.style.top = (last.top - hb.top + last.height / 2) + 'px'; });
-  const go = () => { grid(); build(); heroDood(); addEventListener('resize', heroDood); document.fonts && document.fonts.ready.then(heroDood); requestAnimationFrame(loop); addEventListener('resize', place); document.fonts && document.fonts.ready.then(place); addEventListener('load', place); };
+  // key words in the big sentences go serif, a word or two per sentence, as Ordinary does in the footer
+  const KEY = [
+    ['#s-big .big', ['ordinary.']], ['#s-line', ['ordinary']],
+    ['#case-boon h2', ['trust.']], ['.case-620 h2, #case-620 h2', ['coaching.']],
+    ['.case h2', ['following', 'crowd.', 'terms.']],
+    ['.info-hero h1', ['best.', 'hand,']], ['.ca-state', ['final', 'say.', 'mountains.', 'without', 'us.', 'home.', 'spreadsheet.']],
+    ['.cs-hero h1', ['mountains', 'warmth', 'homes']],
+  ];
+  const serif = () => KEY.forEach(([sel, words]) => document.querySelectorAll(sel).forEach(el => {
+    const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), nodes = []; while (tw.nextNode()) nodes.push(tw.currentNode);
+    nodes.forEach(n => { if (n.parentElement.closest('.fs-s, .cycle, .craft, .ai, script')) return;
+      const re = new RegExp('(^|\\s)(' + words.map(w => w.replace(/[.,]/g, m => '\\' + m)).join('|') + ')(?=\\s|$)', 'g');
+      if (!re.test(n.data)) return; re.lastIndex = 0;
+      const f = document.createDocumentFragment(); let last = 0, m;
+      while ((m = re.exec(n.data))) { const st = m.index + m[1].length; f.append(n.data.slice(last, st)); const sp = document.createElement('span'); sp.className = 'fs-s'; sp.textContent = m[2]; f.append(sp); last = st + m[2].length; }
+      f.append(n.data.slice(last)); n.replaceWith(f); });
+  }));
+  const go = () => { serif(); grid(); build(); heroDood(); addEventListener('resize', heroDood); document.fonts && document.fonts.ready.then(heroDood); requestAnimationFrame(loop); addEventListener('resize', place); document.fonts && document.fonts.ready.then(place); addEventListener('load', place); };
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', go) : go();
   // the little switch, bottom left
   addEventListener('DOMContentLoaded', () => { const s = document.createElement('a'); s.className = 'fs-sw'; s.href = '?nofs'; s.textContent = 'Footer style: on'; document.body.appendChild(s); });

@@ -47,3 +47,5 @@
 .fs .wd-sec .st-word,.fs .cs-did .st-word{font-size:max(1.6rem,19px)!important;line-height:1.1!important;letter-spacing:-.04em!important}
 .fs .wd-sec .st-txt,.fs .cs-did .st-txt{font-size:var(--fs-b)!important;line-height:1.38!important;letter-spacing:-.02em!important;color:var(--grey)}
 .fs .cs-did .st-no,.fs .wd-sec .st-no{color:var(--grey)}
+/* key words inside the big sentences, in the serif (fs.js picks them) */
+.fs .fs-s{font-family:"Riccione",Georgia,serif;font-weight:300;letter-spacing:-.025em;font-size:1.14em;line-height:0}
