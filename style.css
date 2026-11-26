@@ -818,3 +818,4 @@ html.cases-off #s-cases{background:transparent!important}
   html.crios .notch-fill path{fill:#343739}
   html.crios .bk{background:#343739}
 }
+html.crios body::after{display:none}   /* Chrome on iPhone shares Safari's engine but not its toolbar tinting: no ink strip there */
