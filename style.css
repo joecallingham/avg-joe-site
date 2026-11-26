@@ -714,9 +714,15 @@ html.bk-on .logo{opacity:0;pointer-events:none}   /* the corner logos step aside
 .wk-fl button[aria-pressed="true"]::after{content:'×';margin-left:.15em}
 .wk-fl .n,.wk-fl button[aria-pressed="true"] .n{color:#bdb9b1;margin-left:0}
 @media (max-width:760px){.wk-fl{columns:2;column-gap:var(--gutter)}}
-/* Work: the small column (filters) on the left, the projects on the right */
-@media (min-width:761px){
-  .wk-fw .fw-body{grid-template-columns:1fr 3fr}
-  .wk-fw .fw-side{order:-1;border-left:0;border-right:1px solid var(--ink);padding-left:var(--margin)}
-}
+/* Work: projects on the left, filters in the small column on the right (as Featured Work) */
 @media (max-width:760px){.wk-fw .fw-side{width:100%;box-sizing:border-box}}
+
+/* desktop notch, right end: Instagram and WhatsApp icons in place of Book a call */
+.nb-soc{display:flex;align-items:center;justify-content:center;gap:1.1rem}
+.nb-ic{display:block;color:#8e8b86;transition:color .35s;line-height:0}
+.nb-ic svg{display:block;width:max(1rem,14px);height:max(1rem,14px);transform:translateY(1px)}
+.nb-ic:hover{color:var(--ink)}
+html.intro-dark .nb-ic{color:rgba(241,238,231,.5)}
+html.intro-dark .nb-ic:hover{color:var(--cream)}
+.nb-ic:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+@media (max-width:760px){.nb-soc{display:none}}
