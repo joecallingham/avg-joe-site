@@ -16,7 +16,7 @@
 
   /* ---------- smooth scroll: same Lenis settings as the home page ---------- */
   // wheel and trackpad: the smooth glide from before 25 Nov evening (lerp 0.055); touch: Lenis at the feel Joe set on his iPhone (25 Nov)
-  const lenis = new Lenis({ smoothWheel: true, lerp: 0.055, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.07, touchInertiaExponent: 1.7, touchMultiplier: 1.1, autoRaf: false });
+  const lenis = new Lenis({ smoothWheel: true, lerp: 0.055, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.07, touchInertiaExponent: 1.7, touchMultiplier: 0.9, autoRaf: false });
   const raf = t => { lenis.raf(t); requestAnimationFrame(raf); };
   requestAnimationFrame(raf);
 
