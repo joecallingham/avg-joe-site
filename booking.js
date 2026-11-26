@@ -10,7 +10,7 @@
   const panel = el('div', 'bk'); panel.id = 'book'; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-modal', 'true'); panel.setAttribute('aria-label', 'Book a call'); panel.setAttribute('aria-hidden', 'true'); panel.dataset.lenisPrevent = '';
   const FORM = `<form class="bk-form" novalidate>
         <h2 class="bk-lab">Let's chat</h2>
-        <p class="bk-say">Easy, my name is <label class="bk-in"><span class="bk-sr">Your name</span><input name="name" autocomplete="name" required maxlength="100" placeholder="Your name"></label>.
+        <p class="bk-say">Y’alright? My name is <label class="bk-in"><span class="bk-sr">Your name</span><input name="name" autocomplete="name" required maxlength="100" placeholder="Your name"></label>.
           I'm free <label class="bk-in"><span class="bk-sr">When you're free</span><input name="when" required maxlength="120" placeholder="Tuesday Afternoon"></label>.<br class="bk-br">
           You can reach me on <label class="bk-in"><span class="bk-sr">Email or telephone</span><input name="contact" autocomplete="email" required maxlength="120" placeholder="Email or Telephone"></label>.</p>
         <input class="bk-hp" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
