@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>Edge blur test</title>
+<style>
+body{margin:0;background:#f1eee7;color:#0b0b0b;font:500 14px/1.4 system-ui,sans-serif;padding:24px}
+h2{font-size:14px;margin:22px 0 10px}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.eb{position:relative;overflow:hidden;aspect-ratio:3/4;background:#ddd}
+.eb img{width:100%;height:100%;object-fit:cover;display:block}
+.eb i{position:absolute;inset:0;pointer-events:none}
+/* progressive blur rising from the bottom (and one side, per photo), like the reference: sharp at the top,
+   melting into a smooth wash at the foot; stacked layers, each blurrier and confined lower */
+.eb i.l1{--k:.04}.eb i.l2{--k:.1}.eb i.l3{--k:.18}.eb i.l4{--k:.3}.eb i.l5{--k:.45}.eb i.l6{--k:.62}.eb i.l7{--k:.8}.eb i.l8{--k:1}
+.eb i.l1{--o:0}.eb i.l2{--o:1}.eb i.l3{--o:2}.eb i.l4{--o:3}.eb i.l5{--o:4}.eb i.l6{--o:5}.eb i.l7{--o:6}.eb i.l8{--o:7}
+.eb i[class^=l]{backdrop-filter:blur(calc(var(--b) * var(--k)));-webkit-backdrop-filter:blur(calc(var(--b) * var(--k)));
+  mask:linear-gradient(to bottom,transparent calc(var(--s) + var(--o) * var(--step)),#000 calc(var(--s) + (var(--o) + 3.2) * var(--step))),
+       linear-gradient(var(--side,to left),transparent calc(var(--ss,100%) + var(--o) * var(--step)),#000 calc(var(--ss,100%) + (var(--o) + 3.2) * var(--step)));
+  mask-composite:add;-webkit-mask-composite:source-over}
+.eb i.gr{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 -.1'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;opacity:var(--g);mask:linear-gradient(to bottom,transparent var(--s),#000 100%)}
+.A{--b:40px;--s:52%;--step:7%;--g:.35}
+.B{--b:60px;--s:42%;--step:8%;--g:.45}
+.C{--b:80px;--s:32%;--step:9%;--g:.55}
+.eb i.hz{background:linear-gradient(to bottom,rgba(246,243,238,0) var(--hs),rgba(246,243,238,var(--ha)) 100%),
+  linear-gradient(var(--side,to left),rgba(246,243,238,0) calc(var(--ss,100%) + 10%),rgba(246,243,238,calc(var(--ha) * .8)) 130%)}
+.A2{--b:40px;--s:46%;--step:4.5%;--g:.3;--hs:55%;--ha:.42}
+.A3{--b:34px;--s:50%;--step:4%;--g:.25;--hs:62%;--ha:.3}
+</style></head><body>
+<script>
+// per photo: which side also softens (if any) and how far in it starts
+const imgs=[['/img/620-clean.jpg','--side:to left;--ss:62%'],['/img/boon-sign.jpg','--side:to right;--ss:70%'],['/img/bison.jpg','--side:to left;--ss:100%']];
+for (const [k,label] of [['A2','A+ · light, smoother, with haze'],['A3','A+ · lighter still']]){
+  document.write(`<h2>${label}</h2><div class="row">`+imgs.map(([s,v])=>`<div class="eb ${k}" style="${v}"><img src="${s}" alt=""><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i><i class="l5"></i><i class="l6"></i><i class="l7"></i><i class="l8"></i><i class="hz"></i><i class="gr"></i></div>`).join('')+'</div>');
+}
+</script>
+</body></html>
