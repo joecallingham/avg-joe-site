@@ -739,3 +739,7 @@ html.intro-dark .nb-ic:hover{color:var(--cream)}
    list they all move up together instead of the last one sliding over the rest */
 .wk-fw .fw-body .hf-img{height:calc(100vh - var(--hf-top,10rem) - (var(--i,0) + 1) * var(--hf-bar,36px) - 1px);height:calc(100svh - var(--hf-top,10rem) - (var(--i,0) + 1) * var(--hf-bar,36px) - 1px)}
 .wk-fw .hf-hold{height:30vh;height:30svh}
+/* the see-through tail after the form: once the work starts uncovering the footer, the section itself is see-through
+   (every block in it has its own background), so the footer shows below the form */
+html.cases-off #s-cases{background:transparent!important}
+.cases-tail{pointer-events:none}

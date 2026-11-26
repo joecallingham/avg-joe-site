@@ -502,7 +502,7 @@
 
   const spacer = $('#scroll-space');
   const foot = $('#foot');
-  let room = 0, footExtra = 0, unit = 1, endPx = 0, maxPx = 0, cur = 0, ready = false, veiling = false, brandOn = false, travel = 0;
+  let room = 0, sroom = 0, footExtra = 0, unit = 1, endPx = 0, maxPx = 0, cur = 0, ready = false, veiling = false, brandOn = false, travel = 0;
   // scroll position <-> timeline time; section 1->2 is OPEN_LEN screens long, every other section one screen
   // knots of [timeline time, screens scrolled]: section 1-2 is OPEN_LEN long, and there is a HOLD at 3 (a pause on the big sentence)
   const KNOTS = () => { const a = LEN_PART, b = a + OPEN_LEN, c = b + LEN_SHRINK, d = c + HOLD; return [[0, 0], [1, a], [2, b], [3, c], [3, d], [END, d + END - 3]]; };
@@ -512,7 +512,13 @@
     const t = unit > 1 ? Math.min(tOf(cur), END) : 0, past = Math.max(0, cur - endPx);
     unit = VH() * UNIT;
     endPx = pxOf(END);
-    room = Math.max(0, el.cases.scrollHeight - el.cases.clientHeight);
+    // a see-through tail after the form, so the case studies keep scrolling under the held Case Studies bar until the form
+    // reaches it (the form keeps its own size); the footer shows through the tail, exactly as when the section slid up
+    const tail = $('.cases-tail'), mk = $('.fw-mark'), cbar = $('.cases-over > .sec-title'), bkh = $('.bk-home');
+    let T = 0;
+    if (tail && mk && cbar && bkh) { tail.style.height = '0px'; const pinned = (parseFloat(getComputedStyle(mk).top) || 0) + mk.offsetHeight + cbar.offsetHeight - 1; T = Math.max(0, Math.round(el.cases.clientHeight - bkh.offsetHeight - pinned)); tail.style.height = T + 'px'; }
+    room = Math.max(0, el.cases.scrollHeight - el.cases.clientHeight - T);
+    sroom = room + T;
     // phones: the footer can be taller than the screen you can see, so leave room to scroll the rest of it into view
     footExtra = foot ? Math.max(0, Math.max(...[...foot.children].map(c => c.offsetTop + c.offsetHeight)) - SVH()) : 0;
     maxPx = endPx + room + VH() + footExtra;   // + one screen so the work slides up off
@@ -527,7 +533,7 @@
     const t = Math.min(tOf(cur), END);
     if (Math.abs(t - tl.time()) > 1e-5) tl.time(t);
     const past = Math.max(0, cur - endPx);
-    const st = Math.min(past, room);
+    const st = Math.min(past, sroom);
     if (Math.abs(lastSt - st) > 0.5) { el.cases.scrollTop = st; lastSt = st; }
     if (cur >= endPx) put(el.cases, 'transform', `translate3d(0,${(-(past - st)).toFixed(1)}px,0)`);      // after the last case study, the whole section slides up off screen
     if (foot) {
