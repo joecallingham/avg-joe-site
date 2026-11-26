@@ -765,3 +765,15 @@ html.cases-off #s-cases{background:transparent!important}
 .nb,.nb-ic{color:rgba(241,238,231,.5)}
 .nb.on,.nb:hover,.nb-ic:hover,.nb-ic:focus-visible{color:var(--cream)}
 @media (max-width:760px){#wheel-desc{bottom:calc(var(--frame) + 11rem)}}   /* phones: lifted well clear of the notch (26 Nov) */
+/* 26 Nov: the pop-up form inverted to match the notch (the home page form stays light) */
+.bk{background:var(--ink);color:var(--cream)}
+.bk .bk-say{color:rgba(241,238,231,.82)}
+.bk .bk-lab,.bk .bk-done-txt,.bk .bk-big{color:var(--cream)}
+.bk .bk-in input{color:var(--cream);border-bottom-color:rgba(241,238,231,.3)}
+.bk .bk-in input::placeholder{color:rgba(241,238,231,.38)}
+.bk .bk-in input:focus{background:rgba(241,238,231,.08)}
+.bk .bk-go{color:var(--cream)}
+.bk .bk-go:disabled{color:rgba(241,238,231,.45)}
+.bk .bk-go:focus-visible{outline-color:var(--cream)}
+.bk .bk-err,.bk .bk-in input.bad{color:#ff8a7e;border-bottom-color:#ff8a7e}
+.bk .bk-in input.bad{color:var(--cream)}
