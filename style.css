@@ -735,6 +735,7 @@ html.intro-dark .nb-ic:hover{color:var(--cream)}
 /* Let's Chat fills the rest of the screen under the Case Studies bar, so the case studies' own scroll runs until the form
    reaches the bar; only then does the whole layer (title, bar and form) move up together */
 /* (26 Nov) Joe: the form stays its own size, not a full screen */
-/* Work: the projects don't stack; each one simply slides up under the held Case / Studies title */
-.wk-fw .hf{position:relative;top:auto}
-.wk-fw .hf-hold{display:none}
+/* Work: every project's picture runs exactly to the foot of the screen once its bar has stacked, so at the end of the
+   list they all move up together instead of the last one sliding over the rest */
+.wk-fw .fw-body .hf-img{height:calc(100vh - var(--hf-top,10rem) - (var(--i,0) + 1) * var(--hf-bar,36px) - 1px);height:calc(100svh - var(--hf-top,10rem) - (var(--i,0) + 1) * var(--hf-bar,36px) - 1px)}
+.wk-fw .hf-hold{height:30vh;height:30svh}
