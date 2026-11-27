@@ -25,9 +25,9 @@
   const CROP = 0.5;          // how much the frame crops (vs scales) mid-move: 0 = only scales, 1 = only crops; none at the ends
   // scroll lengths (in sections) for the first three moves, which need a slower pace than the rest
   const LEN_PART = TOUCH ? 0.7 : 1.5;      // Avg Joe parting to the sentence
-  const OPEN_LEN = TOUCH ? 0.7 : 2.5;      // the image opening + Avg/Joe dropping
+  const OPEN_LEN = TOUCH ? 1 : 2.5;      // the image opening + Avg/Joe dropping
   const LEN_SHRINK = TOUCH ? 0.7 : 1.6;    // the image cropping in to the big sentence
-  const EXPAND = TOUCH ? 0.6 : LEN_SHRINK / OPEN_LEN;   // share of the open section the image expand takes; the rest is Avg and Joe settling
+  const EXPAND = TOUCH ? 0.42 : LEN_SHRINK / OPEN_LEN;   // share of the open section the image expand takes; the rest is Avg and Joe settling
   const HOLD = 0;            // screens of scrolling where nothing moves once the image has settled into the big sentence
   const WS = 0.2;            // screens of scrolling per word on the wheel (matched to the page's scroll speed)
   const SWAP_EVERY = 85;     // px of scrolling between typeface changes in the rotation words
