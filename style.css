@@ -881,3 +881,6 @@ html.crios body::after{display:none}   /* Chrome on iPhone shares Safari's engin
 .nb-soc{align-items:baseline!important;font-size:var(--small);line-height:1.6;padding:.2rem 0;height:auto!important}
 .nb-soc .nb-ic{display:block;line-height:inherit;height:auto;width:auto}
 .nb-soc .nb-ic svg{display:inline-block!important;width:1.1em!important;height:1.1em!important;transform:none!important;vertical-align:-.19em}
+/* end of home: once the case studies slide away, the see-through part of their section lets clicks through to the footer */
+html.cases-off #s-cases{pointer-events:none}
+html.cases-off #s-cases > :not(.cases-tail){pointer-events:auto}
