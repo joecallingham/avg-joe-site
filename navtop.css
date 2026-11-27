@@ -1,4 +1,4 @@
-/* PREVIEW (?top): desktop only. The notch hangs from the top of the screen, Avg / Joe sit in the top corners,
+/* PREVIEW (?top): desktop only. The notch hangs from the top of the screen, Avg / Joe stay in the bottom corners,
    the form drops down from the top, and anything that holds at the top of the screen holds just under them.
    Loaded only when html.navtop is set (head script, remembered per browser; ?notop turns it off). */
 html.navtop{--hdr:3.3rem}
@@ -15,10 +15,7 @@ html.navtop.bk-on .bk{transform:none}
 html.navtop.bk-on #nav{transform:translate(-50%,var(--bk-h,0px))}
 html.navtop #book .bk-body{padding-top:calc(var(--margin) + 3.2rem)!important;padding-bottom:calc(var(--margin) + 2.6rem)!important}
 
-/* Avg / Joe in the top corners (the home page places them itself) */
-html.navtop.page .logo{top:calc(var(--frame) + .5rem);bottom:auto}
-
-/* things that hold at the top of the screen hold just under the notch and the corner logos, with cream above them */
+/* things that hold at the top of the screen hold just under the notch, with cream above them */
 html.navtop .sec-title,html.navtop #s-cases .sec-title,html.navtop .wd-sec > .sec-title,html.navtop .ab-sec > .sec-title,
 html.navtop .wk-intro{top:var(--hdr)}
 html.navtop .sec-title::before,html.navtop .wd-sec > .sec-title::before,html.navtop .ab-sec > .sec-title::before,
