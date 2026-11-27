@@ -872,7 +872,8 @@ html.crios body::after{display:none}   /* Chrome on iPhone shares Safari's engin
 /* pop-up form (desktop): no "Let's chat", Send under the sentence, sat higher */
 @media (min-width:761px){
   #book .bk-lab{display:none}
-  #book .bk-body{padding-top:calc(var(--margin) + .6rem)}
+  #book .bk-body{padding-top:calc(var(--margin) + 3.6rem);padding-bottom:calc(var(--margin) + 5.4rem)}   /* more room above and below; the bottom clears the Avg / Joe marks */
+  #book .bk-form > .bk-say{margin:0 auto}   /* the sentence block itself centred, not just its lines */
   #book .bk-form{display:block;text-align:center;grid-column:1/-1}
   #book .bk-form > .bk-foot{flex-direction:column;align-items:center;margin-top:1.4rem!important}
 }
