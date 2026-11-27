@@ -66,16 +66,17 @@
     let d0 = 0, y0 = 0, H = 0, d = 0, dragging = false, down = false, hist = [], eat = false;
     const rubber = (x, lim) => x < 0 ? -rubberband(-x) : x > lim ? lim + rubberband(x - lim) : x;
     const rubberband = o => (o * 200 * 0.55) / (200 + 0.55 * o);
+    const TOP = () => root.classList.contains('navtop');   // ?top preview: the notch hangs from the top, so pulling it down opens the form
     const place = () => {
-      nav.style.transform = `translate(-50%,${-d}px)`;
-      panel.style.transform = `translateY(${Math.max(0, H - d)}px)`; veil.style.opacity = Math.max(0, Math.min(1, d / H));
+      nav.style.transform = `translate(-50%,${TOP() ? d : -d}px)`;
+      panel.style.transform = `translateY(${(TOP() ? -1 : 1) * Math.max(0, H - d)}px)`; veil.style.opacity = Math.max(0, Math.min(1, d / H));
     };
     nav.addEventListener('pointerdown', e => {
       if (e.button) return; down = true; dragging = false; y0 = e.clientY; hist = [[e.timeStamp, e.clientY]];
     });
     addEventListener('pointermove', e => {
       if (!down) return;
-      const dy = y0 - e.clientY;
+      const dy = TOP() ? e.clientY - y0 : y0 - e.clientY;
       if (!dragging) {
         if (Math.abs(dy) < 8) return;
         dragging = true; size(); H = panel.offsetHeight; d0 = isOpen ? H : 0;
@@ -89,7 +90,7 @@
       if (!dragging) return;
       dragging = false; eat = true; setTimeout(() => { eat = false; }, 50);
       const b = hist[hist.length - 1], a = hist.find(h => h[0] >= b[0] - 100) || b, dt = b[0] - a[0];
-      const v = dt > 0 && e.timeStamp - b[0] < 100 ? (a[1] - b[1]) / dt * 1000 : 0;   // px/s over the last tenth of a second, upward positive
+      const v = (TOP() ? -1 : 1) * (dt > 0 && e.timeStamp - b[0] < 100 ? (a[1] - b[1]) / dt * 1000 : 0);   // px/s over the last tenth of a second, upward positive
       const proj = d + (v / 1000) * 0.99 / (1 - 0.99);                   // where the flick would carry it (snappy deceleration)
       const want = proj > H / 2;
       root.classList.remove('bk-drag');
