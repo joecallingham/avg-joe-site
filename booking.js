@@ -10,7 +10,7 @@
   const panel = el('div', 'bk'); panel.id = 'book'; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-modal', 'true'); panel.setAttribute('aria-label', 'Book a call'); panel.setAttribute('aria-hidden', 'true'); panel.dataset.lenisPrevent = '';
   const FORM = `<form class="bk-form" novalidate>
         <h2 class="bk-lab">Let's chat</h2>
-        <p class="bk-say">Y’alright? My name is <label class="bk-in"><span class="bk-sr">Your name</span><input name="name" autocomplete="name" required maxlength="100" placeholder="Your name"></label>.
+        <p class="bk-say">Y’alright? I’m <label class="bk-in"><span class="bk-sr">Your name</span><input name="name" autocomplete="name" required maxlength="100" placeholder="Your name"></label>.
           I'm free <label class="bk-in"><span class="bk-sr">When you're free</span><input name="when" required maxlength="120" placeholder="Tuesday Afternoon"></label>.<br class="bk-br">
           You can reach me on <label class="bk-in"><span class="bk-sr">Email or telephone</span><input name="contact" autocomplete="email" required maxlength="120" placeholder="Email or Telephone"></label>.</p>
         <input class="bk-hp" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
@@ -38,6 +38,11 @@
   const fitAll = () => allIn().forEach(fit);
   allIn().forEach(i => i.addEventListener('input', () => { fit(i); i.classList.remove('bad'); const f = i.form; if (!f.querySelector('.bad')) f.querySelector('.bk-err').textContent = ''; }));
   const inputs = [...panel.querySelectorAll('.bk-in input')];
+  // ?top preview: once they start filling the form in, the notch's middle button reads Send and sends it (until then it reads Close)
+  const pform = panel.querySelector('.bk-form');
+  const dirty = () => !panel.querySelector('.bk-body').hidden && inputs.some(i => i.value.trim());
+  const mark = () => { const d = dirty(); if (d !== root.classList.contains('bk-dirty')) { root.classList.toggle('bk-dirty', d); dispatchEvent(new Event('avgbookdirty')); } };
+  inputs.forEach(i => i.addEventListener('input', mark));
 
   // the notch lifts by the form's height, and the form slides up under them
   const size = () => { fitAll(); root.style.setProperty('--bk-h', panel.offsetHeight + 'px'); };   // the notch and the form are both pinned to the bottom edge, so lifting by the form's height keeps them joined
@@ -126,13 +131,13 @@
     }
     $('.bk-body', box).hidden = true; const d = $('.bk-done', box); d.hidden = false;
     $('.bk-done-txt', d).textContent = emailed ? `Joe will be in touch on ${contact} to fix a time.` : 'Your email app has opened with the details: hit send and Joe will be in touch.';
-    size(); dispatchEvent(new Event('resize'));   // the home section changed height: let the page re-measure
+    mark(); size(); dispatchEvent(new Event('resize'));   // the home section changed height: let the page re-measure
   }));
 
   veil.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
   veil.addEventListener('wheel', e => e.preventDefault(), { passive: false });
   panel.addEventListener('touchmove', e => { if (panel.scrollHeight <= panel.clientHeight + 1 && !e.target.closest('input')) e.preventDefault(); }, { passive: false });
 
-  // the notch's middle button opens the form, and while it is open it reads Close and closes it (no separate close button)
-  window.AvgBook = { open: from => open(!isOpen, from), close: () => open(false) };
+  // the notch's middle button opens the form; while it is open it reads Close and closes it (in the ?top preview it reads Send once they've typed, and sends)
+  window.AvgBook = { open: from => (isOpen && root.classList.contains('navtop') && dirty()) ? pform.requestSubmit() : open(!isOpen, from), close: () => open(false) };
 })();

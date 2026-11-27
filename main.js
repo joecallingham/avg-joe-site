@@ -198,7 +198,7 @@
   const SAYS = { top: 'Scroll down', big: 'Book call', wheel: 'Book call', pick: 'Book call', work: 'Book call', end: 'Book call', soon: 'Book call', play: 'Pick a time', beat: 'Book call', info: 'Book call' };
   let saying = 'Studio', sayTl = null, hoverSay = null;
   function say(text) {
-    if (document.documentElement.classList.contains('bk-on')) text = 'Close';   // while the form is open, the middle button closes it
+    { const c = document.documentElement.classList; if (c.contains('bk-on')) text = c.contains('navtop') && c.contains('bk-dirty') ? 'Send ↘' : 'Close'; }   // while the form is open, the middle button closes it (?top: sends it once they've typed)
     if (text === saying) return;
     saying = text;
     if (sayTl) sayTl.kill();
@@ -542,12 +542,14 @@
   });
 
   addEventListener('avgbook', e => { if (e.detail) lenis.stop(); else lenis.start(); navState(); });
+  addEventListener('avgbookdirty', navState);
   const goDown = () => { const f = tOf(lenis.targetScroll), next = f < 1.99 ? 2 : RESTS.find(s => s > Math.max(2, f) + 0.01); if (next !== undefined) goTo(next); };   // to the open film, then the big sentence
   $$('.nb').forEach(a => a.addEventListener('click', e => {
     if (a.dataset.k === 'info' || a.dataset.k === 'work') return;   // Work and Info go to their pages
     e.preventDefault();
     if (a.dataset.k === 'home') { if (window.AvgBook && document.documentElement.classList.contains('bk-on')) AvgBook.close && AvgBook.close(); goTo(0); return; }   // Studio: back to the top
     if (a.dataset.k === 'book') { window.AvgBook && AvgBook.open(a); return; }
+    if (a.dataset.k === 'studio' && document.documentElement.classList.contains('bk-on')) { window.AvgBook && AvgBook.open(a); return; }   // form open: the button reads Close (or Send) and does that, even at the very top
     if (a.dataset.k === 'studio' && downOn) { goDown(); return; }
     if (a.dataset.k === 'studio' && window.AvgBook) AvgBook.open(a);   // the middle button books a call
   }));

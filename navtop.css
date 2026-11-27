@@ -5,7 +5,7 @@ html.navtop{--hdr:3.3rem}
 
 /* the notch: flipped, at the top */
 html.navtop #nav{top:0;bottom:auto}
-html.navtop #nav .notch{padding-top:0;padding-bottom:.3rem}
+html.navtop #nav .notch{padding-top:.28rem;padding-bottom:.02rem}   /* the words sit on the notch's optical centre */
 html.navtop #nav .notch-fill{top:-4px;transform:scaleY(-1)}
 html.navtop.foot-in #nav{transform:translate(-50%,calc(-100% - 5rem))}
 
@@ -21,3 +21,9 @@ html.navtop .wk-intro{top:var(--hdr)}
 html.navtop .sec-title::before,html.navtop .wd-sec > .sec-title::before,html.navtop .ab-sec > .sec-title::before,
 html.navtop .wk-intro.stuck::before{content:'';position:absolute;left:0;right:0;bottom:100%;height:var(--hdr);background:var(--cream)}
 html.navtop .info-top{top:calc(var(--hdr) - var(--hero-h,0px))}
+
+/* the form is just the sentence: Send lives in the notch (it reads Close until they type) */
+html.navtop .bk .bk-go{display:none}
+html.navtop .bk .bk-form > .bk-foot{margin-top:1rem!important}
+html.navtop .bk .bk-say{max-width:15em;margin:0 auto}
+html.navtop .bk .bk-br{display:none}
