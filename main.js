@@ -435,7 +435,7 @@
   const lenis = new Lenis({
     // wheel and trackpad (desktop): the smooth glide from before 25 Nov evening, lerp 0.055. Touch: Lenis drives it at its standard feel (no custom speeds),
     // so the iPhone Safari bar sliding in and out can't make it stick. Lenis also runs the glides for the buttons.
-    smoothWheel: !TOUCH, lerp: 0.055, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.07, touchInertiaExponent: 1.7, touchMultiplier: 0.9, autoRaf: false,   // touch feel Joe set on his iPhone (25 Nov)
+    smoothWheel: !TOUCH, lerp: 0.055, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.07, touchInertiaExponent: 1.7, touchMultiplier: 1, autoRaf: false,   // touch feel Joe set on his iPhone (25 Nov)
   });
   gsap.ticker.add(t => lenis.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
