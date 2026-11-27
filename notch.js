@@ -12,7 +12,7 @@
       svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'notch-fill'); svg.setAttribute('aria-hidden', 'true');
       svg.appendChild(document.createElementNS(NS, 'path')); notch.prepend(svg);
     }
-    const B = h - 1, F = FLANK * B, H = h + 4;   // runs a few px past the bottom so no hairline shows at the screen edge
+    const B = h, F = FLANK * B, H = h + 4;   // the feet land exactly on the notch's bottom edge (flush with the form panel); runs a few px past so no hairline shows
     svg.setAttribute('viewBox', `0 0 ${f(w)} ${f(H)}`); svg.style.width = w + 'px'; svg.style.height = H + 'px';
     svg.firstChild.setAttribute('d', `M0 ${f(B)}C${f(.55 * F)} ${f(B)} ${f(.42 * F)} 0 ${f(F)} 0H${f(w - F)}C${f(w - .42 * F)} 0 ${f(w - .55 * F)} ${f(B)} ${f(w)} ${f(B)}V${f(H)}H0Z`);
   }

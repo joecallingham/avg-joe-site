@@ -864,3 +864,19 @@ html.crios body::after{display:none}   /* Chrome on iPhone shares Safari's engin
   .foot-cols::after{margin-top:var(--fg)}
   .foot-bk{padding-top:var(--fg)!important}
 }
+
+/* nav icons: solid glyphs, no outline stroke; light on the ink notch */
+.nb-ic svg{stroke:none!important;fill:currentColor}
+.nb-ic:hover,.nb-ic:focus-visible{color:var(--cream)}
+
+/* pop-up form (desktop): no "Let's chat", Send under the sentence, sat higher */
+@media (min-width:761px){
+  #book .bk-lab{display:none}
+  #book .bk-body{padding-top:calc(var(--margin) + .6rem)}
+  #book .bk-form{display:block;text-align:center;grid-column:1/-1}
+  #book .bk-form > .bk-foot{flex-direction:column;align-items:center;margin-top:1.4rem!important}
+}
+/* nav icons sit on the text baseline, centred on the capitals, so they line up with the words in every browser */
+.nb-soc{align-items:baseline!important;font-size:var(--small);line-height:1.6;padding:.2rem 0;height:auto!important}
+.nb-soc .nb-ic{display:block;line-height:inherit;height:auto;width:auto}
+.nb-soc .nb-ic svg{display:inline-block!important;width:1.1em!important;height:1.1em!important;transform:none!important;vertical-align:-.19em}
