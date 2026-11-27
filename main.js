@@ -24,10 +24,13 @@
   const UNIT = TOUCH ? 1 : 1.2;   // desktop back to the pace before 25 Nov evening; screens of scrolling per section (higher = slower)
   const CROP = 0.5;          // how much the frame crops (vs scales) mid-move: 0 = only scales, 1 = only crops; none at the ends
   // scroll lengths (in sections) for the first three moves, which need a slower pace than the rest
-  const LEN_PART = TOUCH ? 0.7 : 1.5;      // Avg Joe parting to the sentence
-  const OPEN_LEN = TOUCH ? 1 : 2.5;      // the image opening + Avg/Joe dropping
-  const LEN_SHRINK = TOUCH ? 0.7 : 1.6;    // the image cropping in to the big sentence
-  const EXPAND = TOUCH ? 0.42 : LEN_SHRINK / OPEN_LEN;   // share of the open section the image expand takes; the rest is Avg and Joe settling
+  // screens of scrolling each intro move takes; ?tune on the address opens a panel to set them live (saved in this browser only)
+  const TN = TOUCH ? { part: 0.7, expand: 0.42, rise: 0.58, retract: 0.7, wheelIn: 0.8, swipe: 1.2, glide: 0.07 }
+                   : { part: 1.5, expand: 1.6, rise: 0.9, retract: 1.6, wheelIn: 0.6, swipe: 1.2, glide: 0.07 };
+  const TUNE = /[?&]tune\b/.test(location.search);
+  const TN0 = { ...TN };
+  if (TUNE) try { Object.assign(TN, JSON.parse(localStorage.getItem('avgTune' + (TOUCH ? 'Touch' : 'Desk')) || '{}')); } catch (e) {}
+  const EXPAND = TOUCH ? 0.42 : 0.64;   // timeline split of the open section: the image expand, then Avg and Joe settling (their scroll lengths are TN.expand and TN.rise)
   const HOLD = 0;            // screens of scrolling where nothing moves once the image has settled into the big sentence
   const WS = 0.2;            // screens of scrolling per word on the wheel (matched to the page's scroll speed)
   const SWAP_EVERY = 85;     // px of scrolling between typeface changes in the rotation words
@@ -435,7 +438,7 @@
   const lenis = new Lenis({
     // wheel and trackpad (desktop): the smooth glide from before 25 Nov evening, lerp 0.055. Touch: Lenis drives it at its standard feel (no custom speeds),
     // so the iPhone Safari bar sliding in and out can't make it stick. Lenis also runs the glides for the buttons.
-    smoothWheel: !TOUCH, lerp: 0.055, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.07, touchInertiaExponent: 1.7, touchMultiplier: 1.2, autoRaf: false,   // touch feel Joe set on his iPhone (25 Nov)
+    smoothWheel: !TOUCH, lerp: 0.055, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: TN.glide, touchInertiaExponent: 1.7, touchMultiplier: TN.swipe, autoRaf: false,   // touch feel Joe set on his iPhone (25 Nov)
   });
   gsap.ticker.add(t => lenis.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
@@ -445,7 +448,7 @@
   let room = 0, sroom = 0, held = 0, footExtra = 0, unit = 1, endPx = 0, maxPx = 0, cur = 0, ready = false, veiling = false, brandOn = false, travel = 0;
   // scroll position <-> timeline time; section 1->2 is OPEN_LEN screens long, every other section one screen
   // knots of [timeline time, screens scrolled]: section 1-2 is OPEN_LEN long, and there is a HOLD at 3 (a pause on the big sentence)
-  const KNOTS = () => { const a = LEN_PART, b = a + OPEN_LEN, c = b + LEN_SHRINK, d = c + HOLD; const e = d + (TOUCH ? 0.8 : 0.6), f = e + WE - 4; return [[0, 0], [1, a], [2, b], [3, c], [3, d], [4, e], [WE, f], [END, f + (END - WE) * (TOUCH ? 0.8 : 1)]]; };   // the steps into and out of the wheel are short (shorter still on phones), so no long empty gaps   // the big sentence -> wheel step is 0.6 of a screen, so there's no long empty gap between them
+  const KNOTS = () => { const a = TN.part, x = a + TN.expand, b = x + TN.rise, c = b + TN.retract, d = c + HOLD; const e = d + TN.wheelIn, f = e + WE - 4; return [[0, 0], [1, a], [1 + EXPAND, x], [2, b], [3, c], [3, d], [4, e], [WE, f], [END, f + (END - WE) * (TOUCH ? 0.8 : 1)]]; };   // the steps into and out of the wheel are short (shorter still on phones), so no long empty gaps   // the big sentence -> wheel step is 0.6 of a screen, so there's no long empty gap between them
   const pxOf = t => { const k = KNOTS(); for (let i = 1; i < k.length; i++) { const [t0, s0] = k[i - 1], [t1, s1] = k[i]; if (t <= t1 && t1 > t0) return unit * (s0 + (t - t0) / (t1 - t0) * (s1 - s0)); } const [tl1, sl1] = k[k.length - 1]; return unit * (sl1 + t - tl1); };
   const tOf = px => { const s = px / unit, k = KNOTS(); for (let i = 1; i < k.length; i++) { const [t0, s0] = k[i - 1], [t1, s1] = k[i]; if (s <= s1) return s1 > s0 ? t0 + (s - s0) / (s1 - s0) * (t1 - t0) : t1; } const [tl1, sl1] = k[k.length - 1]; return tl1 + s - sl1; };
   function metrics() {
@@ -759,6 +762,11 @@
     goTo, jumpTo, RESTS, lenis, cy, get intro() { return !!introTl; }, get gap() { return gapState.s; },
     get t() { return tl && tl.time(); }, get target() { return tOf(lenis.targetScroll); }, pxOf: t => pxOf(t),
   };
+  if (TUNE) {
+    window.__avgTune = { TN, TN0, key: 'avgTune' + (TOUCH ? 'Touch' : 'Desk'),
+      apply() { lenis.options.touchMultiplier = TN.swipe; lenis.options.syncTouchLerp = TN.glide; metrics(); render(); } };
+    const sc = document.createElement('script'); sc.src = '/tune.js?v=20261127e'; document.head.appendChild(sc);
+  }
 })();
 
 // Home Featured Work: rows stack under the held title like the Work page; the last picture runs to the foot of the screen
